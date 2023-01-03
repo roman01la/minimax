@@ -1,0 +1,20 @@
+{:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+
+        org.joml/joml {:mvn/version "1.10.5"}
+
+        org.lwjgl/lwjgl {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-glfw {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-bgfx {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-assimp {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-stb {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-nuklear {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-yoga {:mvn/version "3.3.1"}
+
+        org.lwjgl/lwjgl$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-glfw$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-bgfx$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-assimp$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-stb$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-nuklear$natives-macos-arm64 {:mvn/version "3.3.1"}
+        org.lwjgl/lwjgl-yoga$natives-macos-arm64 {:mvn/version "3.3.1"}}
+ :paths ["src" "resources"]}

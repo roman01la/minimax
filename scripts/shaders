@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+mkdir -p /Users/romanliutikov/git/minimax/resources/shaders_out
+rm -f /Users/romanliutikov/git/minimax/resources/shaders_out/*
+
+for file in /Users/romanliutikov/git/minimax/resources/shaders/vs_*
+do
+  shaderc -f $file \
+          -o "/Users/romanliutikov/git/minimax/resources/shaders_out/$(basename $file .sc).bin" \
+          --type vertex --platform osx --profile metal -O 3
+done
+
+for file in /Users/romanliutikov/git/minimax/resources/shaders/fs_*
+do
+  shaderc -f $file \
+          -o "/Users/romanliutikov/git/minimax/resources/shaders_out/$(basename $file .sc).bin" \
+          --type fragment --platform osx --profile metal -O 3
+done

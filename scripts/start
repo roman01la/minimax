@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+clojure -J-Djava.awt.headless=true -J-Dorg.lwjgl.util.Debug=true -M -m fg.core
