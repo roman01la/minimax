@@ -18,7 +18,7 @@
   (:import (java.util.function Consumer)
            (org.joml Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
-           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa)
+           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
            (org.lwjgl.system Configuration MemoryUtil Platform)))
 
 (set! *warn-on-reflection* true)
@@ -67,10 +67,19 @@
             (.reset listeners/reset-flags)
             (.format listeners/texture-format)))))
 
-  (when (= (Platform/get) Platform/MACOSX)
-    (-> init
-        (.platformData)
-        (.nwh (GLFWNativeCocoa/glfwGetCocoaWindow window))))
+  (condp = (Platform/get)
+    Platform/MACOSX
+    (-> (.platformData init)
+        (.nwh (GLFWNativeCocoa/glfwGetCocoaWindow window)))
+
+    Platform/LINUX
+    (-> (.platformData init)
+        (.ndt (GLFWNativeX11/glfwGetX11Display))
+        (.nwh (GLFWNativeX11/glfwGetX11Window window)))
+
+    Platform/WINDOWS
+    (-> (.platformData init)
+        (.nwh (GLFWNativeWin32/glfwGetWin32Window window))))
 
   (when-not (bgfx/init init)
     (throw (RuntimeException. "Error initializing bgfx renderer"))))
