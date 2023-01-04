@@ -7,6 +7,7 @@
     [minimax.clock :as clock]
     [minimax.objects.camera :as camera]
     [minimax.passes :as passes]
+    [minimax.ui :as ui]
     [fg.state :as state]
     [fg.listeners :as listeners]
     [minimax.objects.light :as light]
@@ -14,11 +15,12 @@
     [fg.passes.shadow :as pass.shadow]
     [fg.passes.geometry :as pass.geom]
     [fg.passes.combine :as pass.comb]
-    [fg.passes.picking :as pass.picking])
+    [fg.passes.picking :as pass.picking]
+    [fg.ui])
   (:import (java.util.function Consumer)
            (org.joml Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
-           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
+           (org.lwjgl.glfw Callbacks GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
            (org.lwjgl.system Configuration MemoryUtil Platform)))
 
 (set! *warn-on-reflection* true)
@@ -86,6 +88,8 @@
 
 (println (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
+(ui/init (:vwidth @state/state) (:vheight @state/state))
+
 (def camera
   (atom
     (camera/create-perspective-camera
@@ -123,8 +127,9 @@
 (def cloud-2-obj
   (obj/find-by-name @scene "cloud_2"))
 
-(defn render [dt]
-  (let [pos1 (obj/position cloud-1-obj)
+(defn render []
+  (let [dt (/ (clock/dt clock) 1e9)
+        pos1 (obj/position cloud-1-obj)
         pos2 (obj/position cloud-2-obj)
         y (-> (Math/sin (/ (clock/time clock) 200))
               (/ 100))
@@ -145,22 +150,29 @@
 
     (obj/rotate-y castle-obj (* dt 0.1))))
 
+(defn render-ui []
+  (let [dt (/ (clock/dt clock) 1e6)]
+    (fg.ui/ui-root dt (:width @state/state) (:height @state/state))))
+
 ;; Rendering loop
 (def curr-frame (atom nil))
 
 (defn run []
+  (clock/step clock)
+
   (pass.shadow/setup d-light) ;; setup pass shadow
   (pass.geom/setup camera) ;; render pass geometry
   (pass.picking/setup camera) ;; picking pass
 
-  (render (/ (clock/step clock) 1e9))
+  (render)
 
   (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
   (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
   (obj/render @scene (:id passes/picking)) ;; picking id pass
+  (ui/render (:width @state/state) (:height @state/state) (:dpr @state/state) render-ui) ;; ui pass
   (pass.comb/render) ;; render combine pass
 
-  #_
+  #_#_
   (pass.picking/pick @curr-frame)
   (pass.picking/blit)
 
@@ -177,9 +189,11 @@
     (run))
 
   ;; Disposing the program
+  (ui/shutdown)
   (bgfx/shutdown)
+  (Callbacks/glfwFreeCallbacks window)
   (GLFW/glfwDestroyWindow window)
   (GLFW/glfwTerminate)
-
+  (.free (GLFW/glfwSetErrorCallback nil))
   ;; Stop file watcher
   (fg.dev/stop))

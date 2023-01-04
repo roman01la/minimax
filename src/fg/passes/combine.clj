@@ -8,6 +8,7 @@
     [fg.passes.geometry :as pass.geom]
     [fg.shader :as sd]
     [fg.state :as state]
+    [minimax.ui :as ui]
     [minimax.uniform :as u]
     [minimax.texture :as t]
     [minimax.view :as view])
@@ -66,6 +67,9 @@
 (def u-tex-screen
   (delay (u/create "s_texScreen" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
 
+(def u-tex-ui
+  (delay (u/create "s_texUI" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
+
 (def combine-shader
   (sd/load-program "fs_combine" "vs_combine"))
 
@@ -82,10 +86,11 @@
               BGFX/BGFX_STATE_WRITE_A))
     (obj/render screen-camera (:id passes/combine))
 
-    (u/set-texture @u-tex-screen pass.geom/screen-texture 0)
+    (u/set-texture @u-tex-ui ui/texture 0)
+    (u/set-texture @u-tex-screen pass.geom/screen-texture 1)
 
-    (u/set-value @u-ssao-samples ssao-kernel 64)
-    (u/set-texture @u-ssao-noise @ssao-noise-texture 1)
+    #_(u/set-value @u-ssao-samples ssao-kernel 64)
+    #_(u/set-texture @u-ssao-noise @ssao-noise-texture 1)
 
     (u/set-texture @pass.geom/u-tex-position pass.geom/position-texture 2)
     (u/set-texture @pass.geom/u-tex-normal pass.geom/normal-texture 3)

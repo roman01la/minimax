@@ -22,12 +22,13 @@
 (def shadow-map-fb
   (lib/with-lifecycle
     create-shadow-map-fb
-    bgfx/destroy-frame-buffer
+    fb/destroy
     [(:shadow-size @state/state)]))
 
 (def shadow-map-texture
   (lib/with-lifecycle
     #(bgfx/get-texture % 0)
+    bgfx/destroy-texture
     [@@shadow-map-fb]))
 
 (def ortho-camera

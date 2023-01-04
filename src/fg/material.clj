@@ -66,7 +66,7 @@
   (update-uniforms [this light-mtx]
     (u/set-value (:color uniforms) diffuse)
     (u/set-value (:light-mtx uniforms) light-mtx)
-    (u/set-texture (:shadow uniforms) pass.shadow/shadow-map-texture 0)
+    (u/set-texture (:shadow uniforms) pass.shadow/shadow-map-texture 4)
     (u/set-texture (:texture uniforms) (:data texture) 1)))
 
 (defn create-standard-material

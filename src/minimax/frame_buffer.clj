@@ -6,12 +6,15 @@
 (set! *warn-on-reflection* true)
 
 (defprotocol IFrameBuffer
-  (texture [this attachment-idx]))
+  (texture [this attachment-idx])
+  (destroy [this]))
 
 (deftype FrameBuffer [handle]
   IFrameBuffer
   (texture [this attachment-idx]
     (bgfx/get-texture handle attachment-idx))
+  (destroy [this]
+    (bgfx/destroy-frame-buffer handle))
   IDeref
   (deref [this]
     handle))

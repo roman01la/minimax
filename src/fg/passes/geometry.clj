@@ -11,7 +11,7 @@
     [minimax.frame-buffer :as fb]
     [bgfx.core :as bgfx]
     [minimax.view :as view])
-  (:import (org.lwjgl.bgfx BGFX BGFXAttachment)))
+  (:import (org.lwjgl.bgfx BGFX)))
 
 (defn create-geometry-fb [v-width v-height]
   (let [attachment1 (attachment/create)
@@ -47,17 +47,19 @@
 (def geometry-fb
   (lib/with-lifecycle
     create-geometry-fb
-    bgfx/destroy-frame-buffer
+    fb/destroy
     [(:vwidth @state/state) (:vheight @state/state)]))
 
 (def screen-texture
   (lib/with-lifecycle
     #(bgfx/get-texture %1 0)
+    bgfx/destroy-texture
     [@@geometry-fb]))
 
 (def position-texture
   (lib/with-lifecycle
     #(bgfx/get-texture %1 1)
+    bgfx/destroy-texture
     [@@geometry-fb]))
 
 (def u-tex-position
@@ -66,6 +68,7 @@
 (def normal-texture
   (lib/with-lifecycle
     #(bgfx/get-texture %1 2)
+    bgfx/destroy-texture
     [@@geometry-fb]))
 
 (def u-tex-normal

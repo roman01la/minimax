@@ -44,6 +44,7 @@
       (swap! state/state assoc :vwidth width :vheight height)
       (swap! camera assoc :aspect (/ width height))
       (bgfx/reset width height reset-flags texture-format)
+      #_
       (update-screen))))
 
 (def mouse-move-callback

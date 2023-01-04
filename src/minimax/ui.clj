@@ -1,1 +1,64 @@
-(ns minimax.ui)
+(ns minimax.ui
+  (:require
+    [bgfx.core :as bgfx]
+    [clojure.java.io :as io]
+    [fg.state :as state]
+    [minimax.lib :as lib]
+    [minimax.passes :as passes]
+    [minimax.util.fs :as util.fs]
+    [minimax.view :as view]
+    [minimax.ui.elements :as ui.els])
+  (:import (org.lwjgl.bgfx BGFX)
+           (org.lwjgl.nanovg NanoVG NanoVGBGFX)
+           (org.lwjgl.util.yoga Yoga)))
+
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
+(defn create-font [vg font-name file]
+  (let [data (util.fs/load-resource file)]
+    (not= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 1))))
+
+(defn create-frame-buffer [vg width height]
+  (let [fb (NanoVGBGFX/nvgluCreateFramebuffer vg width height 0)]
+    (NanoVGBGFX/nvgluSetViewFramebuffer (:id passes/ui) fb)
+    fb))
+
+(def frame-buffer
+  (lib/with-lifecycle
+    create-frame-buffer
+    #(NanoVGBGFX/nvgluDeleteFramebuffer %)
+    [@ui.els/vg (:vwidth @state/state) (:vheight @state/state)]))
+
+(def texture
+  (lib/with-lifecycle
+    #(bgfx/get-texture (.handle %) 0)
+    bgfx/destroy-texture
+    [@frame-buffer]))
+
+(defn init [width height]
+  (let [vg (NanoVGBGFX/nvgCreate true (:id passes/ui) 0)]
+    (when-not vg
+      (throw (RuntimeException. "Failed to init NanoVG")))
+    (reset! ui.els/vg vg)
+
+    (when-not (create-font vg "VarelaRound" (io/file (io/resource "fonts/VarelaRound-Regular.ttf")))
+      (throw (RuntimeException. "Failed to load VarelaRound font")))
+
+    (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
+
+(defn render* [width height f]
+  (let [el (f)]
+    (ui.els/layout el)
+    (ui.els/draw el [0 0 width height 0 0])
+    (Yoga/YGNodeFreeRecursive (:ynode el))))
+
+(defn render [width height dpr render-root]
+  (view/rect passes/ui 0 0 (* dpr width) (* dpr height))
+  (NanoVG/nvgBeginFrame @ui.els/vg width height dpr)
+  (render* width height render-root)
+  (NanoVG/nvgEndFrame @ui.els/vg))
+
+(defn shutdown []
+  (NanoVGBGFX/nvgDelete @ui.els/vg)
+  (reset! ui.els/vg nil))

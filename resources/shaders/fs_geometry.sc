@@ -3,7 +3,7 @@ $input v_normal, v_view, v_texcoord0, v_shadowcoord, v_model, v_normal0
 #include "bgfx_shader.sh"
 #include "shaderlib.sh"
 
-SAMPLER2DSHADOW(s_shadowMap, 0);
+SAMPLER2DSHADOW(s_shadowMap, 4);
 SAMPLER2D(s_texDiffuse, 1);
 
 uniform vec4 u_color;
