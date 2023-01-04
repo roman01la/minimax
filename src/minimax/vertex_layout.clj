@@ -8,7 +8,8 @@
 (defprotocol IVertexLayout
   (begin [this])
   (end [this])
-  (add [this attribute n-elements element-type]))
+  (add [this attribute n-elements element-type]
+       [this attribute n-elements element-type normalized?]))
 
 (deftype VertexLayout [layout]
   IVertexLayout
@@ -18,6 +19,8 @@
     (bgfx/vertex-layout-end layout))
   (add [this attribute n-elements element-type]
     (bgfx/vertex-layout-add layout attribute n-elements element-type))
+  (add [this attribute n-elements element-type normalized?]
+    (bgfx/vertex-layout-add layout attribute n-elements element-type normalized?))
   IDeref
   (deref [this]
     layout))
@@ -30,7 +33,7 @@
          vl (VertexLayout. layout)]
      (when (seq attributes)
        (begin vl)
-       (doseq [[attribute n-elements element-type] attributes]
-         (add vl attribute n-elements element-type))
+       (doseq [[attribute n-elements element-type normalized?] attributes]
+         (add vl attribute n-elements element-type (true? normalized?)))
        (end vl))
      vl)))

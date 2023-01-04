@@ -4,7 +4,7 @@
     [minimax.objects.camera :as camera]
     [fg.deferred :as d]
     [minimax.object :as obj]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.passes.geometry :as pass.geom]
     [fg.shader :as sd]
     [fg.state :as state]

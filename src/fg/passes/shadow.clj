@@ -4,7 +4,7 @@
     [minimax.objects.camera :as camera]
     [minimax.lib :as lib]
     [minimax.object :as obj]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.state :as state]
     [minimax.frame-buffer :as fb]
     [minimax.view :as view])

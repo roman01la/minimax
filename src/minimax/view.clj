@@ -1,5 +1,6 @@
 (ns minimax.view
-  (:require [bgfx.core :as bgfx]))
+  (:require [bgfx.core :as bgfx]
+            [minimax.lib :as lib]))
 
 (set! *warn-on-reflection* true)
 
@@ -20,7 +21,7 @@
   (frame-buffer [this fb-handle]
     (bgfx/set-view-frame-buffer id fb-handle))
   (transform [this view-mtx proj-mtx]
-    (bgfx/set-view-transform id view-mtx proj-mtx)))
+    (lib/set-view-transform id view-mtx proj-mtx)))
 
 (defn create [id]
   (View. id))

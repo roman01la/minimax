@@ -3,7 +3,7 @@
     [minimax.objects.camera :as camera]
     [minimax.lib :as lib]
     [minimax.object :as obj]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.state :as state]
     [minimax.attachment :as attachment]
     [minimax.texture :as t]

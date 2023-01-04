@@ -3,7 +3,7 @@
     [bgfx.core :as bgfx]
     [minimax.lib :as lib]
     [fg.material :as mat]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.passes.picking :as pass.picking]
     [fg.passes.shadow :as pass.shadow]
     [minimax.assimp.mesh :as assimp.mesh]

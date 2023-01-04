@@ -17,6 +17,7 @@
 
 (state/add-state-listener :mouse-move [:mx :my]
   (fn [{:keys [mouse-button mouse-button-action mx my width at eye]}]
+    #_
     (condp = [mouse-button mouse-button-action]
       [GLFW/GLFW_MOUSE_BUTTON_LEFT GLFW/GLFW_PRESS]
       (let [p (- (/ mx width) 0.5)]

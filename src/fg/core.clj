@@ -6,7 +6,7 @@
     [fg.model :as md]
     [minimax.clock :as clock]
     [minimax.objects.camera :as camera]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.state :as state]
     [fg.listeners :as listeners]
     [minimax.objects.light :as light]
@@ -17,9 +17,9 @@
     [fg.passes.picking :as pass.picking])
   (:import (java.util.function Consumer)
            (org.joml Vector3f)
-           (org.lwjgl.bgfx BGFX BGFXInit BGFXResolution)
+           (org.lwjgl.bgfx BGFXInit BGFXResolution)
            (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa)
-           (org.lwjgl.system Configuration MemoryStack MemoryUtil Platform)))
+           (org.lwjgl.system Configuration MemoryUtil Platform)))
 
 (set! *warn-on-reflection* true)
 

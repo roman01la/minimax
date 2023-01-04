@@ -3,7 +3,7 @@
     [bgfx.core :as bgfx]
     [minimax.objects.camera :as camera]
     [minimax.object :as obj]
-    [fg.passes :as passes]
+    [minimax.passes :as passes]
     [fg.shader :as sd]
     [fg.state :as state]
     [minimax.frame-buffer :as fb]
