@@ -15,9 +15,10 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
 
-(defn create-font [vg font-name file]
+(defn load-font! [vg font-name file]
   (let [data (util.fs/load-resource file)]
-    (not= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 1))))
+    (when (= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 0))
+      (throw (RuntimeException. (str "Failed to load " font-name " font"))))))
 
 (defn create-frame-buffer [vg width height]
   (let [fb (NanoVGBGFX/nvgluCreateFramebuffer vg width height 0)]
@@ -37,13 +38,12 @@
     [@frame-buffer]))
 
 (defn init [width height]
-  (let [vg (NanoVGBGFX/nvgCreate true (:id passes/ui) 0)]
+  (let [vg (NanoVGBGFX/nvgCreate false (:id passes/ui) 0)]
     (when-not vg
       (throw (RuntimeException. "Failed to init NanoVG")))
     (reset! ui.els/vg vg)
 
-    (when-not (create-font vg "VarelaRound" (io/file (io/resource "fonts/VarelaRound-Regular.ttf")))
-      (throw (RuntimeException. "Failed to load VarelaRound font")))
+    (load-font! vg "RobotoSlab-Bold" (io/file (io/resource "fonts/Roboto_Slab/RobotoSlab-Bold.ttf")))
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
