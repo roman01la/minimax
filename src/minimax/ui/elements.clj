@@ -30,7 +30,10 @@
                 :stretch Yoga/YGAlignStretch
                 :flex-end Yoga/YGAlignFlexEnd
                 :flex-start Yoga/YGAlignFlexStart}
-   :display {:flex Yoga/YGDisplayFlex}})
+   :display {:flex Yoga/YGDisplayFlex}
+   :position {:static Yoga/YGPositionTypeStatic
+              :relative Yoga/YGPositionTypeRelative
+              :absolute Yoga/YGPositionTypeAbsolute}})
 
 (def styles-mapping
   {:flex-direction #(Yoga/YGNodeStyleSetDirection %1 (get-in style-prop-mapping [:flex-direction %2]))
@@ -50,6 +53,7 @@
               (Yoga/YGNodeStyleSetPadding node Yoga/YGEdgeLeft left))
 
    :display #(Yoga/YGNodeStyleSetDisplay %1 (get-in style-prop-mapping [:display %2]))
+   :position #(Yoga/YGNodeStyleSetPositionType %1 (get-in style-prop-mapping [:position %2]))
    :flex #(Yoga/YGNodeStyleSetFlex %1 %2)
 
    :height #(Yoga/YGNodeStyleSetHeight %1 %2)
