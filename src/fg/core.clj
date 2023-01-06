@@ -4,7 +4,7 @@
     [minimax.object :as obj]
     [fg.dev]
     [fg.model :as md]
-    [minimax.clock :as clock]
+    [fg.clock :as clock]
     [minimax.objects.camera :as camera]
     [minimax.passes :as passes]
     [minimax.ui :as ui]
@@ -107,10 +107,8 @@
 (def model
   (md/load-model "models/castle.glb"))
 
-(def clock (clock/create))
-
 (defn fps []
-  (Math/round (float (/ 1e3 (/ (clock/dt clock) 1e6)))))
+  (Math/round (float (/ 1e3 (/ (clock/dt) 1e6)))))
 
 ;; scene
 (def scene
@@ -128,14 +126,14 @@
   (obj/find-by-name @scene "cloud_2"))
 
 (defn render []
-  (let [dt (/ (clock/dt clock) 1e9)
+  (let [dt (/ (clock/dt) 1e9)
         pos1 (obj/position cloud-1-obj)
         pos2 (obj/position cloud-2-obj)
-        y (-> (Math/sin (/ (clock/time clock) 200))
+        y (-> (Math/sin (/ (clock/time) 200))
               (/ 100))
-        x (-> (Math/sin (/ (clock/time clock) 1000))
+        x (-> (Math/sin (/ (clock/time) 1000))
               (/ 100))
-        z (-> (Math/cos (/ (clock/time clock) 1000))
+        z (-> (Math/cos (/ (clock/time) 1000))
               (/ 100))]
 
     (obj/rotate-y cloud-1-obj (* dt 0.3))
@@ -151,14 +149,14 @@
     (obj/rotate-y castle-obj (* dt 0.1))))
 
 (defn render-ui []
-  (let [dt (/ (clock/dt clock) 1e6)]
+  (let [dt (/ (clock/dt) 1e6)]
     (fg.ui/ui-root dt (:width @state/state) (:height @state/state))))
 
 ;; Rendering loop
 (def curr-frame (atom nil))
 
 (defn run []
-  (clock/step clock)
+  (clock/step)
 
   (pass.shadow/setup d-light) ;; setup pass shadow
   (pass.geom/setup camera) ;; render pass geometry

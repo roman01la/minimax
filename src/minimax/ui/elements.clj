@@ -142,7 +142,7 @@
        (<= mx (+ x w))
        (<= my (+ y h))))
 
-(defrecord UIRect [vg ynode children state parent-layout style]
+(defrecord UIRect [vg ynode children state parent-layout style on-mouse-down on-mouse-up]
   IDrawable
   (draw [this]
     (let [[x y w h] (get-layout ynode @parent-layout)
@@ -182,6 +182,13 @@
     (let [[x y w h] (get-layout ynode @parent-layout)
           active? (and (= 0 mouse-button) (= 1 mouse-button-action))
           hover? (point-in-rect? mx my x y w h)]
+      ;; TODO: click event (stateful)
+      ;; TODO: continuous pressed state
+      (when hover?
+        (case mouse-button-action
+          0 (when on-mouse-up (on-mouse-up))
+          1 (when on-mouse-down (on-mouse-down))
+          nil))
       (swap! state assoc :active? active? :hover? hover?)
       (run! #(mouse % opts) children))))
 

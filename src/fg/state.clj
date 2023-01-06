@@ -35,8 +35,10 @@
          :light-pos (Vector3f. -0.4 -1.0 0.6)}))
 
 (defn reset-state []
-  ;; reset mouse button state on mouse up
-  (when (= 0 (:mouse-button-action @state))
+  ;; reset mouse button state to make it singular
+  ;; TODO: continuous pressed state
+  (when (or (= 0 (:mouse-button-action @state))
+            (= 1 (:mouse-button-action @state)))
     (swap! state assoc
       :mouse-button-action nil
       :mouse-button nil)))

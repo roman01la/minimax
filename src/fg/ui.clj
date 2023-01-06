@@ -1,5 +1,6 @@
 (ns fg.ui
-  (:require [minimax.ui.elements :refer [root text rect]])
+  (:require [minimax.ui.elements :refer [root text rect]]
+            [minimax.ui.animation :as ui.anim])
   (:import (java.nio FloatBuffer)
            (org.lwjgl.nanovg NanoVG)
            (org.lwjgl.system MemoryUtil)))
@@ -39,12 +40,24 @@
        :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}
       child-text)))
 
+;; TODO: stateful UI components
+(def button-state (atom nil))
+(def button-spring (ui.anim/make-spring 5 1 2))
+(def f (volatile! (constantly 1)))
+(def click (atom 0))
+
 (defn button [props child-text]
   (rect
-    {:on-click #(prn "CLICK")
+    {:on-mouse-down (fn []
+                      (swap! click inc)
+                      (if (odd? @click)
+                        (vreset! f #(button-spring 1 2 0.16))
+                        (vreset! f #(button-spring 2 1 0.16))))
+     :on-mouse-up #(prn "mouse up")
      :style
      (merge
        {:padding [8 8 8 8]
+        :height (* 32 (@f))
         :background-color #ui/rgba [40 210 40 1]
         :hover/background-color #ui/rgba [50 230 50 1]
         :active/background-color #ui/rgba [20 150 10 1]
