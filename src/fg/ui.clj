@@ -16,20 +16,22 @@
         (recur (dec idx) (+ sum (.get buff idx)))
         (Math/round (float (/ sum 100)))))))
 
-(defn dialog [styles & children]
+(defn dialog [props & children]
   (apply rect
     (merge
-      {:padding [8 8 8 8]
-       :background-color #ui/rgba [230 190 80 1]
-       :border-width 4
-       :border-color #ui/rgba [210 160 35 1]
-       :border-radius 4}
-      styles)
+      props
+      {:style (merge
+                {:padding [8 8 8 8]
+                 :background-color #ui/rgba [230 190 80 1]
+                 :border-width 2
+                 :border-color #ui/rgba [210 160 35 1]
+                 :border-radius 4}
+                (:style props))})
     children))
 
-(defn menu-item [styles child-text]
+(defn menu-item [props child-text]
   (rect
-    {:padding [4 0 4 0]}
+    {:style {:padding [4 0 4 0]}}
     (text
       {:font-size 14
        :font-face "RobotoSlab-Bold"
@@ -37,17 +39,21 @@
        :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}
       child-text)))
 
-(defn button [styles child-text]
+(defn button [props child-text]
   (rect
-    (merge
-      {:padding [8 8 8 8]
-       :background-color #ui/rgba [40 210 40 1]
-       :border-width 4
-       :border-color #ui/rgba [30 70 30 1]
-       :border-radius 4
-       :justify-content :center
-       :align-items :center}
-      styles)
+    {:on-click #(prn "CLICK")
+     :style
+     (merge
+       {:padding [8 8 8 8]
+        :background-color #ui/rgba [40 210 40 1]
+        :hover/background-color #ui/rgba [50 230 50 1]
+        :active/background-color #ui/rgba [20 150 10 1]
+        :border-width 2
+        :border-color #ui/rgba [30 70 30 1]
+        :border-radius 4
+        :justify-content :center
+        :align-items :center}
+       (:style props))}
     (text
       {:font-size 16
        :font-face "RobotoSlab-Bold"
@@ -62,9 +68,9 @@
        :height height
        :flex-direction :column}
       (dialog
-        {:margin [8 8 8 8]
-         :justify-content :center
-         :width 80}
+        {:style {:margin [8 8 8 8]
+                 :justify-content :center
+                 :width 80}}
         (text
           {:font-size 14
            :font-face "RobotoSlab-Bold"
@@ -72,22 +78,22 @@
            :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}
           (str "FPS: " fps)))
       (rect
-        {:flex 1
-         :justify-content :center}
+        {:style {:flex 1
+                 :justify-content :center}}
         (dialog
-          {:width 180
-           :margin [0 16 0 0]
-           :align-self :flex-end}
+          {:style {:width 180
+                   :margin [0 16 0 0]
+                   :align-self :flex-end}}
           (menu-item {} "Buildings: 1")
           (menu-item {} "Fruit trees: 2")
-          (button {:margin [32 0 0 0]}
+          (button {:style {:margin [32 0 0 0]}}
             "Add item")))
       (rect
-        {:height 64
-         :justify-content :center
-         :align-items :center}
+        {:style {:height 64
+                 :justify-content :center
+                 :align-items :center}}
         (dialog
-          {:padding [8 32 8 32]}
+          {:style {:padding [8 32 8 32]}}
           (text
             {:font-size 16
              :font-face "RobotoSlab-Bold"

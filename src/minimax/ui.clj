@@ -47,16 +47,18 @@
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
-(defn render* [width height f]
+(defn render* [opts f]
   (let [el (f)]
     (ui.els/layout el)
-    (ui.els/draw el [0 0 width height 0 0])
+    (ui.els/store-layout el)
+    (ui.els/mouse el opts)
+    (ui.els/draw el)
     (Yoga/YGNodeFreeRecursive (:ynode el))))
 
-(defn render [width height dpr render-root]
+(defn render [{:keys [width height dpr] :as opts} render-root]
   (view/rect passes/ui 0 0 (* dpr width) (* dpr height))
   (NanoVG/nvgBeginFrame @ui.els/vg width height dpr)
-  (render* width height render-root)
+  (render* opts render-root)
   (NanoVG/nvgEndFrame @ui.els/vg))
 
 (defn shutdown []

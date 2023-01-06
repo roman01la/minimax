@@ -34,8 +34,16 @@
          :shadow-size 1024
          :light-pos (Vector3f. -0.4 -1.0 0.6)}))
 
+(defn reset-state []
+  ;; reset mouse button state on mouse up
+  (when (= 0 (:mouse-button-action @state))
+    (swap! state assoc
+      :mouse-button-action nil
+      :mouse-button nil)))
+
 (defn set-size [dpr]
-  (swap! state assoc :dpr dpr
+  (swap! state assoc
+         :dpr dpr
          :vwidth (* dpr (:width @state))
          :vheight (* dpr (:height @state))))
 

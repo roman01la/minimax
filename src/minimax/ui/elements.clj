@@ -7,7 +7,18 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
 
+;; NanoVG context
 (def vg (atom nil))
+
+(defprotocol IDrawable
+  (draw [this]))
+
+(defprotocol ILayout
+  (layout [this])
+  (store-layout [this]))
+
+(defprotocol IEventTarget
+  (mouse [this opts]))
 
 (def color
   (NVGColor/create))
@@ -93,7 +104,8 @@
 
 (defn insert-children [ynode children]
   (doseq [idx (range (count children))]
-    (Yoga/YGNodeInsertChild ynode (:ynode (nth children idx)) idx)))
+    (Yoga/YGNodeInsertChild ynode (:ynode (nth children idx)) idx))
+  (run! layout children))
 
 (defn get-layout [^long node parent-layout]
   (let [layout (.layout (YGNode/create node))
@@ -117,16 +129,30 @@
 (defn rgba-tag [[r g b a]]
   `(rgba ~r ~g ~b ~a (NVGColor/create)))
 
-(defprotocol IDrawable
-  (draw [this parent-layout]))
+;; Vector Elements
 
-(defprotocol ILayout
-  (layout [this]))
+(defn store-layout* [ynode parent-layout children]
+  (let [layout (get-layout ynode @parent-layout)]
+    (run! #(reset! (:parent-layout %) layout) children)
+    (run! store-layout children)))
 
-(defrecord UIRect [vg ynode children background-color border-width border-color border-radius]
+(defn point-in-rect? [mx my x y w h]
+  (and (>= mx x)
+       (>= my y)
+       (<= mx (+ x w))
+       (<= my (+ y h))))
+
+(defrecord UIRect [vg ynode children state parent-layout style]
   IDrawable
-  (draw [this parent-layout]
-    (let [[x y w h :as layout] (get-layout ynode parent-layout)]
+  (draw [this]
+    (let [[x y w h] (get-layout ynode @parent-layout)
+          {:keys [background-color border-width border-color border-radius]} style
+          background-color (or
+                             (when (:hover? @state)
+                               (if (:active? @state)
+                                 (:active/background-color style)
+                                 (:hover/background-color style)))
+                             background-color)]
       (NanoVG/nvgBeginPath vg)
       (if border-radius
         (if (number? border-radius)
@@ -136,28 +162,43 @@
         (NanoVG/nvgRect vg x y w h))
       (NanoVG/nvgClosePath vg)
 
+      (when background-color
+        (NanoVG/nvgFillColor vg background-color)
+        (NanoVG/nvgFill vg))
+
       (when (and border-color border-width)
         (NanoVG/nvgStrokeColor vg border-color)
         (NanoVG/nvgStrokeWidth vg border-width)
         (NanoVG/nvgStroke vg))
 
-      (when background-color
-        (NanoVG/nvgFillColor vg background-color)
-        (NanoVG/nvgFill vg))
-
-      (run! #(draw % layout) children)))
+      (run! draw children)))
   ILayout
   (layout [this]
-    (insert-children ynode children)
-    (run! layout children)))
+    (insert-children ynode children))
+  (store-layout [this]
+    (store-layout* ynode parent-layout children))
+  IEventTarget
+  (mouse [this {:keys [mx my mouse-button mouse-button-action] :as opts}]
+    (let [[x y w h] (get-layout ynode @parent-layout)
+          active? (and (= 0 mouse-button) (= 1 mouse-button-action))
+          hover? (point-in-rect? mx my x y w h)]
+      (swap! state assoc :active? active? :hover? hover?)
+      (run! #(mouse % opts) children))))
 
-(defn rect [styles & children]
-  (map->UIRect (assoc styles :vg @vg :ynode (create-node styles) :children children)))
+(defn rect [props & children]
+  (map->UIRect
+    (merge
+      props
+      {:vg @vg
+       :ynode (create-node (:style props))
+       :children children
+       :state (atom {:hover? false :active? false})
+       :parent-layout (atom [])})))
 
-(defrecord UIText [vg ynode text font-size font-face text-color text-align]
+(defrecord UIText [vg ynode parent-layout text font-size font-face text-color text-align]
   IDrawable
-  (draw [this parent-layout]
-    (let [[x y w h] (get-layout ynode parent-layout)]
+  (draw [this]
+    (let [[x y w h] (get-layout ynode @parent-layout)]
       (doto ^long vg
         (NanoVG/nvgFontSize font-size)
         (NanoVG/nvgFontFace ^CharSequence font-face)
@@ -165,21 +206,36 @@
         (NanoVG/nvgTextAlign text-align)
         (NanoVG/nvgText ^float x ^float y ^CharSequence text))))
   ILayout
-  (layout [this]))
+  (layout [this])
+  (store-layout [this])
+  IEventTarget
+  (mouse [this opts]))
 
 (defn text [styles text]
-  (map->UIText (assoc styles :vg @vg :ynode (create-text-node styles text) :text text)))
+  (map->UIText
+    (assoc styles
+      :vg @vg
+      :ynode (create-text-node styles text)
+      :text text
+      :parent-layout (atom []))))
 
-(defrecord UIRoot [ynode width height flex-direction children]
+(defrecord UIRoot [ynode parent-layout width height flex-direction children]
   IDrawable
-  (draw [this parent-layout]
-    (let [layout (get-layout ynode parent-layout)]
-      (run! #(draw % layout) children)))
+  (draw [this]
+    (run! draw children))
   ILayout
   (layout [this]
     (insert-children ynode children)
-    (run! layout children)
-    (Yoga/YGNodeCalculateLayout ynode width height (get-in style-prop-mapping [:flex-direction flex-direction]))))
+    (Yoga/YGNodeCalculateLayout ynode width height (get-in style-prop-mapping [:flex-direction flex-direction])))
+  (store-layout [this]
+    (store-layout* ynode parent-layout children))
+  IEventTarget
+  (mouse [this opts]
+    (run! #(mouse % opts) children)))
 
 (defn root [styles & children]
-  (map->UIRoot (assoc styles :ynode (create-node styles) :children children)))
+  (map->UIRoot
+    (assoc styles
+      :ynode (create-node styles)
+      :parent-layout (atom [0 0 (:width styles) (:height styles)])
+      :children children)))

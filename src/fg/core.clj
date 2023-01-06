@@ -169,7 +169,8 @@
   (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
   (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
   (obj/render @scene (:id passes/picking)) ;; picking id pass
-  (ui/render (:width @state/state) (:height @state/state) (:dpr @state/state) render-ui) ;; ui pass
+  (ui/render (select-keys @state/state [:width :height :dpr :mx :my :mouse-button :mouse-button-action])
+             render-ui) ;; ui pass
   (pass.comb/render) ;; render combine pass
 
   #_#_
@@ -185,6 +186,7 @@
   (fg.dev/start)
 
   (while (not (GLFW/glfwWindowShouldClose window))
+    (state/reset-state)
     (GLFW/glfwPollEvents)
     (run))
 
