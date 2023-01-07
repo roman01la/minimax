@@ -20,7 +20,7 @@
     [minimax.debug :as debug]
     [fg.ui])
   (:import (java.util.function Consumer)
-           (org.joml Vector3f)
+           (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
            (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
            (org.lwjgl.system Configuration MemoryUtil Platform)))
@@ -154,8 +154,16 @@
 
     (obj/rotate-y castle-obj (* dt 0.1))
 
+    (vreset! (:visible? debug-box) (some? @selected-object))
+
     (when-let [obj @selected-object]
-      (debug/set-object-transform obj debug-box))))
+      (let [[root & objs] (reverse (obj/obj->parent-seq obj []))
+            mtx (->> objs
+                     (reduce
+                       (fn [mtx obj]
+                         (obj/apply-matrix* mtx (:lmtx obj) mtx))
+                       (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
+        (debug/set-object-transform obj debug-box mtx)))))
 
 (defn render-ui []
   (let [dt (/ (clock/dt) 1e6)]

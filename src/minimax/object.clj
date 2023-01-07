@@ -1,4 +1,5 @@
 (ns minimax.object
+  (:require [minimax.util.scene :as util.scene])
   (:import (org.joml Matrix4f Vector3f Vector4f)))
 
 (set! *warn-on-reflection* true)
@@ -43,13 +44,20 @@
   (run! #(render % id) children))
 
 (defn add-child* [this child]
-  (update this :children conj child))
+  (util.scene/add-parent-link
+    (update this :children conj child)))
 
 (defn remove-child* [this child]
   (update this :children #(filterv (comp not #{child}) %)))
 
 (defn scene->seq [scene]
   (tree-seq #(seq (children %)) children scene))
+
+(defn obj->parent-seq [obj ret]
+  (let [parent @(:parent obj)]
+    (if parent
+      (obj->parent-seq parent (conj ret parent))
+      ret)))
 
 (defn find-by-name* [this name]
   (->> (scene->seq this)

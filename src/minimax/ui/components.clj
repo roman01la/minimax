@@ -116,13 +116,14 @@
         {:style (assoc (:text/style props) :text-color text-color)}
         text))))
 
-(defn widget-header [props title]
+(defn widget-header [{:keys [on-mouse-down expanded?]} title]
   (ui/view
-    {:style {:align-items :center
+    {:on-mouse-down on-mouse-down
+     :style {:align-items :center
              :flex-direction :row
              :padding [8 0]
              :background-color #ui/rgba [50 50 50 1]
-             :border-radius [5 5 0 0]}}
+             :border-radius (if expanded? [5 5 0 0] 5)}}
     (ui/text
       {:style {:font-size 12
                :font-face "IBMPlexMono-Regular"
@@ -130,10 +131,13 @@
                :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
       title)))
 
-(defn widget [{:keys [width height]} child]
+(defn widget [{:keys [width height on-header-click expanded?]} child]
   (view
     {:style {:width width}}
-    (widget-header {} "Scene Inspector")
+    (widget-header
+      {:on-mouse-down on-header-click
+       :expanded? expanded?}
+      "Scene Inspector")
     (scroll-view
       {:style {:width width
                :height height

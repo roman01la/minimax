@@ -63,31 +63,32 @@
                  vertex-buffer index-buffer
                  ^Matrix4f lmtx ^Matrix4f mtx material children
                  tvec ^Matrix4f light-mtx
-                 bounding-box]
+                 bounding-box visible?]
   obj/IRenderable
   (render [this id]
-    (if (or (and (= id (:id passes/shadow)) (not cast-shadow?))
-            (and (= id (:id passes/picking)) (nil? pid)))
-      nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
-      (let [shader (:shader material)
-            shadow-shader (:shadow-shader material)
-            program (condp = id
-                      (:id passes/shadow) shadow-shader
-                      (:id passes/geometry) shader
-                      (:id passes/picking) @pass.picking/shader)]
-        (assert program "shader should be set")
-        (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
-        (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
-        (when (= id (:id passes/picking))
-          (u/set-value @pass.picking/u-id pid))
-        (mat/update-uniforms material light-mtx)
-        (submit-mesh id
-                     @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
-                     @index-buffer (.size ^ArrayList (:indices index-buffer))
-                     program
-                     mtx
-                     state)
-        (obj/render* id mtx children))))
+    (when @visible?
+      (if (or (and (= id (:id passes/shadow)) (not cast-shadow?))
+              (and (= id (:id passes/picking)) (nil? pid)))
+        nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
+        (let [shader (:shader material)
+              shadow-shader (:shadow-shader material)
+              program (condp = id
+                        (:id passes/shadow) shadow-shader
+                        (:id passes/geometry) shader
+                        (:id passes/picking) @pass.picking/shader)]
+          (assert program "shader should be set")
+          (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
+          (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
+          (when (= id (:id passes/picking))
+            (u/set-value @pass.picking/u-id pid))
+          (mat/update-uniforms material light-mtx)
+          (submit-mesh id
+                       @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
+                       @index-buffer (.size ^ArrayList (:indices index-buffer))
+                       program
+                       mtx
+                       state)
+          (obj/render* id mtx children)))))
   obj/IObject3D
   (add-child [this child]
     (obj/add-child* this child))
@@ -141,5 +142,7 @@
        :tvec (Vector3f.)
        :material material
        :children []
+       :parent (volatile! nil)
        :cast-shadow? true
+       :visible? (volatile! true)
        :bounding-box (:bounding-box parsed-mesh)})))

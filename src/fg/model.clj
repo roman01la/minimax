@@ -3,7 +3,8 @@
             [fg.material :as mat]
             [minimax.assimp.texture :as t]
             [minimax.objects.group :as obj.group]
-            [minimax.objects.mesh :as obj.mesh])
+            [minimax.objects.mesh :as obj.mesh]
+            [minimax.util.scene :as util.scene])
   (:import (org.joml Matrix4f)
            (org.lwjgl PointerBuffer)
            (org.lwjgl.assimp AIMatrix4x4 AIMesh AINode AIScene Assimp)))
@@ -31,19 +32,22 @@
                                   (create-scene-graph* meshes materials))))]
     (case (count cmeshes)
       ;; single mesh node — mesh
-      1 (assoc (first cmeshes) :children children)
+      1 (util.scene/add-parent-link
+          (assoc (first cmeshes) :children children))
       ;; zero mesh node — group/empty
-      0 (obj.group/create
-          {:name name
-           :children children
-           :lmtx mtx})
+      0 (util.scene/add-parent-link
+          (obj.group/create
+            {:name name
+             :children children
+             :lmtx mtx}))
       ;; multi mesh node (mesh with multiple materials) — group
-      (obj.group/create
-        {:name name
-         ;; reset local transform on child meshes
-         :children (-> (mapv #(assoc % :lmtx (Matrix4f.)) cmeshes)
-                       (into children))
-         :lmtx mtx}))))
+      (util.scene/add-parent-link
+        (obj.group/create
+          {:name name
+           ;; reset local transform on child meshes
+           :children (-> (mapv #(assoc % :lmtx (Matrix4f.)) cmeshes)
+                         (into children))
+           :lmtx mtx})))))
 
 (defn create-scene-graph [^AIScene scene materials]
   (create-scene-graph* (.mMeshes scene) materials (.mRootNode scene)))

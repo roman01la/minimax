@@ -163,13 +163,25 @@
            :object obj
            :selected selected})))))
 
-(defn scene-graph [scene selected]
-  (mui/widget {:width 240 :height 500}
-    (tree-view
-      {:style {:padding [8 0]}
-       :object scene
-       :on-select #(reset! selected %)
-       :selected @selected})))
+(def widget-spring (ui.anim/make-spring 5 1 3))
+(def widget-spring-f (volatile! (constantly 0)))
+
+(defui scene-graph [scene selected]
+  (let [expanded? (mui/use-state false)]
+    (mui/widget
+      {:width 240
+       :height (* 500 (@widget-spring-f))
+       :expanded? @expanded?
+       :on-header-click (fn []
+                          (if-not @expanded?
+                            (vreset! widget-spring-f #(widget-spring 0 1 0.16))
+                            (vreset! widget-spring-f #(widget-spring 1 0 0.16)))
+                          (swap! expanded? not))}
+      (tree-view
+        {:style {:padding [8 0]}
+         :object scene
+         :on-select #(reset! selected %)
+         :selected @selected}))))
 
 (defn debug-ui [width height scene selected]
   (ui/root

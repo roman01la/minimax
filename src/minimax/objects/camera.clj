@@ -25,7 +25,8 @@
      :fov fov
      :aspect aspect
      :near near
-     :far far}))
+     :far far
+     :parent (volatile! nil)}))
 
 (defrecord OrthographicCamera [proj-mtx view-mtx area near far]
   ICamera
@@ -44,7 +45,8 @@
      :view-mtx (Matrix4f.)
      :area area
      :near near
-     :far far}))
+     :far far
+     :parent (volatile! nil)}))
 
 (defrecord ScreenCamera []
   obj/IRenderable
@@ -54,5 +56,5 @@
       (lib/set-view-transform id nil proj-mtx))))
 
 (defn create-screen-camera []
-  (map->ScreenCamera {}))
+  (map->ScreenCamera {:parent (volatile! nil)}))
 

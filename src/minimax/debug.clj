@@ -65,24 +65,28 @@
        :tvec (Vector3f.)
        :material @material
        :children []
+       :parent (volatile! nil)
        :cast-shadow? false
        :state lines-state
-       :debug-skip? true})))
+       :debug-skip? true
+       :visible? (volatile! false)})))
 
 (def debug-box
   (delay (create-debug-box)))
 
-(defn set-object-transform [source target]
+(defn set-object-transform [source target ^Matrix4f cmtx]
   (let [{:keys [^Vector3f min ^Vector3f max]} (:bounding-box source)
-        a0 (- (.x max) (.x min))
-        a5 (- (.y max) (.y min))
-        a10 (- (.z max) (.z min))
-        a12 (+ (.x min) (.x max))
-        a13 (+ (.y min) (.y max))
-        a14 (+ (.z min) (.z max))
+        a0 (* 0.5 (- (.x max) (.x min)))
+        a5 (* 0.5 (- (.y max) (.y min)))
+        a10 (* 0.5 (- (.z max) (.z min)))
+        a12 (* 0.5 (+ (.x min) (.x max)))
+        a13 (* 0.5 (+ (.y min) (.y max)))
+        a14 (* 0.5 (+ (.z min) (.z max)))
         mtx (Matrix4f.
               a0  0   0   0
               0   a5  0   0
               0   0   a10 0
-              a12 a13 a14 1)]
-    (.set ^Matrix4f (:lmtx target) mtx)))
+              a12 a13 a14 1)
+        ^Matrix4f lmtx (:lmtx target)]
+    (.set lmtx mtx)
+    (.mul cmtx lmtx lmtx)))

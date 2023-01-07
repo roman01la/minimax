@@ -28,4 +28,8 @@
     (obj/rotate-y* lmtx v)))
 
 (defn create [{:keys [lmtx] :as m}]
-  (map->Group (assoc m :mtx (Matrix4f.) :lmtx (or lmtx (Matrix4f.)))))
+  (map->Group
+    (assoc m
+      :mtx (Matrix4f.)
+      :lmtx (or lmtx (Matrix4f.))
+      :parent (volatile! nil))))

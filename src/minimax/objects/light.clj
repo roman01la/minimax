@@ -25,4 +25,5 @@
        :position position
        :mtx (Matrix4f.)
        :lmtx (Matrix4f.)
-       :uniforms {:position u-position}})))
+       :uniforms {:position u-position}
+       :parent (volatile! nil)})))

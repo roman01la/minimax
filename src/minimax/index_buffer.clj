@@ -19,7 +19,6 @@
       dst source true)
     (while (pos? (.remaining dst))
       (.add ret (.get dst)))
-    (prn (.size ret))
     ret))
 
 (defn- create* [^ArrayList indices]

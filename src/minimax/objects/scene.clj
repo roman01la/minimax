@@ -1,17 +1,18 @@
 (ns minimax.objects.scene
-  (:require [minimax.object :as obj])
+  (:require [minimax.object :as obj]
+            [minimax.util.scene :as util.scene])
   (:import (minimax.objects.light DirectionalLight)
            (org.joml Matrix4f)))
 
 (set! *warn-on-reflection* true)
 
-(defrecord Scene [name children]
+(defrecord Scene [name children mtx]
   obj/IRenderable
   (render [this id]
     (let [lights (obj/find-by-type this DirectionalLight)]
       ;; lights are rendered first to set up uniforms
       (run! #(obj/render % id) lights)
-      (obj/render* id (Matrix4f.) children)))
+      (obj/render* id mtx children)))
   obj/IObject3D
   (add-child [this child]
     (obj/add-child* this child))
@@ -27,5 +28,9 @@
     (obj/replace-by-name* this name obj)))
 
 (defn create [{:keys [name children]}]
-  (map->Scene {:name name
-               :children children}))
+  (util.scene/add-parent-link
+    (map->Scene
+      {:name name
+       :mtx (Matrix4f.)
+       :children children
+       :parent (volatile! nil)})))
