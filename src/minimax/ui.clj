@@ -46,18 +46,23 @@
       (throw (RuntimeException. "Failed to init NanoVG")))
     (reset! ui.ctx/vg vg)
 
-    (load-font! vg "RobotoSlab-Bold" (io/file (io/resource "fonts/Roboto_Slab/RobotoSlab-Bold.ttf")))
+    ;; loading UI fonts
+    (doseq [[dir file] [["Roboto_Slab" "RobotoSlab-Bold"]
+                        ["IBM_Plex_Mono" "IBMPlexMono-Regular"]
+                        ["IBM_Plex_Mono" "IBMPlexMono-Bold"]]]
+      (load-font! vg file (io/file (io/resource (str "fonts/" dir "/" file ".ttf")))))
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
 (def !root (atom nil))
 
 (defn render* [opts f]
+  (reset! mui/!id 0)
   (let [el (f)]
     (reset! !root el)
     (ui.pmt/layout (:vnode el))
     (ui.pmt/store-layout (:vnode el))
-    (ui/mouse el opts)
+    (ui/ui-event el opts)
     (ui.pmt/draw (:vnode el))
     (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))))
 

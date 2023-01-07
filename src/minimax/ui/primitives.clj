@@ -1,7 +1,8 @@
 (ns minimax.ui.primitives
-  (:require [minimax.ui.context :as ui.ctx])
+  (:require [minimax.ui.context :as ui.ctx]
+            [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.nanovg NanoVG)
+           (org.lwjgl.nanovg NVGColor NanoVG)
            (org.lwjgl.system MemoryUtil)
            (org.lwjgl.util.yoga YGNode Yoga)))
 
@@ -38,22 +39,28 @@
               :relative Yoga/YGPositionTypeRelative
               :absolute Yoga/YGPositionTypeAbsolute}})
 
+(defn prop-shorthand [f v]
+  (cond
+    (number? v) (f Yoga/YGEdgeAll v)
+    (= 4 (count v)) (let [[top right bottom left] v]
+                      (f Yoga/YGEdgeTop top)
+                      (f Yoga/YGEdgeRight right)
+                      (f Yoga/YGEdgeBottom bottom)
+                      (f Yoga/YGEdgeLeft left))
+    (= 2 (count v)) (let [[v h] v]
+                      (f Yoga/YGEdgeHorizontal h)
+                      (f Yoga/YGEdgeVertical v))))
+
 (def styles-mapping
   {:flex-direction #(Yoga/YGNodeStyleSetDirection %1 (get-in style-prop-mapping [:flex-direction %2]))
    :justify-content #(Yoga/YGNodeStyleSetJustifyContent %1 (get-in style-prop-mapping [:justify-content %2]))
    :align-items #(Yoga/YGNodeStyleSetAlignItems %1 (get-in style-prop-mapping [:align-items %2]))
    :align-self #(Yoga/YGNodeStyleSetAlignSelf %1 (get-in style-prop-mapping [:align-self %2]))
 
-   :margin (fn [node [top right bottom left]]
-             (Yoga/YGNodeStyleSetMargin node Yoga/YGEdgeTop top)
-             (Yoga/YGNodeStyleSetMargin node Yoga/YGEdgeRight right)
-             (Yoga/YGNodeStyleSetMargin node Yoga/YGEdgeBottom bottom)
-             (Yoga/YGNodeStyleSetMargin node Yoga/YGEdgeLeft left))
-   :padding (fn [node [top right bottom left]]
-              (Yoga/YGNodeStyleSetPadding node Yoga/YGEdgeTop top)
-              (Yoga/YGNodeStyleSetPadding node Yoga/YGEdgeRight right)
-              (Yoga/YGNodeStyleSetPadding node Yoga/YGEdgeBottom bottom)
-              (Yoga/YGNodeStyleSetPadding node Yoga/YGEdgeLeft left))
+   :margin (fn [node v]
+             (prop-shorthand #(Yoga/YGNodeStyleSetMargin node %1 %2) v))
+   :padding (fn [node v]
+              (prop-shorthand #(Yoga/YGNodeStyleSetPadding node %1 %2) v))
 
    :display #(Yoga/YGNodeStyleSetDisplay %1 (get-in style-prop-mapping [:display %2]))
    :position #(Yoga/YGNodeStyleSetPositionType %1 (get-in style-prop-mapping [:position %2]))
@@ -75,9 +82,14 @@
     node))
 
 (def ^FloatBuffer text-bounds (MemoryUtil/memAllocFloat 4))
-(defn measure-text [text]
-  (let [_ (NanoVG/nvgTextBounds ^long (deref ui.ctx/vg) (float 0) (float 0) ^CharSequence text text-bounds)
-        xmin (.get text-bounds 0)
+(defn measure-text [{:keys [font-size font-face text-color text-align]} text]
+  (doto ^long (deref ui.ctx/vg)
+    (NanoVG/nvgFontSize font-size)
+    (NanoVG/nvgFontFace ^CharSequence font-face)
+    (NanoVG/nvgFillColor text-color)
+    (NanoVG/nvgTextAlign text-align)
+    (NanoVG/nvgTextBounds (float 0) (float 0) ^CharSequence text text-bounds))
+  (let [xmin (.get text-bounds 0)
         ymin (.get text-bounds 1)
         xmax (.get text-bounds 2)
         ymax (.get text-bounds 3)
@@ -87,7 +99,7 @@
 
 (defn create-text-node [styles text]
   (let [node (create-node styles)
-        [w h] (measure-text text)
+        [w h] (measure-text styles text)
         set-width (styles-mapping :width)
         set-height (styles-mapping :height)]
     (set-width node w)
@@ -117,7 +129,20 @@
     (run! store-layout children)))
 
 ;; Primitive elements
-(defrecord Rect [vg ynode children parent-layout style
+(defn draw-rounded-rect [vg x y w h border-radius]
+  (cond
+    (number? border-radius)
+    (NanoVG/nvgRoundedRect vg x y w h border-radius)
+
+    (= 4 (count border-radius))
+    (let [[tl tr br bl] border-radius]
+      (NanoVG/nvgRoundedRectVarying vg x y w h tl tr br bl))
+
+    (= 2 (count border-radius))
+    (let [[rv rh] border-radius]
+      (NanoVG/nvgRoundedRectVarying vg x y w h rh rh rv rv))))
+
+(defrecord Rect [vg ynode children parent-layout style clip?
                  on-mouse-down on-mouse-up on-mouse-over]
   IDrawable
   (draw [this]
@@ -125,10 +150,7 @@
           {:keys [background-color border-width border-color border-radius]} style]
       (NanoVG/nvgBeginPath vg)
       (if border-radius
-        (if (number? border-radius)
-          (NanoVG/nvgRoundedRect vg x y w h border-radius)
-          (let [[tl tr br bl] border-radius]
-            (NanoVG/nvgRoundedRectVarying vg x y w h tl tr br bl)))
+        (draw-rounded-rect vg x y w h border-radius)
         (NanoVG/nvgRect vg x y w h))
       (NanoVG/nvgClosePath vg)
 
@@ -141,7 +163,9 @@
         (NanoVG/nvgStrokeWidth vg border-width)
         (NanoVG/nvgStroke vg))
 
-      (run! draw children)))
+      (when clip? (NanoVG/nvgScissor vg x y w h))
+      (run! draw children)
+      (when clip? (NanoVG/nvgResetScissor vg))))
   ILayout
   (layout [this]
     (insert-children ynode children))
@@ -159,11 +183,22 @@
        :children children
        :parent-layout (atom [])})))
 
-(defrecord Text [vg ynode parent-layout text style]
+(def debug-color (ui.utils/rgba 0 150 0 1 (NVGColor/create)))
+
+(defn debug-rect [vg x y w h]
+  (doto ^long vg
+    (NanoVG/nvgBeginPath)
+    (NanoVG/nvgRect x y w h)
+    (NanoVG/nvgClosePath)
+    (NanoVG/nvgFillColor debug-color)
+    (NanoVG/nvgFill)))
+
+(defrecord Text [vg ynode parent-layout text style debug?]
   IDrawable
   (draw [this]
     (let [{:keys [font-size font-face text-color text-align]} style
           [x y w h] (get-layout this)]
+      (when debug? (debug-rect vg x y w h))
       (doto ^long vg
         (NanoVG/nvgFontSize font-size)
         (NanoVG/nvgFontFace ^CharSequence font-face)

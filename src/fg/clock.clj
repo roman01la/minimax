@@ -1,4 +1,5 @@
 (ns fg.clock
+  (:refer-clojure :exclude [time])
   (:require [minimax.clock :as clock]))
 
 (def clock (clock/create))

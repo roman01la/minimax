@@ -40,7 +40,9 @@
             (= 1 (:mouse-button-action @state)))
     (swap! state assoc
       :mouse-button-action nil
-      :mouse-button nil)))
+      :mouse-button nil))
+  ;; reset mouse scroll
+  (swap! state assoc :sx 0 :sy 0))
 
 (defn set-size [dpr]
   (swap! state assoc

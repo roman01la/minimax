@@ -1,8 +1,13 @@
 (ns fg.ui
-  (:require [minimax.ui.elements :as ui]
-            [minimax.ui.animation :as ui.anim]
-            [minimax.ui.components :as mui :refer [defui]])
+  (:require
+    [minimax.ui.elements :as ui]
+    [minimax.ui.animation :as ui.anim]
+    [minimax.ui.components :as mui :refer [defui]])
   (:import (java.nio FloatBuffer)
+           (minimax.objects.group Group)
+           (minimax.objects.light DirectionalLight)
+           (minimax.objects.mesh Mesh)
+           (minimax.objects.scene Scene)
            (org.lwjgl.nanovg NanoVG)
            (org.lwjgl.system MemoryUtil)))
 
@@ -47,20 +52,9 @@
 (def f (volatile! (constantly 1)))
 (def click (atom 0))
 
-(defui view [{:keys [on-mouse-enter on-mouse-leave] :as props} & children]
-  (let [mouse-over? (mui/use-state false)
-        props (assoc props
-                :on-mouse-over (fn [hover?]
-                                 (when (and (not @mouse-over?) hover? on-mouse-enter)
-                                   (on-mouse-enter))
-                                 (when (and @mouse-over? (not hover?) on-mouse-leave)
-                                   (on-mouse-leave))
-                                 (reset! mouse-over? hover?)))]
-    (apply ui/view props children)))
-
 (defui button [props child-text]
   (let [state (mui/use-state {:hover? false :pressed? false})]
-    (view
+    (mui/view
       {:on-mouse-down (fn []
                         (swap! state assoc :pressed? true)
 
@@ -95,6 +89,7 @@
                  :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
         child-text))))
 
+#_
 (defui ui-root [dt width height]
   (let [fps (measure-fps dt)]
     (ui/root
@@ -134,3 +129,56 @@
                      :text-color #ui/rgba [115 90 25 1]
                      :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
             "Welcome!"))))))
+
+(defn tree-view [{:keys [style on-select object selected]}]
+  (let [selected? (= selected object)]
+    (ui/view {:style style}
+      (ui/view
+        {}
+        (mui/button-text
+          {:on-mouse-down #(on-select (if selected? nil object))
+           :style {:border-radius 2
+                   :padding [4 8]
+                   :margin [2 12 2 0]
+                   :background-color (when selected? #ui/rgba [120 120 255 1])
+                   :hover/background-color #ui/rgba [80 80 80 1]
+                   :justify-content :center
+                   :cursor :pointer}
+           :text/style {:font-size 10
+                        :font-face "IBMPlexMono-Regular"
+                        :text-color #ui/rgba [230 230 230 1]
+                        :hover/text-color (when-not selected? #ui/rgba [120 120 255 1])
+                        :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
+          (condp = (type object)
+            Scene "<Scene>"
+            Mesh (str (:name object) " <Mesh>")
+            Group (str (:name object) " <Group>")
+            DirectionalLight (str (:name object) " <DirectionalLight>")
+            (type object))))
+      (for [obj (:children object)]
+        (tree-view
+          {:style {:padding [0 0 0 8]}
+           :on-select on-select
+           :object obj
+           :selected selected})))))
+
+(defui scene-graph [scene]
+  (let [selected (mui/use-state nil)]
+    (mui/widget {:width 240 :height 500}
+      (tree-view
+        {:style {:padding [8 0]}
+         :object scene
+         :on-select #(reset! selected %)
+         :selected @selected}))))
+
+(defn debug-ui [width height scene]
+  (ui/root
+    {:style {:width width
+             :height height
+             :flex-direction :column
+             :padding 8}}
+    (scene-graph scene)))
+
+(defui ui-root [dt width height scene]
+  (debug-ui width height scene))
+

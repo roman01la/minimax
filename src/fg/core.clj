@@ -12,6 +12,7 @@
     [fg.listeners :as listeners]
     [minimax.objects.light :as light]
     [minimax.objects.scene :as scene]
+    [minimax.glfw :as glfw]
     [fg.passes.shadow :as pass.shadow]
     [fg.passes.geometry :as pass.geom]
     [fg.passes.combine :as pass.comb]
@@ -20,7 +21,7 @@
   (:import (java.util.function Consumer)
            (org.joml Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
-           (org.lwjgl.glfw Callbacks GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
+           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
            (org.lwjgl.system Configuration MemoryUtil Platform)))
 
 (set! *warn-on-reflection* true)
@@ -42,10 +43,10 @@
 (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
 
 (def window
-  (GLFW/glfwCreateWindow ^int (:width @state/state) ^int (:height @state/state) "Window" 0 0))
-
-(when (nil? window)
-  (throw (RuntimeException. "Failed to create the GLFW window")))
+  (glfw/create-window
+    {:width (:width @state/state)
+     :height (:height @state/state)
+     :title "Minimax"}))
 
 (defn detect-dpr []
   (let [x (MemoryUtil/memAllocFloat 1)
@@ -150,7 +151,7 @@
 
 (defn render-ui []
   (let [dt (/ (clock/dt) 1e6)]
-    (fg.ui/ui-root dt (:width @state/state) (:height @state/state))))
+    (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene)))
 
 ;; Rendering loop
 (def curr-frame (atom nil))
@@ -167,7 +168,9 @@
   (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
   (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
   (obj/render @scene (:id passes/picking)) ;; picking id pass
-  (ui/render (select-keys @state/state [:width :height :dpr :mx :my :mouse-button :mouse-button-action])
+  (ui/render (select-keys @state/state
+               [:width :height :dpr :mx :my :sx :sy
+                :mouse-button :mouse-button-action])
              render-ui) ;; ui pass
   (pass.comb/render) ;; render combine pass
 
@@ -191,8 +194,7 @@
   ;; Disposing the program
   (ui/shutdown)
   (bgfx/shutdown)
-  (Callbacks/glfwFreeCallbacks window)
-  (GLFW/glfwDestroyWindow window)
+  (glfw/destroy-window)
   (GLFW/glfwTerminate)
   (.free (GLFW/glfwSetErrorCallback nil))
   ;; Stop file watcher
