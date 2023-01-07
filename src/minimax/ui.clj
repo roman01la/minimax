@@ -5,9 +5,12 @@
     [fg.state :as state]
     [minimax.lib :as lib]
     [minimax.passes :as passes]
+    [minimax.ui.context :as ui.ctx]
+    [minimax.ui.components :as mui]
+    [minimax.ui.elements :as ui]
+    [minimax.ui.primitives :as ui.pmt]
     [minimax.util.fs :as util.fs]
-    [minimax.view :as view]
-    [minimax.ui.elements :as ui.els])
+    [minimax.view :as view])
   (:import (org.lwjgl.bgfx BGFX)
            (org.lwjgl.nanovg NanoVG NanoVGBGFX)
            (org.lwjgl.util.yoga Yoga)))
@@ -29,7 +32,7 @@
   (lib/with-lifecycle
     create-frame-buffer
     #(NanoVGBGFX/nvgluDeleteFramebuffer %)
-    [@ui.els/vg (:vwidth @state/state) (:vheight @state/state)]))
+    [@ui.ctx/vg (:vwidth @state/state) (:vheight @state/state)]))
 
 (def texture
   (lib/with-lifecycle
@@ -41,26 +44,29 @@
   (let [vg (NanoVGBGFX/nvgCreate false (:id passes/ui) 0)]
     (when-not vg
       (throw (RuntimeException. "Failed to init NanoVG")))
-    (reset! ui.els/vg vg)
+    (reset! ui.ctx/vg vg)
 
     (load-font! vg "RobotoSlab-Bold" (io/file (io/resource "fonts/Roboto_Slab/RobotoSlab-Bold.ttf")))
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
+(def !root (atom nil))
+
 (defn render* [opts f]
   (let [el (f)]
-    (ui.els/layout el)
-    (ui.els/store-layout el)
-    (ui.els/mouse el opts)
-    (ui.els/draw el)
-    (Yoga/YGNodeFreeRecursive (:ynode el))))
+    (reset! !root el)
+    (ui.pmt/layout (:vnode el))
+    (ui.pmt/store-layout (:vnode el))
+    (ui/mouse el opts)
+    (ui.pmt/draw (:vnode el))
+    (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))))
 
 (defn render [{:keys [width height dpr] :as opts} render-root]
   (view/rect passes/ui 0 0 (* dpr width) (* dpr height))
-  (NanoVG/nvgBeginFrame @ui.els/vg width height dpr)
+  (NanoVG/nvgBeginFrame @ui.ctx/vg width height dpr)
   (render* opts render-root)
-  (NanoVG/nvgEndFrame @ui.els/vg))
+  (NanoVG/nvgEndFrame @ui.ctx/vg))
 
 (defn shutdown []
-  (NanoVGBGFX/nvgDelete @ui.els/vg)
-  (reset! ui.els/vg nil))
+  (NanoVGBGFX/nvgDelete @ui.ctx/vg)
+  (reset! ui.ctx/vg nil))
