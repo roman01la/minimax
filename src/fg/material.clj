@@ -57,6 +57,9 @@
 (def shadow-shader
   (sd/load-program "fs_shadow" "vs_shadow"))
 
+(def line-shader
+  (sd/load-program "fs_line" "vs_line"))
+
 ;; materials
 (defprotocol IMaterial
   (update-uniforms [this light-mtx]))
@@ -78,6 +81,21 @@
      :shader shader
      :shadow-shader shadow-shader
      :uniforms uniforms}))
+
+
+
+(defrecord LineMaterial [diffuse shader uniforms]
+  IMaterial
+  (update-uniforms [this light-mtx]
+    (u/set-value (:color uniforms) diffuse)))
+
+(defn create-line-material [{:keys [color]}]
+  (map->LineMaterial
+    {:diffuse color
+     :shader @line-shader
+     :uniforms {:color @u-color}}))
+
+
 
 (defn create-material [^AIMaterial material textures]
   (let [ambient (get-material-color material Assimp/AI_MATKEY_COLOR_AMBIENT)

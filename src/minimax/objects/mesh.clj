@@ -1,6 +1,7 @@
 (ns minimax.objects.mesh
   (:require
     [bgfx.core :as bgfx]
+    [fg.passes.geometry :as pass.geom]
     [minimax.lib :as lib]
     [fg.material :as mat]
     [minimax.passes :as passes]
@@ -20,42 +21,30 @@
 
 (set! *warn-on-reflection* true)
 
+(def discard-state
+  (bit-or
+    #_BGFX/BGFX_DISCARD_ALL
+    0
+    BGFX/BGFX_DISCARD_INDEX_BUFFER
+    BGFX/BGFX_DISCARD_VERTEX_STREAMS
+    BGFX/BGFX_DISCARD_BINDINGS
+    BGFX/BGFX_DISCARD_STATE
+    BGFX/BGFX_DISCARD_TRANSFORM))
+
 (def mtx-buff (MemoryUtil/memAllocFloat 16))
 
-(defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx]
-  (let [state (condp contains? id
-                #{(:id passes/shadow)}
-                (bit-or
-                  0
-                  BGFX/BGFX_STATE_WRITE_Z
-                  BGFX/BGFX_STATE_DEPTH_TEST_LESS
-                  BGFX/BGFX_STATE_CULL_CW
-                  BGFX/BGFX_STATE_MSAA)
-
-                #{(:id passes/geometry)
-                  (:id passes/picking)}
-                (bit-or
-                  0
-                  BGFX/BGFX_STATE_WRITE_RGB
-                  BGFX/BGFX_STATE_WRITE_A
-                  BGFX/BGFX_STATE_WRITE_Z
-                  BGFX/BGFX_STATE_DEPTH_TEST_LESS
-                  BGFX/BGFX_STATE_CULL_CW
-                  BGFX/BGFX_STATE_MSAA))]
+(defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx state]
+  (let [state (or
+                state
+                (condp contains? id
+                  #{(:id passes/shadow)} pass.shadow/render-state
+                  #{(:id passes/geometry) (:id passes/picking)} pass.geom/render-state))]
     (assert state "state should be set")
     (bgfx/set-vertex-buffer 0 vb 0 vc)
     (bgfx/set-index-buffer ib 0 ic)
     (bgfx/set-transform (.get mtx ^FloatBuffer mtx-buff))
     (bgfx/set-state state)
-    (bgfx/submit id shader 0
-                 (bit-or
-                   #_BGFX/BGFX_DISCARD_ALL
-                   0
-                   BGFX/BGFX_DISCARD_INDEX_BUFFER
-                   BGFX/BGFX_DISCARD_VERTEX_STREAMS
-                   BGFX/BGFX_DISCARD_BINDINGS
-                   BGFX/BGFX_DISCARD_STATE
-                   BGFX/BGFX_DISCARD_TRANSFORM))))
+    (bgfx/submit id shader 0 discard-state)))
 
 (def ^BGFXCaps caps (bgfx/get-caps))
 
@@ -70,29 +59,35 @@
       0.5 0.5 tz  1.0)))
 
 ;; Mesh node - a mesh ¯\_(ツ)_/¯
-(defrecord Mesh [name id pid
+(defrecord Mesh [name id pid cast-shadow? state
                  vertex-buffer index-buffer
                  ^Matrix4f lmtx ^Matrix4f mtx material children
-                 tvec ^Matrix4f light-mtx]
+                 tvec ^Matrix4f light-mtx
+                 bounding-box]
   obj/IRenderable
   (render [this id]
-    (let [shader (:shader material)
-          shadow-shader (:shadow-shader material)
-          program (condp = id
-                    (:id passes/shadow) shadow-shader
-                    (:id passes/geometry) shader
-                    (:id passes/picking) @pass.picking/shader)]
-      (assert program "shader should be set")
-      (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
-      (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
-      (u/set-value @pass.picking/u-id pid)
-      (mat/update-uniforms material light-mtx)
-      (submit-mesh id
-                   @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
-                   @index-buffer (.size ^ArrayList (:indices index-buffer))
-                   program
-                   mtx)
-      (obj/render* id mtx children)))
+    (if (or (and (= id (:id passes/shadow)) (not cast-shadow?))
+            (and (= id (:id passes/picking)) (nil? pid)))
+      nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
+      (let [shader (:shader material)
+            shadow-shader (:shadow-shader material)
+            program (condp = id
+                      (:id passes/shadow) shadow-shader
+                      (:id passes/geometry) shader
+                      (:id passes/picking) @pass.picking/shader)]
+        (assert program "shader should be set")
+        (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
+        (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
+        (when (= id (:id passes/picking))
+          (u/set-value @pass.picking/u-id pid))
+        (mat/update-uniforms material light-mtx)
+        (submit-mesh id
+                     @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
+                     @index-buffer (.size ^ArrayList (:indices index-buffer))
+                     program
+                     mtx
+                     state)
+        (obj/render* id mtx children))))
   obj/IObject3D
   (add-child [this child]
     (obj/add-child* this child))
@@ -145,4 +140,6 @@
        :light-mtx (Matrix4f.)
        :tvec (Vector3f.)
        :material material
-       :children []})))
+       :children []
+       :cast-shadow? true
+       :bounding-box (:bounding-box parsed-mesh)})))

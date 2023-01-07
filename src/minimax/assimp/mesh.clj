@@ -1,5 +1,6 @@
 (ns minimax.assimp.mesh
   (:import (java.util ArrayList)
+           (org.joml Vector3f)
            (org.lwjgl.assimp AIFace AIMesh AIVector3D)))
 
 (set! *warn-on-reflection* true)
@@ -58,14 +59,23 @@
             #_(.add texture-coords (.z v))))))
     texture-coords))
 
-(defn process-mesh [mesh]
+(defn process-bounding-box [^AIMesh mesh]
+  (let [aabb (.mAABB mesh)
+        min (.mMin aabb)
+        max (.mMax aabb)]
+    {:min (Vector3f. (.x min) (.y min) (.z min))
+     :max (Vector3f. (.x max) (.y max) (.z max))}))
+
+(defn process-mesh [^AIMesh mesh]
   (let [vertices (process-vertices mesh)
         indices (process-indices mesh)
         normals (process-normals mesh)
         tangents (process-tangents mesh)
-        texture-coords (process-texture-coords mesh)]
+        texture-coords (process-texture-coords mesh)
+        bounding-box (process-bounding-box mesh)]
     {:vertices vertices
      :indices indices
      :normals normals
      :tangents tangents
-     :texture-coords texture-coords}))
+     :texture-coords texture-coords
+     :bounding-box bounding-box}))

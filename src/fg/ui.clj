@@ -155,30 +155,30 @@
             Group (str (:name object) " <Group>")
             DirectionalLight (str (:name object) " <DirectionalLight>")
             (type object))))
-      (for [obj (:children object)]
+      (for [obj (:children object)
+            :when (not (:debug-skip? obj))]
         (tree-view
           {:style {:padding [0 0 0 8]}
            :on-select on-select
            :object obj
            :selected selected})))))
 
-(defui scene-graph [scene]
-  (let [selected (mui/use-state nil)]
-    (mui/widget {:width 240 :height 500}
-      (tree-view
-        {:style {:padding [8 0]}
-         :object scene
-         :on-select #(reset! selected %)
-         :selected @selected}))))
+(defn scene-graph [scene selected]
+  (mui/widget {:width 240 :height 500}
+    (tree-view
+      {:style {:padding [8 0]}
+       :object scene
+       :on-select #(reset! selected %)
+       :selected @selected})))
 
-(defn debug-ui [width height scene]
+(defn debug-ui [width height scene selected]
   (ui/root
     {:style {:width width
              :height height
              :flex-direction :column
              :padding 8}}
-    (scene-graph scene)))
+    (scene-graph scene selected)))
 
-(defui ui-root [dt width height scene]
-  (debug-ui width height scene))
+(defui ui-root [dt width height scene selected]
+  (debug-ui width height scene selected))
 

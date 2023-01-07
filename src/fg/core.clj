@@ -17,6 +17,7 @@
     [fg.passes.geometry :as pass.geom]
     [fg.passes.combine :as pass.comb]
     [fg.passes.picking :as pass.picking]
+    [minimax.debug :as debug]
     [fg.ui])
   (:import (java.util.function Consumer)
            (org.joml Vector3f)
@@ -111,11 +112,15 @@
 (defn fps []
   (Math/round (float (/ 1e3 (/ (clock/dt) 1e6)))))
 
+;; debug
+(def selected-object (atom nil))
+(def debug-box @debug/debug-box)
+
 ;; scene
 (def scene
   (atom (scene/create
           {:name "MainScene"
-           :children [d-light (:scene model)]})))
+           :children [d-light (:scene model) debug-box]})))
 
 (def castle-obj
   (obj/find-by-name @scene "castle_root"))
@@ -147,11 +152,14 @@
     (obj/set-position-x cloud-2-obj (+ (.x pos2) z))
     (obj/set-position-z cloud-2-obj (+ (.z pos2) x))
 
-    (obj/rotate-y castle-obj (* dt 0.1))))
+    (obj/rotate-y castle-obj (* dt 0.1))
+
+    (when-let [obj @selected-object]
+      (debug/set-object-transform obj debug-box))))
 
 (defn render-ui []
   (let [dt (/ (clock/dt) 1e6)]
-    (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene)))
+    (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene selected-object)))
 
 ;; Rendering loop
 (def curr-frame (atom nil))

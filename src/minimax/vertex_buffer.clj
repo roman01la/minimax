@@ -18,19 +18,20 @@
                                (.size tangents)
                                (.size texture-coords)))))
 
-(defn- create-vertex-layout [texture-coords? tangents?]
+(defn- create-vertex-layout [normals? texture-coords? tangents?]
   (vertex-layout/create
-    (cond-> [[BGFX/BGFX_ATTRIB_POSITION 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT]
-             [BGFX/BGFX_ATTRIB_NORMAL 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT]]
+    (cond-> [[BGFX/BGFX_ATTRIB_POSITION 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT]]
+            normals? (conj [BGFX/BGFX_ATTRIB_NORMAL 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
             tangents? (conj [BGFX/BGFX_ATTRIB_TANGENT 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
             texture-coords? (conj [BGFX/BGFX_ATTRIB_TEXCOORD0 2 BGFX/BGFX_ATTRIB_TYPE_FLOAT]))))
 
 (defn- create*
   [{:keys [^ArrayList vertices ^ArrayList normals ^ArrayList tangents ^ArrayList texture-coords] :as opts}]
   (let [mem (alloc-memory opts)
+        normals? (pos? (.size normals))
         texture-coords? (pos? (.size texture-coords))
         tangents? (pos? (.size tangents))
-        layout (create-vertex-layout texture-coords? tangents?)
+        layout (create-vertex-layout normals? texture-coords? tangents?)
         cnt (dec (/ (.size vertices) 3))]
     (loop [idx 0]
       (let [idx3 (* 3 idx)
@@ -41,9 +42,10 @@
         (.putFloat mem (.get vertices (+ idx3 2)))
 
         ;; normal coords
-        (.putFloat mem (.get normals idx3))
-        (.putFloat mem (.get normals (inc idx3)))
-        (.putFloat mem (.get normals (+ idx3 2)))
+        (when normals?
+          (.putFloat mem (.get normals idx3))
+          (.putFloat mem (.get normals (inc idx3)))
+          (.putFloat mem (.get normals (+ idx3 2))))
 
         ;; tangent coords
         (when tangents?

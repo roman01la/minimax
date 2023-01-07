@@ -13,6 +13,16 @@
     [minimax.view :as view])
   (:import (org.lwjgl.bgfx BGFX)))
 
+(def render-state
+  (bit-or
+    0
+    BGFX/BGFX_STATE_WRITE_RGB
+    BGFX/BGFX_STATE_WRITE_A
+    BGFX/BGFX_STATE_WRITE_Z
+    BGFX/BGFX_STATE_DEPTH_TEST_LESS
+    BGFX/BGFX_STATE_CULL_CW
+    BGFX/BGFX_STATE_MSAA))
+
 (defn create-geometry-fb [v-width v-height]
   (let [attachment1 (attachment/create)
         attachment2 (attachment/create)
