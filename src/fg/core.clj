@@ -177,13 +177,13 @@
 
   (pass.shadow/setup d-light) ;; setup pass shadow
   (pass.geom/setup camera) ;; render pass geometry
-  (pass.picking/setup camera) ;; picking pass
+  #_(pass.picking/setup camera) ;; picking pass
 
   (render)
 
   (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
   (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
-  (obj/render @scene (:id passes/picking)) ;; picking id pass
+  #_(obj/render @scene (:id passes/picking)) ;; picking id pass
   (ui/render (select-keys @state/state
                [:width :height :dpr :mx :my :sx :sy
                 :mouse-button :mouse-button-action])

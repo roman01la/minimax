@@ -38,7 +38,7 @@
                 state
                 (condp contains? id
                   #{(:id passes/shadow)} pass.shadow/render-state
-                  #{(:id passes/geometry) (:id passes/picking)} pass.geom/render-state))]
+                  #{(:id passes/geometry) #_(:id passes/picking)} pass.geom/render-state))]
     (assert state "state should be set")
     (bgfx/set-vertex-buffer 0 vb 0 vc)
     (bgfx/set-index-buffer ib 0 ic)
@@ -68,19 +68,19 @@
   (render [this id]
     (when @visible?
       (if (or (and (= id (:id passes/shadow)) (not cast-shadow?))
-              (and (= id (:id passes/picking)) (nil? pid)))
+              #_(and (= id (:id passes/picking)) (nil? pid)))
         nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
         (let [shader (:shader material)
               shadow-shader (:shadow-shader material)
               program (condp = id
                         (:id passes/shadow) shadow-shader
                         (:id passes/geometry) shader
-                        (:id passes/picking) @pass.picking/shader)]
+                        #_#_(:id passes/picking) @pass.picking/shader)]
           (assert program "shader should be set")
           (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
           (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
-          (when (= id (:id passes/picking))
-            (u/set-value @pass.picking/u-id pid))
+          #_(when (= id (:id passes/picking))
+              (u/set-value @pass.picking/u-id pid))
           (mat/update-uniforms material light-mtx)
           (submit-mesh id
                        @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
