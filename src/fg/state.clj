@@ -31,7 +31,7 @@
 
          :background-color 0xe9fcff
 
-         :shadow-size 1024
+         :shadow-map-size 1024
          :light-pos (Vector3f. -0.4 -1.0 0.6)}))
 
 (defn reset-state []

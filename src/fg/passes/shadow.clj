@@ -28,10 +28,7 @@
                     BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
 
 (def shadow-map-fb
-  (lib/with-lifecycle
-    create-shadow-map-fb
-    fb/destroy
-    [(:shadow-size @state/state)]))
+  (delay (create-shadow-map-fb (:shadow-map-size @state/state))))
 
 (def shadow-map-texture
   (lib/with-lifecycle
@@ -52,11 +49,12 @@
 (def ^Matrix4f shadow-mtx (Matrix4f.))
 
 (defn setup [d-light]
-  (view/rect passes/shadow 0 0 (:shadow-size @state/state) (:shadow-size @state/state))
-  (view/frame-buffer passes/shadow @@shadow-map-fb)
-  (update-ortho-view-projection (:id passes/shadow) ortho-camera
-                                (.negate ^Vector3f (:position d-light) (Vector3f.))
-                                (:at @state/state))
+  (let [shadow-map-size (:shadow-map-size @state/state)]
+    (view/rect passes/shadow 0 0 shadow-map-size shadow-map-size)
+    (view/frame-buffer passes/shadow @@shadow-map-fb)
+    (update-ortho-view-projection (:id passes/shadow) ortho-camera
+                                  (.negate ^Vector3f (:position d-light) (Vector3f.))
+                                  (:at @state/state)))
   (view/clear passes/shadow
     (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH BGFX/BGFX_CLEAR_STENCIL)
     (:background-color @state/state))

@@ -1,5 +1,6 @@
 (ns minimax.glfw
-  (:import (org.lwjgl.glfw Callbacks GLFW)))
+  (:import (org.lwjgl.glfw Callbacks GLFW)
+           (org.lwjgl.system MemoryUtil)))
 
 (set! *warn-on-reflection* true)
 
@@ -16,7 +17,6 @@
   (Callbacks/glfwFreeCallbacks @!window)
   (GLFW/glfwDestroyWindow @!window))
 
-#_(def cursor-arrow (GLFW/glfwCreateStandardCursor GLFW/GLFW_ARROW_CURSOR))
 (def cursor-hand (delay (GLFW/glfwCreateStandardCursor GLFW/GLFW_HAND_CURSOR)))
 
 (defn set-cursor* [window cursor]
@@ -27,3 +27,13 @@
 
 (defn set-cursor [cursor]
   (set-cursor* @!window cursor))
+
+(defn detect-dpr []
+  (let [x (MemoryUtil/memAllocFloat 1)
+        y (MemoryUtil/memAllocFloat 1)
+        _ (GLFW/glfwGetMonitorContentScale
+            (GLFW/glfwGetPrimaryMonitor) x y)
+        dpr (.get x)
+        _ (MemoryUtil/memFree x)
+        _ (MemoryUtil/memFree y)]
+    dpr))

@@ -1,6 +1,7 @@
 (ns fg.core
   (:require
     [bgfx.core :as bgfx]
+    [minimax.logger :as log]
     [minimax.object :as obj]
     [fg.dev]
     [fg.model :as md]
@@ -49,17 +50,7 @@
      :height (:height @state/state)
      :title "Minimax"}))
 
-(defn detect-dpr []
-  (let [x (MemoryUtil/memAllocFloat 1)
-        y (MemoryUtil/memAllocFloat 1)
-        _ (GLFW/glfwGetMonitorContentScale
-            (GLFW/glfwGetPrimaryMonitor) x y)
-        dpr (.get x)
-        _ (MemoryUtil/memFree x)
-        _ (MemoryUtil/memFree y)]
-    dpr))
-
-(state/set-size (detect-dpr))
+(state/set-size (glfw/detect-dpr))
 
 (let [^BGFXInit init (bgfx/create-init)]
   (.resolution init
@@ -90,7 +81,7 @@
 
 (println (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
-(ui/init (:vwidth @state/state) (:vheight @state/state))
+(ui/init)
 
 (def camera
   (atom
@@ -107,7 +98,9 @@
      :color (Vector3f. 1.0 1.0 1.0)}))
 
 (def model
-  (md/load-model "models/castle.glb"))
+  (do
+    (log/debug "Importing model...")
+    (time (md/load-model "models/castle.glb"))))
 
 (defn fps []
   (Math/round (float (/ 1e3 (/ (clock/dt) 1e6)))))

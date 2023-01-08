@@ -10,7 +10,8 @@
     [minimax.ui.elements :as ui]
     [minimax.ui.primitives :as ui.pmt]
     [minimax.util.fs :as util.fs]
-    [minimax.view :as view])
+    [minimax.view :as view]
+    [minimax.logger :as log])
   (:import (org.lwjgl.bgfx BGFX)
            (org.lwjgl.nanovg NanoVG NanoVGBGFX)
            (org.lwjgl.util.yoga Yoga)))
@@ -40,17 +41,24 @@
     bgfx/destroy-texture
     [@frame-buffer]))
 
-(defn init [width height]
+(def fonts
+  [["Roboto_Slab" "RobotoSlab-Bold"]
+   ["IBM_Plex_Mono" "IBMPlexMono-Regular"]
+   ["IBM_Plex_Mono" "IBMPlexMono-Bold"]])
+
+(defn load-fonts! [vg]
+  (doseq [[dir file] fonts]
+    (load-font! vg file (io/file (io/resource (str "fonts/" dir "/" file ".ttf"))))))
+
+(defn init []
   (let [vg (NanoVGBGFX/nvgCreate false (:id passes/ui) 0)]
     (when-not vg
       (throw (RuntimeException. "Failed to init NanoVG")))
     (reset! ui.ctx/vg vg)
 
     ;; loading UI fonts
-    (doseq [[dir file] [["Roboto_Slab" "RobotoSlab-Bold"]
-                        ["IBM_Plex_Mono" "IBMPlexMono-Regular"]
-                        ["IBM_Plex_Mono" "IBMPlexMono-Bold"]]]
-      (load-font! vg file (io/file (io/resource (str "fonts/" dir "/" file ".ttf")))))
+    (log/debug "Loading fonts...")
+    (time (load-fonts! vg))
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
