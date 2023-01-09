@@ -11,6 +11,8 @@
          :width width
          :height height
          :dpr 1
+         :minimized? false
+         :maximized? false
          ;; resolution
          :vwidth width
          :vheight height

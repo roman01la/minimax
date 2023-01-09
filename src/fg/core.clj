@@ -79,7 +79,7 @@
   (when-not (bgfx/init init)
     (throw (RuntimeException. "Error initializing bgfx renderer"))))
 
-(println (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
+(log/debug (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
 (ui/init)
 
@@ -102,9 +102,6 @@
     (log/debug "Importing model...")
     (time (md/load-model "models/castle.glb"))))
 
-(defn fps []
-  (Math/round (float (/ 1e3 (/ (clock/dt) 1e6)))))
-
 ;; debug
 (def selected-object (atom nil))
 (def debug-box @debug/debug-box)
@@ -124,15 +121,15 @@
 (def cloud-2-obj
   (obj/find-by-name @scene "cloud_2"))
 
-(defn render []
-  (let [dt (/ (clock/dt) 1e9)
+(defn render [dt t]
+  (let [t (* t 10)
         pos1 (obj/position cloud-1-obj)
         pos2 (obj/position cloud-2-obj)
-        y (-> (Math/sin (/ (clock/time) 200))
+        y (-> (Math/sin (/ t 2))
               (/ 100))
-        x (-> (Math/sin (/ (clock/time) 1000))
+        x (-> (Math/sin (/ t 10))
               (/ 100))
-        z (-> (Math/cos (/ (clock/time) 1000))
+        z (-> (Math/cos (/ t 10))
               (/ 100))]
 
     (obj/rotate-y cloud-1-obj (* dt 0.3))
@@ -158,37 +155,38 @@
                        (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
         (debug/set-object-transform obj debug-box mtx)))))
 
-(defn render-ui []
-  (let [dt (/ (clock/dt) 1e6)]
-    (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene selected-object)))
+(defn render-ui [dt]
+  (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene selected-object))
 
 ;; Rendering loop
 (def curr-frame (atom nil))
 
 (defn run []
-  (clock/step)
+  (let [dt (clock/dt)
+        t (clock/time)]
+    #_(prn "RENDER")
+    (clock/step)
 
-  (pass.shadow/setup d-light) ;; setup pass shadow
-  (pass.geom/setup camera) ;; render pass geometry
-  #_(pass.picking/setup camera) ;; picking pass
+    (pass.shadow/setup d-light) ;; setup pass shadow
+    (pass.geom/setup camera) ;; render pass geometry
+    #_(pass.picking/setup camera) ;; picking pass
 
-  (render)
+    (render dt t)
 
-  (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
-  (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
-  #_(obj/render @scene (:id passes/picking)) ;; picking id pass
-  (ui/render (select-keys @state/state
-               [:width :height :dpr :mx :my :sx :sy
-                :mouse-button :mouse-button-action])
-             render-ui) ;; ui pass
-  (pass.comb/render) ;; render combine pass
+    (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
+    (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
+    #_(obj/render @scene (:id passes/picking)) ;; picking id pass
 
-  #_#_
-  (pass.picking/pick @curr-frame)
-  (pass.picking/blit)
+    (ui/render @state/state #(render-ui dt)) ;; ui pass
 
-  ;; next frame
-  (reset! curr-frame (bgfx/frame)))
+    (pass.comb/render) ;; render combine pass
+
+    #_#_
+    (pass.picking/pick @curr-frame)
+    (pass.picking/blit)
+
+    ;; next frame
+    (reset! curr-frame (bgfx/frame))))
 
 (listeners/set-listeners window camera run)
 

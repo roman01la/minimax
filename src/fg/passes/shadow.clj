@@ -2,7 +2,6 @@
   (:require
     [bgfx.core :as bgfx]
     [minimax.objects.camera :as camera]
-    [minimax.lib :as lib]
     [minimax.object :as obj]
     [minimax.passes :as passes]
     [fg.state :as state]
@@ -28,13 +27,12 @@
                     BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
 
 (def shadow-map-fb
+  ;; TODO: Maybe make it dependant on `:shadow-map-size` if the value is dynamic
   (delay (create-shadow-map-fb (:shadow-map-size @state/state))))
 
 (def shadow-map-texture
-  (lib/with-lifecycle
-    #(bgfx/get-texture % 0)
-    bgfx/destroy-texture
-    [@@shadow-map-fb]))
+  ;; TODO: Maybe make it dependant on `shadow-map-fb`
+  (delay (bgfx/get-texture @@shadow-map-fb 0)))
 
 (def ortho-camera
   (camera/create-orthographic-camera

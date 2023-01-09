@@ -4,7 +4,7 @@
     [fg.state :as state])
   (:import (org.joml Vector3f)
            (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.glfw GLFW GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback GLFWMouseButtonCallback GLFWScrollCallback GLFWWindowSizeCallback)))
+           (org.lwjgl.glfw GLFW GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback GLFWMouseButtonCallback GLFWScrollCallback GLFWWindowIconifyCallback GLFWWindowMaximizeCallback GLFWWindowSizeCallback)))
 
 (set! *warn-on-reflection* true)
 
@@ -62,6 +62,16 @@
     (invoke [window x y]
       (swap! state/state assoc :sx x :sy y))))
 
+(def minimize-callback
+  (proxy [GLFWWindowIconifyCallback] []
+    (invoke [window minimized?]
+      (swap! state/state assoc :minimized? minimized?))))
+
+(def maximize-callback
+  (proxy [GLFWWindowMaximizeCallback] []
+    (invoke [window maximized?]
+      (swap! state/state assoc :maximized? maximized?))))
+
 (defn set-listeners [window camera update-screen]
   (let [fb-resize-callback (create-fb-resize-callback update-screen camera)]
     (GLFW/glfwSetKeyCallback window key-callback)
@@ -69,4 +79,6 @@
     (GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
     (GLFW/glfwSetCursorPosCallback window mouse-move-callback)
     (GLFW/glfwSetMouseButtonCallback window mouse-press-callback)
-    (GLFW/glfwSetScrollCallback window mouse-scroll-callback)))
+    (GLFW/glfwSetScrollCallback window mouse-scroll-callback)
+    (GLFW/glfwSetWindowIconifyCallback window minimize-callback)
+    (GLFW/glfwSetWindowMaximizeCallback window maximize-callback)))

@@ -1,5 +1,6 @@
 (ns minimax.clock
-  (:refer-clojure :exclude [time]))
+  (:refer-clojure :exclude [time])
+  (:import (org.lwjgl.glfw GLFW)))
 
 (set! *warn-on-reflection* true)
 
@@ -11,14 +12,14 @@
 (deftype Clock [state dt]
   IClock
   (step [this]
-    (let [ct (System/nanoTime)
+    (let [ct (GLFW/glfwGetTime)
           _ (vreset! dt (- ct @state))
           _ (vreset! state ct)]
       @dt))
   (dt [this]
     @dt)
   (time [this]
-    (System/currentTimeMillis)))
+    (GLFW/glfwGetTime)))
 
 (defn create []
-  (Clock. (volatile! (System/nanoTime)) (volatile! 0)))
+  (Clock. (volatile! 0) (volatile! 0.016)))

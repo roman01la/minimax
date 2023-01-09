@@ -15,7 +15,7 @@
 
 (defn measure-fps [dt]
   (let [pos (int (mod (inc (.position buff)) 100))]
-    (.put buff pos (float (/ 1000 dt)))
+    (.put buff pos (float (/ 1 dt)))
     (.position buff pos)
     (loop [idx 99
            sum 0]
@@ -89,8 +89,7 @@
                  :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
         child-text))))
 
-#_
-(defui ui-root [dt width height]
+(defui game-ui [dt width height]
   (let [fps (measure-fps dt)]
     (ui/root
       {:style {:width width
@@ -192,5 +191,6 @@
     (scene-graph scene selected)))
 
 (defui ui-root [dt width height scene selected]
+  #_(game-ui dt width height)
   (debug-ui width height scene selected))
 

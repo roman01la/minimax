@@ -56,30 +56,38 @@
 
 (def geometry-fb
   (lib/with-lifecycle
+    :geometry-fb
     create-geometry-fb
     fb/destroy
-    [(:vwidth @state/state) (:vheight @state/state)]))
+    [state/state]
+    (juxt :vwidth :vheight)))
 
 (def screen-texture
   (lib/with-lifecycle
+    :screen-texture
     #(bgfx/get-texture %1 0)
     bgfx/destroy-texture
-    [@@geometry-fb]))
+    [geometry-fb]
+    (fn [geometry-fb] [@geometry-fb])))
 
 (def position-texture
   (lib/with-lifecycle
+    :position-texture
     #(bgfx/get-texture %1 1)
     bgfx/destroy-texture
-    [@@geometry-fb]))
-
-(def u-tex-position
-  (delay (u/create "s_texPosition" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
+    [geometry-fb]
+    (fn [geometry-fb] [@geometry-fb])))
 
 (def normal-texture
   (lib/with-lifecycle
+    :normal-texture
     #(bgfx/get-texture %1 2)
     bgfx/destroy-texture
-    [@@geometry-fb]))
+    [geometry-fb]
+    (fn [geometry-fb] [@geometry-fb])))
+
+(def u-tex-position
+  (delay (u/create "s_texPosition" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
 
 (def u-tex-normal
   (delay (u/create "s_texNormal" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))

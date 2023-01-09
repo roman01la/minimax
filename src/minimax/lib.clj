@@ -1,6 +1,6 @@
 (ns minimax.lib
   (:require [bgfx.core :as bgfx])
-  (:import (clojure.lang IDeref)
+  (:import (clojure.lang IDeref IRef)
            (java.nio FloatBuffer)
            (org.joml Matrix4f Vector3f Vector4f)
            (org.lwjgl.system MemoryUtil)))
@@ -37,26 +37,47 @@
 
 
 
-(defn int->rgba [i]
+(defn int->rgba
+  "Encodes integer as RGBA value in Vector4f"
+  [i]
   (let [r (/ (bit-shift-right (bit-and i 0x000000ff) 0) 255)
         g (/ (bit-shift-right (bit-and i 0x0000ff00) 8) 255)
         b (/ (bit-shift-right (bit-and i 0x00ff0000) 16) 255)]
     (Vector4f. r g b 1.0)))
 
+(defn with-lifecycle
+  "Sets up reactive dependency on `deps` where `derive-deps-fn` is used to calculate
+  a value from `deps`, which is then passed into `setup-fn`. The return value of `setup-fn`
+  is passed into `cleanup-fn` (when provided) to clean up state before the next update.
 
-(defmacro with-lifecycle
-  ([setup-fn deps]
-   `(with-lifecycle ~setup-fn ~identity ~deps))
-  ([setup-fn cleanup-fn deps]
-   `(let [v# (atom nil)
-          st# (atom nil)]
-      (reify IDeref
-        (deref [this#]
-          (let [nst# ~deps]
-            (when (not= @st# nst#)
-              (when-let [v# @v#]
-                (~cleanup-fn v#))
-              (reset! st# nst#)
-              (reset! v# (apply ~setup-fn nst#)))
-            @v#))))))
-
+  NOTE: `setup-fn` is not called immediately upon creation,
+  instead it's called on the first `deref`, which essentially defers initial `setup-fn`
+  to 'read' stage."
+  ([key setup-fn deps derive-deps-fn]
+   (with-lifecycle key setup-fn nil deps derive-deps-fn))
+  ([key setup-fn cleanup-fn deps derive-deps-fn]
+   (let [get-state #(apply derive-deps-fn (map deref deps))
+         state (atom ::nothing)
+         value (atom ::nothing)
+         first-deref? (atom false)
+         on-change (fn [_ _ _ _]
+                     (let [next-state (get-state)]
+                       (when (not= @state next-state)
+                         (reset! state next-state))))]
+     (add-watch state key (fn [_ _ _ v]
+                            (when (and (not= ::nothing @value) cleanup-fn)
+                              (cleanup-fn @value))
+                            (reset! value (apply setup-fn v))))
+     (reify
+       IDeref
+       (deref [this]
+         (when (= ::nothing @state)
+           (reset! first-deref? true)
+           (reset! state (get-state))
+           (run! #(add-watch % key on-change) deps))
+         @value)
+       IRef
+       (addWatch [this key callback]
+         (add-watch value key callback))
+       (removeWatch [this key]
+         (remove-watch value key))))))

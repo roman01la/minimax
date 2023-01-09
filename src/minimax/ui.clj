@@ -31,15 +31,19 @@
 
 (def frame-buffer
   (lib/with-lifecycle
-    create-frame-buffer
+    :frame-buffer
+    #(create-frame-buffer @ui.ctx/vg %1 %2)
     #(NanoVGBGFX/nvgluDeleteFramebuffer %)
-    [@ui.ctx/vg (:vwidth @state/state) (:vheight @state/state)]))
+    [state/state]
+    (juxt :vwidth :vheight)))
 
 (def texture
   (lib/with-lifecycle
+    :texture
     #(bgfx/get-texture (.handle %) 0)
     bgfx/destroy-texture
-    [@frame-buffer]))
+    [frame-buffer]
+    (fn [fb] [fb])))
 
 (def fonts
   [["Roboto_Slab" "RobotoSlab-Bold"]

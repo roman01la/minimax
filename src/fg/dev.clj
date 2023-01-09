@@ -1,5 +1,6 @@
 (ns fg.dev
-  (:require [clojure.java.io :as io])
+  (:require [clojure.java.io :as io]
+            [minimax.logger :as log])
   (:import (java.nio.file FileSystems Path StandardWatchEventKinds WatchEvent WatchService)))
 
 (def ^WatchService watch-service
@@ -20,7 +21,7 @@
   (reset! watcher
     (doto (Thread.
             (fn []
-              (println "shader watcher has started")
+              (log/debug "shader watcher has started")
               (try
                 (loop []
                   (let [key (.take watch-service)]
@@ -29,13 +30,13 @@
                         (when-let [entry (get @change-listeners path)]
                           (let [[cmd on-change] entry]
                             (if (zero? (cmd path))
-                              (do (println "Recompiled shaders")
+                              (do (log/debug "Recompiled shaders")
                                   (on-change))
-                              (println "Failed to recompile shaders"))))))
+                              (log/debug "Failed to recompile shaders"))))))
                     (when (.reset key)
                       (recur))))
                 (catch InterruptedException e
-                  (println "shader watcher has stopped")))))
+                  (log/debug "shader watcher has stopped")))))
       (.start))))
 
 (defn watch [res cmd on-change]
