@@ -1,6 +1,6 @@
 (ns bgfx.core
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.bgfx BGFX BGFXCaps BGFXInit)))
+           (org.lwjgl.bgfx BGFX BGFXCaps BGFXInit BGFXStats)))
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
@@ -31,6 +31,9 @@
 
 (defn get-caps ^BGFXCaps []
   (BGFX/bgfx_get_caps))
+
+(defn get-stats ^BGFXStats []
+  (BGFX/bgfx_get_stats))
 
 (defn create-uniform
   ([name type]

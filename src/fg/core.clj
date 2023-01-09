@@ -155,8 +155,8 @@
                        (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
         (debug/set-object-transform obj debug-box mtx)))))
 
-(defn render-ui [dt]
-  (fg.ui/ui-root dt (:width @state/state) (:height @state/state) @scene selected-object))
+(defn render-ui []
+  (fg.ui/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
 
 ;; Rendering loop
 (def curr-frame (atom nil))
@@ -177,7 +177,7 @@
     (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
     #_(obj/render @scene (:id passes/picking)) ;; picking id pass
 
-    (ui/render @state/state #(render-ui dt)) ;; ui pass
+    (ui/render @state/state render-ui) ;; ui pass
 
     (pass.comb/render) ;; render combine pass
 

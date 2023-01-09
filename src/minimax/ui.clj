@@ -66,13 +66,24 @@
 
     (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
 
+(def layout-time (volatile! 0))
+
+(defmacro measure-time [ref & body]
+  `(let [start# (System/nanoTime)
+         ret# (do ~@body)
+         end# (System/nanoTime)
+         t# (- end# start#)]
+     (vreset! ~ref t#)
+     ret#))
+
 (def !root (atom nil))
 
 (defn render* [opts f]
   (reset! mui/!id 0)
   (let [el (f)]
     (reset! !root el)
-    (ui.pmt/layout (:vnode el))
+    (measure-time layout-time
+      (ui.pmt/layout (:vnode el)))
     (ui.pmt/store-layout (:vnode el))
     (ui/ui-event el opts)
     (ui.pmt/draw (:vnode el))
