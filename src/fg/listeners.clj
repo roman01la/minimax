@@ -53,7 +53,8 @@
                :vwidth vwidth :vheight vheight)
 
         (swap! camera assoc :aspect (/ vwidth vheight))
-        (bgfx/reset vwidth vheight reset-flags texture-format)))))
+        (bgfx/reset vwidth vheight reset-flags texture-format)
+        (update-screen)))))
 
 (defn create-fb-resize-callback [update-screen camera]
   (proxy [GLFWFramebufferSizeCallback] []

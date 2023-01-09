@@ -176,16 +176,13 @@
     (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
     #_(obj/render @scene (:id passes/picking)) ;; picking id pass
 
-    (ui/render @state/state render-ui) ;; ui pass
+    #_(ui/render @state/state render-ui) ;; ui pass
 
     (pass.comb/render) ;; render combine pass
 
     #_#_
     (pass.picking/pick @curr-frame)
-    (pass.picking/blit)
-
-    ;; next frame
-    (reset! curr-frame (bgfx/frame))))
+    (pass.picking/blit)))
 
 (listeners/set-listeners window camera run)
 
@@ -195,7 +192,8 @@
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    (run))
+    (run)
+    (reset! curr-frame (bgfx/frame)))
 
   ;; Disposing the program
   (ui/shutdown)

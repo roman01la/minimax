@@ -24,9 +24,9 @@
     BGFX/BGFX_STATE_MSAA))
 
 (defn create-geometry-fb [v-width v-height]
-  (let [attachment1 (attachment/create)
-        attachment2 (attachment/create)
-        attachment3 (attachment/create)
+  (let [attachment-color (attachment/create)
+        attachment-position (attachment/create)
+        attachment-normal (attachment/create)
         flags (bit-or 0
                 BGFX/BGFX_TEXTURE_RT_MSAA_X4
                 BGFX/BGFX_SAMPLER_MIN_POINT
@@ -34,25 +34,25 @@
                 BGFX/BGFX_SAMPLER_MIP_POINT
                 BGFX/BGFX_SAMPLER_U_CLAMP
                 BGFX/BGFX_SAMPLER_V_CLAMP)
-        texture1 (t/create-2d
-                   {:width v-width
-                    :height v-height
-                    :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16
-                    :flags flags})
-        texture2 (t/create-2d
-                   {:width v-width
-                    :height v-height
-                    :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16F
-                    :flags flags})
-        texture3 (t/create-2d
-                   {:width v-width
-                    :height v-height
-                    :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16F
-                    :flags flags})]
-    (attachment/init attachment1 @texture1)
-    (attachment/init attachment2 @texture2)
-    (attachment/init attachment3 @texture3)
-    (fb/create-from-attachments [@attachment1 @attachment2 @attachment3] true)))
+        texture-color (t/create-2d
+                        {:width v-width
+                         :height v-height
+                         :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                         :flags flags})
+        texture-position (t/create-2d
+                           {:width v-width
+                            :height v-height
+                            :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16F
+                            :flags flags})
+        texture-normal (t/create-2d
+                         {:width v-width
+                          :height v-height
+                          :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                          :flags flags})]
+    (attachment/init attachment-color @texture-color)
+    (attachment/init attachment-position @texture-position)
+    (attachment/init attachment-normal @texture-normal)
+    (fb/create-from-attachments [@attachment-color @attachment-position @attachment-normal] true)))
 
 (defmacro with-log [msg f]
   `(fn [& args#]

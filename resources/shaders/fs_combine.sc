@@ -15,5 +15,6 @@ void main()
 
     vec4 ui_color = texture2D(s_texUI, v_texcoord0);
     vec4 color = texture2D(s_texScreen, v_texcoord0);
-    gl_FragColor = all(equal(ui_color, mask_color)) ? color : ui_color;
+//    gl_FragColor = all(equal(ui_color, mask_color)) ? color : ui_color;
+    gl_FragColor = color;
 }
