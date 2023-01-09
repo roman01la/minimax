@@ -164,7 +164,6 @@
 (defn run []
   (let [dt (clock/dt)
         t (clock/time)]
-    #_(prn "RENDER")
     (clock/step)
 
     (pass.shadow/setup d-light) ;; setup pass shadow
