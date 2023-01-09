@@ -54,6 +54,11 @@
     (attachment/init attachment3 @texture3)
     (fb/create-from-attachments [@attachment1 @attachment2 @attachment3] true)))
 
+(defmacro with-log [msg f]
+  `(fn [& args#]
+     (prn ~msg)
+     (apply ~f args#)))
+
 (def geometry-fb
   (lib/with-lifecycle
     :geometry-fb
