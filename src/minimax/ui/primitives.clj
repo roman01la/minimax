@@ -232,8 +232,9 @@
       ;; TODO: "inherit" styles from the Rect class
       (doto ^long vg
         (NanoVG/nvgSave)
+        (NanoVG/nvgTranslate x y)
         (NanoVG/nvgBeginPath)
-        (NanoVG/nvgRect x y w h)
+        (NanoVG/nvgRect 0 0 w h)
         (NanoVG/nvgClosePath)
         (NanoVG/nvgFillPaint image-paint)
         (NanoVG/nvgFill)
