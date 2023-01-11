@@ -22,21 +22,19 @@
 
 (def frame-buffer
   (delay
-    (let [attachment1 (attachment/create)
-          flags (bit-or 0
+    (let [flags (bit-or 0
                   BGFX/BGFX_TEXTURE_RT
                   BGFX/BGFX_SAMPLER_MIN_POINT
                   BGFX/BGFX_SAMPLER_MAG_POINT
                   BGFX/BGFX_SAMPLER_MIP_POINT
                   BGFX/BGFX_SAMPLER_U_CLAMP
                   BGFX/BGFX_SAMPLER_V_CLAMP)
-          texture1 (t/create-2d
-                     {:width SIZE
-                      :height SIZE
-                      :format BGFX/BGFX_TEXTURE_FORMAT_RGBA32F
-                      :flags flags})]
-      (attachment/init attachment1 @texture1)
-      (fb/create-from-attachments [@attachment1] true))))
+          texture (t/create-2d
+                    {:width SIZE
+                     :height SIZE
+                     :format BGFX/BGFX_TEXTURE_FORMAT_RGBA32F
+                     :flags flags})]
+      (fb/create-from-textures [texture] true))))
 
 (def picking-texture
   (delay (fb/texture @frame-buffer 0)))

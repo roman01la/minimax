@@ -23,5 +23,10 @@
     (FrameBuffer. handle)))
 
 (defn create-from-attachments [attachments destroy-textures?]
-  (let [handle (bgfx/create-frame-buffer-from-attachments attachments destroy-textures?)]
+  ;; TODO: destroying and creating a new fb doesn't work...
+  (let [handle (bgfx/create-frame-buffer-from-attachments (map deref attachments) destroy-textures?)]
+    (FrameBuffer. handle)))
+
+(defn create-from-textures [textures destroy-textures?]
+  (let [handle (bgfx/create-frame-buffer-from-textures (map deref textures) destroy-textures?)]
     (FrameBuffer. handle)))

@@ -98,7 +98,7 @@
   ([textures]
    (create-frame-buffer-from-textures textures false))
   ([textures destroy-textures?]
-   (let [textures-buff (MemoryUtil/memAllocShort 2)
+   (let [textures-buff (MemoryUtil/memAllocShort (count textures))
          _ (run! #(.put textures-buff ^short %) textures)
          _ (.flip textures-buff)
          handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]

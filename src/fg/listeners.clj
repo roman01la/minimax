@@ -2,13 +2,11 @@
   (:require
     [bgfx.core :as bgfx]
     [fg.state :as state])
-  (:import (java.nio IntBuffer)
-           (org.joml Vector3f)
+  (:import (org.joml Vector3f)
            (org.lwjgl.bgfx BGFX)
            (org.lwjgl.glfw GLFW GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback
                            GLFWMouseButtonCallback GLFWScrollCallback GLFWWindowIconifyCallback
-                           GLFWWindowMaximizeCallback GLFWWindowSizeCallback)
-           (org.lwjgl.system MemoryUtil)))
+                           GLFWWindowMaximizeCallback GLFWWindowSizeCallback)))
 
 (set! *warn-on-reflection* true)
 
@@ -38,23 +36,11 @@
         (GLFW/glfwSetWindowShouldClose window true)))))
 
 
-(def fbw (MemoryUtil/memAllocInt 1))
-(def fbh (MemoryUtil/memAllocInt 1))
-
-(defn create-window-resize-callback [update-screen camera]
+(def window-resize-callback
   (proxy [GLFWWindowSizeCallback] []
-    (invoke [^long window w h]
-      (let [_ (GLFW/glfwGetFramebufferSize window ^IntBuffer fbw ^IntBuffer fbh)
-            vwidth (.get fbw 0)
-            vheight (.get fbh 0)]
+    (invoke [window w h]
+      (swap! state/state assoc :width w :height h))))
 
-        (swap! state/state assoc
-               :width w :height h
-               :vwidth vwidth :vheight vheight)
-
-        (swap! camera assoc :aspect (/ vwidth vheight))
-        (bgfx/reset vwidth vheight reset-flags texture-format)
-        (update-screen)))))
 
 (defn create-fb-resize-callback [update-screen camera]
   (proxy [GLFWFramebufferSizeCallback] []
@@ -62,7 +48,6 @@
       (swap! state/state assoc :vwidth width :vheight height)
       (swap! camera assoc :aspect (/ width height))
       (bgfx/reset width height reset-flags texture-format)
-      #_
       (update-screen))))
 
 (def mouse-move-callback
@@ -91,11 +76,10 @@
       (swap! state/state assoc :maximized? maximized?))))
 
 (defn set-listeners [window camera update-screen]
-  (let [fb-resize-callback (create-fb-resize-callback update-screen camera)
-        window-resize-callback (create-window-resize-callback update-screen camera)]
+  (let [fb-resize-callback (create-fb-resize-callback update-screen camera)]
     (GLFW/glfwSetKeyCallback window key-callback)
     (GLFW/glfwSetWindowSizeCallback window window-resize-callback)
-    #_(GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
+    (GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
     (GLFW/glfwSetCursorPosCallback window mouse-move-callback)
     (GLFW/glfwSetMouseButtonCallback window mouse-press-callback)
     (GLFW/glfwSetScrollCallback window mouse-scroll-callback)

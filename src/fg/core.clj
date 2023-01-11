@@ -182,7 +182,9 @@
 
     #_#_
     (pass.picking/pick @curr-frame)
-    (pass.picking/blit)))
+    (pass.picking/blit)
+
+    (reset! curr-frame (bgfx/frame))))
 
 (listeners/set-listeners window camera run)
 
@@ -192,8 +194,7 @@
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    (run)
-    (reset! curr-frame (bgfx/frame)))
+    (run))
 
   ;; Disposing the program
   (ui/shutdown)

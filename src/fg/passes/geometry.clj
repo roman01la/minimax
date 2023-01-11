@@ -24,10 +24,7 @@
     BGFX/BGFX_STATE_MSAA))
 
 (defn create-geometry-fb [v-width v-height]
-  (let [attachment-color (attachment/create)
-        attachment-position (attachment/create)
-        attachment-normal (attachment/create)
-        flags (bit-or 0
+  (let [flags (bit-or 0
                 BGFX/BGFX_TEXTURE_RT_MSAA_X4
                 BGFX/BGFX_SAMPLER_MIN_POINT
                 BGFX/BGFX_SAMPLER_MAG_POINT
@@ -49,10 +46,7 @@
                           :height v-height
                           :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
                           :flags flags})]
-    (attachment/init attachment-color @texture-color)
-    (attachment/init attachment-position @texture-position)
-    (attachment/init attachment-normal @texture-normal)
-    (fb/create-from-attachments [@attachment-color @attachment-position @attachment-normal] true)))
+    (fb/create-from-textures [texture-color texture-position texture-normal] true)))
 
 (defmacro with-log [msg f]
   `(fn [& args#]
