@@ -1,5 +1,7 @@
 (ns minimax.ui.utils
-  (:import (org.lwjgl.nanovg NVGColor)))
+  (:import (java.io File)
+           (org.lwjgl.nanovg NVGColor NanoVG)
+           (org.lwjgl.system MemoryUtil)))
 
 (set! *warn-on-reflection* true)
 
@@ -31,3 +33,13 @@
              (>= bx2 ax1 bx1))
          (or (>= by2 ay2 by1)
              (>= by2 ay1 by1)))))
+
+(let [w (MemoryUtil/memAllocInt 1)
+      h (MemoryUtil/memAllocInt 1)]
+  ;; TODO: cache and delete image (lifecycle)
+  (defn create-image-from-file [^long vg ^File file]
+    (let [img (NanoVG/nvgCreateImage vg (.getAbsolutePath file) 0)]
+      (NanoVG/nvgImageSize vg img w h)
+      {:handle img
+       :width (.get w 0)
+       :height (.get h 0)})))

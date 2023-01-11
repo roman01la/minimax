@@ -1,8 +1,10 @@
 (ns minimax.ui.primitives
-  (:require [minimax.ui.context :as ui.ctx]
-            [minimax.ui.utils :as ui.utils])
+  (:require
+    [clojure.java.io :as io]
+    [minimax.ui.context :as ui.ctx]
+    [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.nanovg NVGColor NanoVG)
+           (org.lwjgl.nanovg NVGColor NVGPaint NanoVG)
            (org.lwjgl.system MemoryUtil)
            (org.lwjgl.util.yoga YGNode Yoga)))
 
@@ -218,6 +220,41 @@
       :ynode (create-text-node (:style props) text)
       :text text
       :parent-layout (atom []))))
+
+
+(def ^:private image-paint (NVGPaint/create))
+
+(defrecord Image [vg ynode parent-layout img]
+  IDrawable
+  (draw [this]
+    (let [[x y w h] (get-layout this)
+          _ (NanoVG/nvgImagePattern ^long vg 0 0 w h 0 (:handle img) 1 image-paint)]
+      ;; TODO: "inherit" styles from the Rect class
+      (doto ^long vg
+        (NanoVG/nvgSave)
+        (NanoVG/nvgBeginPath)
+        (NanoVG/nvgRect x y w h)
+        (NanoVG/nvgClosePath)
+        (NanoVG/nvgFillPaint image-paint)
+        (NanoVG/nvgFill)
+        (NanoVG/nvgRestore))))
+  ILayout
+  (layout [this])
+  (store-layout [this])
+  (get-layout [this]
+    (get-layout* ynode @parent-layout)))
+
+(defn image [props]
+  (let [vg @ui.ctx/vg
+        img (ui.utils/create-image-from-file vg (io/file (:src props)))]
+    (map->Image
+      (assoc props
+        :vg vg
+        :ynode (create-node (:style props))
+        :parent-layout (atom [])
+        :img img))))
+
+
 
 (defrecord Root [ynode parent-layout style children]
   IDrawable

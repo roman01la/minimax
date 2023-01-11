@@ -132,6 +132,10 @@
              :height height
              :flex-direction :column}}
     (perf-stats)
+    (ui/image {:src "logo.png"
+               ;; TODO: apply device pixel ratio internally
+               :style {:width (/ 175 2)
+                       :height (/ 108 2)}})
     (ui/view
       {:style {:flex 1
                :justify-content :center}}

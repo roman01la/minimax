@@ -81,6 +81,14 @@
                   :children children})))
 
 
+(defrecord UIImage [vnode props]
+  IEventTarget
+  (ui-event [this opts]))
+
+(defn image [props]
+  (map->UIText {:vnode (ui.pmt/image props)
+                :props props}))
+
 
 (defrecord UIRoot [vnode props children]
   IEventTarget
