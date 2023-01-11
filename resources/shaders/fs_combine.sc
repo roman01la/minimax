@@ -15,5 +15,5 @@ void main()
     vec4 color = texture2D(s_texScreen, v_texcoord0);
 
     // blend UI texture onto screen texture using ALPHA as factor
-    gl_FragColor = ui_color * ui_color.a + color * (1.0 - ui_color.a);
+    gl_FragColor = vec4(mix(color.rgb, ui_color.rgb, ui_color.a), 1.0);
 }
