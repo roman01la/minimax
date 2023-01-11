@@ -21,18 +21,26 @@
 
 (defn load-font! [vg font-name file]
   (let [data (util.fs/load-resource file)]
-    (when (= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 0))
+    (when (= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 1))
       (throw (RuntimeException. (str "Failed to load " font-name " font"))))))
 
-(defn create-frame-buffer [vg width height]
-  (let [fb (NanoVGBGFX/nvgluCreateFramebuffer vg width height 0)]
-    (NanoVGBGFX/nvgluSetViewFramebuffer (:id passes/ui) fb)
-    fb))
+(defn create-frame-buffer [width height]
+  (let [textures [(bgfx/create-texture-2d width height false 1
+                                          BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                                          BGFX/BGFX_TEXTURE_RT)
+                  (bgfx/create-texture-2d width height false 1
+                                          BGFX/BGFX_TEXTURE_FORMAT_D24S8
+                                          (bit-or BGFX/BGFX_TEXTURE_RT
+                                                  BGFX/BGFX_TEXTURE_RT_WRITE_ONLY))]
+        fbh (bgfx/create-frame-buffer-from-textures textures true)]
+    (bgfx/set-view-frame-buffer (:id passes/ui) fbh)
+    (bgfx/set-view-mode (:id passes/ui) BGFX/BGFX_VIEW_MODE_SEQUENTIAL)
+    fbh))
 
 (def frame-buffer
   (lib/with-lifecycle
     :frame-buffer
-    #(create-frame-buffer @ui.ctx/vg %1 %2)
+    #(create-frame-buffer %1 %2)
     #(NanoVGBGFX/nvgluDeleteFramebuffer %)
     [state/state]
     (juxt :vwidth :vheight)))
@@ -40,7 +48,7 @@
 (def texture
   (lib/with-lifecycle
     :texture
-    #(bgfx/get-texture (.handle %) 0)
+    #(bgfx/get-texture % 0)
     bgfx/destroy-texture
     [frame-buffer]
     (fn [fb] [fb])))
@@ -64,7 +72,7 @@
     (log/debug "Loading fonts...")
     (time (load-fonts! vg))
 
-    (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0xff0000ff)))
+    (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0x00000000)))
 
 (def layout-time (volatile! 0))
 

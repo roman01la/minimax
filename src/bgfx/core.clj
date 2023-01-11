@@ -138,6 +138,9 @@
   ([view-id flags rgba depth stencil]
    (BGFX/bgfx_set_view_clear view-id flags rgba depth stencil)))
 
+(defn set-view-mode [view-id mode]
+  (BGFX/bgfx_set_view_mode view-id mode))
+
 (defn set-view-frame-buffer [view-id frame-buffer-handle]
   (BGFX/bgfx_set_view_frame_buffer view-id frame-buffer-handle))
 

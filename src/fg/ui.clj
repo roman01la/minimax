@@ -132,9 +132,6 @@
              :height height
              :flex-direction :column}}
     (perf-stats)
-    (ui/image {:src "logo.png"
-               :style {:width (/ 175 2)
-                       :height (/ 108 2)}})
     (ui/view
       {:style {:flex 1
                :justify-content :center}}
@@ -157,7 +154,13 @@
                    :font-face "RobotoSlab-Bold"
                    :text-color #ui/rgba [115 90 25 1]
                    :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
-          "Welcome!")))))
+          "Welcome!")))
+    (ui/image {:src "logo.png"
+               :style {:position :absolute
+                       :left 16
+                       :bottom 16
+                       :width (/ 175 2)
+                       :height (/ 108 2)}})))
 
 (defn tree-view [{:keys [style on-select object selected]}]
   (let [selected? (= selected object)]

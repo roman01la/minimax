@@ -176,7 +176,7 @@
     (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
     #_(obj/render @scene (:id passes/picking)) ;; picking id pass
 
-    #_(ui/render @state/state render-ui) ;; ui pass
+    (ui/render @state/state render-ui) ;; ui pass
 
     (pass.comb/render) ;; render combine pass
 
