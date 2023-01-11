@@ -44,7 +44,7 @@
 (def frame-buffer
   (lib/with-lifecycle
     :frame-buffer
-    #(create-frame-buffer %1 %2)
+    create-frame-buffer
     fb/destroy
     [state/state]
     (juxt :vwidth :vheight)))
@@ -101,9 +101,9 @@
 
 (defn render [{:keys [^int width ^int height ^int dpr ^int vwidth ^int vheight] :as opts} render-root]
   (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0x00000000)
+  (view/rect passes/ui 0 0 vwidth vheight)
   (view/frame-buffer passes/ui @@frame-buffer)
   (view/mode passes/ui BGFX/BGFX_VIEW_MODE_SEQUENTIAL)
-  (view/rect passes/ui 0 0 vwidth vheight)
   (NanoVG/nvgBeginFrame @ui.ctx/vg width height dpr)
   (render* opts render-root)
   (NanoVG/nvgEndFrame @ui.ctx/vg))
