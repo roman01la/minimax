@@ -1,5 +1,5 @@
 (ns bgfx.core
-  (:import (java.nio FloatBuffer ShortBuffer)
+  (:import (java.nio FloatBuffer)
            (org.lwjgl.bgfx BGFX BGFXAttachment BGFXCaps BGFXInit BGFXStats)
            (org.lwjgl.system MemoryUtil)))
 
