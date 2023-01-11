@@ -48,11 +48,6 @@
                           :flags flags})]
     (fb/create-from-textures [texture-color texture-position texture-normal] true)))
 
-(defmacro with-log [msg f]
-  `(fn [& args#]
-     (prn ~msg)
-     (apply ~f args#)))
-
 (def geometry-fb
   (lib/with-lifecycle
     :geometry-fb
