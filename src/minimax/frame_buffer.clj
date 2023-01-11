@@ -1,7 +1,6 @@
 (ns minimax.frame-buffer
   (:require [bgfx.core :as bgfx])
-  (:import (clojure.lang IDeref)
-           (org.lwjgl.bgfx BGFX BGFXAttachment)))
+  (:import (clojure.lang IDeref)))
 
 (set! *warn-on-reflection* true)
 
@@ -24,11 +23,5 @@
     (FrameBuffer. handle)))
 
 (defn create-from-attachments [attachments destroy-textures?]
-  (let [attachments-buff (BGFXAttachment/create (count attachments))
-        _ (doseq [x attachments]
-            (.put attachments-buff ^BGFXAttachment x))
-        _ (.flip attachments-buff)
-        handle (bgfx/create-frame-buffer-from-attachment attachments-buff destroy-textures?)]
-    (assert (every? #(BGFX/bgfx_is_frame_buffer_valid handle %) attachments)
-            "create-from-attachments: the framebuffer is not valid")
+  (let [handle (bgfx/create-frame-buffer-from-attachments attachments destroy-textures?)]
     (FrameBuffer. handle)))

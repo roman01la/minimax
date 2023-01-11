@@ -1,6 +1,7 @@
 (ns bgfx.core
-  (:import (java.nio FloatBuffer)
-           (org.lwjgl.bgfx BGFX BGFXCaps BGFXInit BGFXStats)))
+  (:import (java.nio FloatBuffer ShortBuffer)
+           (org.lwjgl.bgfx BGFX BGFXAttachment BGFXCaps BGFXInit BGFXStats)
+           (org.lwjgl.system MemoryUtil)))
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
@@ -81,11 +82,28 @@
   ([width height texture-format texture-flags]
    (BGFX/bgfx_create_frame_buffer width height texture-format texture-flags)))
 
-(defn create-frame-buffer-from-attachment
-  ([attachment]
-   (create-frame-buffer-from-attachment attachment false))
-  ([attachment destroy-textures?]
-   (BGFX/bgfx_create_frame_buffer_from_attachment attachment destroy-textures?)))
+(defn create-frame-buffer-from-attachments
+  ([attachments]
+   (create-frame-buffer-from-attachments attachments false))
+  ([attachments destroy-textures?]
+   (let [attachments-buff (BGFXAttachment/create (count attachments))
+         _ (run! #(.put attachments-buff ^BGFXAttachment %) attachments)
+         _ (.flip attachments-buff)
+         handle (BGFX/bgfx_create_frame_buffer_from_attachment attachments-buff destroy-textures?)]
+     (assert (every? #(BGFX/bgfx_is_frame_buffer_valid handle %) attachments)
+             "create-from-attachments: the framebuffer is not valid")
+     handle)))
+
+(defn create-frame-buffer-from-textures
+  ([textures]
+   (create-frame-buffer-from-textures textures false))
+  ([textures destroy-textures?]
+   (let [textures-buff (MemoryUtil/memAllocShort 2)
+         _ (run! #(.put textures-buff ^short %) textures)
+         _ (.flip textures-buff)
+         handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]
+     (assert (not= handle 0xffff) "create-frame-buffer-from-textures: the framebuffer is not valid")
+     handle)))
 
 (defn get-texture [frame-buffer-handle attachment-idx]
   (BGFX/bgfx_get_texture frame-buffer-handle attachment-idx))
