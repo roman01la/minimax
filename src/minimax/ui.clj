@@ -97,7 +97,7 @@
     (ui.pmt/draw (:vnode el))
     (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))))
 
-(defn render [{:keys [width height dpr] :as opts} render-root]
+(defn render [{:keys [^int width ^int height ^int dpr] :as opts} render-root]
   (view/rect passes/ui 0 0 (* dpr width) (* dpr height))
   (NanoVG/nvgBeginFrame @ui.ctx/vg width height dpr)
   (render* opts render-root)

@@ -39,7 +39,7 @@
       (when on-layout (on-layout x y w h))
       (when on-mouse-over (on-mouse-over mouse-over?))
       (when mouse-over?
-        (case mouse-button-action
+        (case (int mouse-button-action)
           0 (when on-mouse-up (on-mouse-up))
           1 (when on-mouse-down (on-mouse-down))
           nil))

@@ -85,18 +85,19 @@
 
 (def ^FloatBuffer text-bounds (MemoryUtil/memAllocFloat 4))
 (defn measure-text [{:keys [font-size font-face text-color text-align]} text]
-  (doto ^long (deref ui.ctx/vg)
-    (NanoVG/nvgFontSize font-size)
-    (NanoVG/nvgFontFace ^CharSequence font-face)
-    (NanoVG/nvgFillColor text-color)
-    (NanoVG/nvgTextAlign text-align)
-    (NanoVG/nvgTextBounds (float 0) (float 0) ^CharSequence text text-bounds))
-  (let [xmin (.get text-bounds 0)
+  (let [^long vg @ui.ctx/vg
+
+        xmin (.get text-bounds 0)
         ymin (.get text-bounds 1)
         xmax (.get text-bounds 2)
         ymax (.get text-bounds 3)
         w (+ (abs xmin) (abs xmax))
         h (+ (abs ymin) (abs ymax))]
+    (NanoVG/nvgFontSize vg font-size)
+    (NanoVG/nvgFontFace vg ^CharSequence font-face)
+    (NanoVG/nvgFillColor vg text-color)
+    (NanoVG/nvgTextAlign vg text-align)
+    (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds)
     [w h]))
 
 (defn create-text-node [styles text]

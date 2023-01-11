@@ -1,4 +1,4 @@
 (ns minimax.logger)
 
 (defn debug [& args]
-  (apply println args))
+  (apply println "[MINIMAX]" args))
