@@ -5,7 +5,6 @@
     [minimax.object :as obj]
     [minimax.passes :as passes]
     [fg.state :as state]
-    [minimax.attachment :as attachment]
     [minimax.texture :as t]
     [minimax.uniform :as u]
     [minimax.frame-buffer :as fb]
@@ -59,26 +58,26 @@
 (def screen-texture
   (lib/with-lifecycle
     :screen-texture
-    #(bgfx/get-texture %1 0)
+    #(fb/texture %1 0)
     bgfx/destroy-texture
     [geometry-fb]
-    (fn [geometry-fb] [@geometry-fb])))
+    vector))
 
 (def position-texture
   (lib/with-lifecycle
     :position-texture
-    #(bgfx/get-texture %1 1)
+    #(fb/texture %1 1)
     bgfx/destroy-texture
     [geometry-fb]
-    (fn [geometry-fb] [@geometry-fb])))
+    vector))
 
 (def normal-texture
   (lib/with-lifecycle
     :normal-texture
-    #(bgfx/get-texture %1 2)
+    #(fb/texture %1 2)
     bgfx/destroy-texture
     [geometry-fb]
-    (fn [geometry-fb] [@geometry-fb])))
+    vector))
 
 (def u-tex-position
   (delay (u/create "s_texPosition" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))

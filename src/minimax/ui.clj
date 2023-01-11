@@ -3,8 +3,10 @@
     [bgfx.core :as bgfx]
     [clojure.java.io :as io]
     [fg.state :as state]
+    [minimax.frame-buffer :as fb]
     [minimax.lib :as lib]
     [minimax.passes :as passes]
+    [minimax.texture :as t]
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.components :as mui]
     [minimax.ui.elements :as ui]
@@ -25,33 +27,35 @@
       (throw (RuntimeException. (str "Failed to load " font-name " font"))))))
 
 (defn create-frame-buffer [width height]
-  (let [textures [(bgfx/create-texture-2d width height false 1
-                                          BGFX/BGFX_TEXTURE_FORMAT_RGBA8
-                                          BGFX/BGFX_TEXTURE_RT)
-                  (bgfx/create-texture-2d width height false 1
-                                          BGFX/BGFX_TEXTURE_FORMAT_D24S8
-                                          (bit-or BGFX/BGFX_TEXTURE_RT
-                                                  BGFX/BGFX_TEXTURE_RT_WRITE_ONLY))]
-        fbh (bgfx/create-frame-buffer-from-textures textures true)]
-    (bgfx/set-view-frame-buffer (:id passes/ui) fbh)
-    (bgfx/set-view-mode (:id passes/ui) BGFX/BGFX_VIEW_MODE_SEQUENTIAL)
-    fbh))
+  (let [textures [(t/create-2d
+                    {:width width
+                     :height height
+                     :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                     :flags BGFX/BGFX_TEXTURE_RT})
+                  (t/create-2d
+                    {:width width
+                     :height height
+                     :format BGFX/BGFX_TEXTURE_FORMAT_D24S8
+                     :flags (bit-or BGFX/BGFX_TEXTURE_RT
+                                    BGFX/BGFX_TEXTURE_RT_WRITE_ONLY)})]]
+
+    (fb/create-from-textures textures true)))
 
 (def frame-buffer
   (lib/with-lifecycle
     :frame-buffer
     #(create-frame-buffer %1 %2)
-    bgfx/destroy-frame-buffer
+    fb/destroy
     [state/state]
     (juxt :vwidth :vheight)))
 
 (def texture
   (lib/with-lifecycle
     :texture
-    #(bgfx/get-texture % 0)
+    #(fb/texture % 0)
     bgfx/destroy-texture
     [frame-buffer]
-    (fn [fb] [fb])))
+    vector))
 
 (def fonts
   [["Roboto_Slab" "RobotoSlab-Bold"]
@@ -70,9 +74,7 @@
 
     ;; loading UI fonts
     (log/debug "Loading fonts...")
-    (time (load-fonts! vg))
-
-    (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0x00000000)))
+    (time (load-fonts! vg))))
 
 (def layout-time (volatile! 0))
 
@@ -97,8 +99,11 @@
     (ui.pmt/draw (:vnode el))
     (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))))
 
-(defn render [{:keys [^int width ^int height ^int dpr] :as opts} render-root]
-  (view/rect passes/ui 0 0 (* dpr width) (* dpr height))
+(defn render [{:keys [^int width ^int height ^int dpr ^int vwidth ^int vheight] :as opts} render-root]
+  (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0x00000000)
+  (view/frame-buffer passes/ui @@frame-buffer)
+  (view/mode passes/ui BGFX/BGFX_VIEW_MODE_SEQUENTIAL)
+  (view/rect passes/ui 0 0 vwidth vheight)
   (NanoVG/nvgBeginFrame @ui.ctx/vg width height dpr)
   (render* opts render-root)
   (NanoVG/nvgEndFrame @ui.ctx/vg))
