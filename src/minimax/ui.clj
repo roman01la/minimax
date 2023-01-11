@@ -41,7 +41,7 @@
   (lib/with-lifecycle
     :frame-buffer
     #(create-frame-buffer %1 %2)
-    #(NanoVGBGFX/nvgluDeleteFramebuffer %)
+    bgfx/destroy-frame-buffer
     [state/state]
     (juxt :vwidth :vheight)))
 
