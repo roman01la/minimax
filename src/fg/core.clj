@@ -159,12 +159,11 @@
   (fg.ui/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
 
 ;; Rendering loop
-(def curr-frame (atom nil))
+(def curr-frame (volatile! nil))
 
 (defn run []
   (let [dt (clock/dt)
         t (clock/time)]
-    (clock/step)
 
     (pass.shadow/setup d-light) ;; setup pass shadow
     (pass.geom/setup camera) ;; render pass geometry
@@ -184,7 +183,7 @@
     (pass.picking/pick @curr-frame)
     (pass.picking/blit)
 
-    (reset! curr-frame (bgfx/frame))))
+    (vreset! curr-frame (bgfx/frame))))
 
 (listeners/set-listeners window camera run)
 
@@ -194,6 +193,7 @@
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
+    (clock/step)
     (run))
 
   ;; Disposing the program

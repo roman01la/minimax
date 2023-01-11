@@ -159,8 +159,8 @@
                :style {:position :absolute
                        :left 16
                        :bottom 16
-                       :width (/ 175 2)
-                       :height (/ 108 2)}})))
+                       :width (/ 175 3)
+                       :height (/ 108 3)}})))
 
 (defn tree-view [{:keys [style on-select object selected]}]
   (let [selected? (= selected object)]
