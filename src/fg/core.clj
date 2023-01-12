@@ -159,7 +159,7 @@
   (fg.ui/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
 
 ;; Rendering loop
-(def curr-frame (volatile! nil))
+(def curr-frame (volatile! 0))
 
 (defn run []
   (let [dt (clock/dt)
@@ -181,11 +181,19 @@
 
     #_#_
     (pass.picking/pick @curr-frame)
-    (pass.picking/blit)
+    (pass.picking/blit)))
 
-    (vreset! curr-frame (bgfx/frame))))
+(def fb-size (volatile! [800 600]))
 
-(listeners/set-listeners window camera run)
+(defn on-resize [width height]
+  (vreset! fb-size [width height]))
+
+(listeners/set-listeners window on-resize)
+
+(defn run-on-resize [width height]
+  (swap! state/state assoc :vwidth width :vheight height)
+  (swap! camera assoc :aspect (/ width height))
+  (bgfx/reset width height listeners/reset-flags listeners/texture-format))
 
 (defn -main [& args]
   (fg.dev/start)
@@ -193,8 +201,11 @@
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
+    (when (not= @fb-size ((juxt :vwidth :vheight) @state/state))
+      (apply run-on-resize @fb-size))
     (clock/step)
-    (run))
+    (run)
+    (vreset! curr-frame (bgfx/frame)))
 
   ;; Disposing the program
   (ui/shutdown)
