@@ -183,17 +183,33 @@
     (pass.picking/pick @curr-frame)
     (pass.picking/blit)))
 
-(def fb-size (volatile! [800 600]))
+(def resize-frame (volatile! 0))
+(def fb-size (volatile! nil))
 
-(defn on-resize [width height]
-  (vreset! fb-size [width height]))
-
-(listeners/set-listeners window on-resize)
-
-(defn run-on-resize [width height]
+(defn on-resize* [width height]
   (swap! state/state assoc :vwidth width :vheight height)
   (swap! camera assoc :aspect (/ width height))
   (bgfx/reset width height listeners/reset-flags listeners/texture-format))
+
+;; resize every 20th frame
+(defn on-resize [width height]
+  (vreset! fb-size [width height])
+  (vswap! resize-frame inc)
+  (when (zero? (mod @resize-frame 20))
+    (on-resize* width height)
+    (run)
+    (vreset! curr-frame (bgfx/frame))))
+
+(listeners/set-listeners window on-resize)
+
+;; resize to the latest size value in a rendering loop
+(defn maybe-set-size []
+  (when (some? @fb-size)
+    (let [[fbw fbh] @fb-size
+          {:keys [vwidth vheight]} @state/state]
+      (when (or (not= fbw vwidth)
+                (not= fbh vheight))
+        (on-resize* fbw fbh)))))
 
 (defn -main [& args]
   (fg.dev/start)
@@ -201,8 +217,7 @@
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    (when (not= @fb-size ((juxt :vwidth :vheight) @state/state))
-      (apply run-on-resize @fb-size))
+    (maybe-set-size)
     (clock/step)
     (run)
     (vreset! curr-frame (bgfx/frame)))

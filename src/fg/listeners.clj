@@ -42,10 +42,10 @@
       (swap! state/state assoc :width w :height h))))
 
 
-(defn create-fb-resize-callback [update-screen]
+(defn create-fb-resize-callback [on-resize]
   (proxy [GLFWFramebufferSizeCallback] []
     (invoke [window width height]
-      (update-screen width height))))
+      (on-resize width height))))
 
 (def mouse-move-callback
   (proxy [GLFWCursorPosCallback] []
@@ -72,8 +72,8 @@
     (invoke [window maximized?]
       (swap! state/state assoc :maximized? maximized?))))
 
-(defn set-listeners [window update-screen]
-  (let [fb-resize-callback (create-fb-resize-callback update-screen)]
+(defn set-listeners [window on-resize]
+  (let [fb-resize-callback (create-fb-resize-callback on-resize)]
     (GLFW/glfwSetKeyCallback window key-callback)
     (GLFW/glfwSetWindowSizeCallback window window-resize-callback)
     (GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
