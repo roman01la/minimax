@@ -1,5 +1,7 @@
 (ns minimax.glfw
-  (:import (org.lwjgl.glfw Callbacks GLFW)
+  (:require [minimax.mem :as mem])
+  (:import (java.nio FloatBuffer)
+           (org.lwjgl.glfw Callbacks GLFW)
            (org.lwjgl.system MemoryUtil)))
 
 (set! *warn-on-reflection* true)
@@ -29,11 +31,8 @@
   (set-cursor* @!window cursor))
 
 (defn detect-dpr []
-  (let [x (MemoryUtil/memAllocFloat 1)
-        y (MemoryUtil/memAllocFloat 1)
-        _ (GLFW/glfwGetMonitorContentScale
-            (GLFW/glfwGetPrimaryMonitor) x y)
-        dpr (.get x)
-        _ (MemoryUtil/memFree x)
-        _ (MemoryUtil/memFree y)]
-    dpr))
+  (mem/slet [^FloatBuffer x [:float 1]
+             ^FloatBuffer y [:float 1]]
+    (GLFW/glfwGetMonitorContentScale
+      (GLFW/glfwGetPrimaryMonitor) x y)
+    (.get x)))

@@ -2,13 +2,13 @@
   (:require
     [bgfx.core :as bgfx]
     [clojure.java.io :as io]
-    [minimax.texture :as t])
+    [minimax.texture :as t]
+    [minimax.mem :as mem])
   (:import (java.nio IntBuffer)
            (java.util ArrayList)
            (org.lwjgl.assimp AIScene AITexture)
            (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.stb STBImage)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.stb STBImage)))
 
 (set! *warn-on-reflection* true)
 
@@ -20,14 +20,14 @@
     textures))
 
 (defn create-image [load handle]
-  (let [x (MemoryUtil/memAllocInt 1)
-        y (MemoryUtil/memAllocInt 1)
-        channels (MemoryUtil/memAllocInt 1)
-        data (load x y channels)
-        width (.get x)
-        height (.get y)
-        channels (.get channels)]
-    (handle width height channels data)))
+  (mem/slet [^IntBuffer x [:int 1]
+             ^IntBuffer y [:int 1]
+             ^IntBuffer channels [:int 1]]
+    (let [data (load x y channels)
+          width (.get x)
+          height (.get y)
+          channels (.get channels)]
+      (handle width height channels data))))
 
 (defn create-texture* [name load]
   (create-image load

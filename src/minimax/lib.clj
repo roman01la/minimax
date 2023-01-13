@@ -1,5 +1,6 @@
 (ns minimax.lib
-  (:require [bgfx.core :as bgfx])
+  (:require [bgfx.core :as bgfx]
+            [minimax.mem :as mem])
   (:import (clojure.lang IDeref IRef)
            (java.nio FloatBuffer)
            (org.joml Matrix4f Vector3f Vector4f)
@@ -29,8 +30,8 @@
   m)
 
 (defn set-view-transform [view-id view-mtx proj-mtx]
-  (let [view-buff (MemoryUtil/memAllocFloat 16)
-        proj-buff (MemoryUtil/memAllocFloat 16)]
+  (mem/slet [view-buff [:float 16]
+             proj-buff [:float 16]]
     (bgfx/set-view-transform view-id
                              (when view-mtx (.get ^Matrix4f view-mtx ^FloatBuffer view-buff))
                              (when proj-mtx (.get ^Matrix4f proj-mtx ^FloatBuffer proj-buff)))))

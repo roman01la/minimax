@@ -1,6 +1,7 @@
 (ns minimax.ui.primitives
   (:require
     [clojure.java.io :as io]
+    [minimax.mem :as mem]
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
@@ -83,22 +84,22 @@
         (f node v)))
     node))
 
-(def ^FloatBuffer text-bounds (MemoryUtil/memAllocFloat 4))
 (defn measure-text [{:keys [font-size font-face text-color text-align]} text]
-  (let [^long vg @ui.ctx/vg
+  (mem/slet [^FloatBuffer text-bounds [:float 4]]
+    (let [^long vg @ui.ctx/vg
 
-        xmin (.get text-bounds 0)
-        ymin (.get text-bounds 1)
-        xmax (.get text-bounds 2)
-        ymax (.get text-bounds 3)
-        w (+ (abs xmin) (abs xmax))
-        h (+ (abs ymin) (abs ymax))]
-    (NanoVG/nvgFontSize vg font-size)
-    (NanoVG/nvgFontFace vg ^CharSequence font-face)
-    (NanoVG/nvgFillColor vg text-color)
-    (NanoVG/nvgTextAlign vg text-align)
-    (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds)
-    [w h]))
+          xmin (.get text-bounds 0)
+          ymin (.get text-bounds 1)
+          xmax (.get text-bounds 2)
+          ymax (.get text-bounds 3)
+          w (+ (abs xmin) (abs xmax))
+          h (+ (abs ymin) (abs ymax))]
+      (NanoVG/nvgFontSize vg font-size)
+      (NanoVG/nvgFontFace vg ^CharSequence font-face)
+      (NanoVG/nvgFillColor vg text-color)
+      (NanoVG/nvgTextAlign vg text-align)
+      (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds)
+      [w h])))
 
 (defn create-text-node [styles text]
   (let [node (create-node styles)
