@@ -17,5 +17,5 @@
                                     ~stack-sym
                                     ~c)])))
            ret#  (do ~@body)]
-       (.pop ~stack-sym)
+       (MemoryStack/stackPop)
        ret#)))
