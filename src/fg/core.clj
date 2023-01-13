@@ -31,6 +31,10 @@
 (when (= (Platform/get) Platform/MACOSX)
   (.set Configuration/GLFW_LIBRARY_NAME "glfw_async"))
 
+(.set Configuration/DEBUG true)
+(.set Configuration/DEBUG_MEMORY_ALLOCATOR true)
+(.set Configuration/DEBUG_STACK true)
+
 ;; GLFW window
 
 (when-not (GLFW/glfwInit)
