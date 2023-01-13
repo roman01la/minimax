@@ -2,8 +2,7 @@
   (:require [minimax.mem :as mem])
   (:import (java.io File)
            (java.nio IntBuffer)
-           (org.lwjgl.nanovg NVGColor NanoVG)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.nanovg NVGColor NanoVG)))
 
 (set! *warn-on-reflection* true)
 
