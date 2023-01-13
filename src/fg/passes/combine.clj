@@ -55,7 +55,7 @@
       {:width 4
        :height 4
        :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16F
-       :mem (bgfx/make-ref ssao-noise)})))
+       :mem (bgfx/make-ref-release ssao-noise)})))
 
 (def u-ssao-noise
   (delay (u/create "s_ssaoNoise" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))

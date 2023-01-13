@@ -14,6 +14,6 @@
 
 (defn create [path]
   (let [f (io/file (io/resource (str "shaders_out/" path ".bin")))
-        handle (bgfx/create-shader (bgfx/make-ref (util.fs/load-resource f)))]
+        handle (bgfx/create-shader (bgfx/make-ref-release (util.fs/load-resource f)))]
     (bgfx/set-shader-name handle path)
     (Shader. handle)))

@@ -27,7 +27,7 @@
       (.putShort mem (short idx)))
     (assert (zero? (.remaining mem)) "ByteBuffer size and number of arguments do not match")
     (.flip mem)
-    (bgfx/create-index-buffer (bgfx/make-ref mem))))
+    (bgfx/create-index-buffer (bgfx/make-ref-release mem))))
 
 (defrecord IndexBuffer [buffer indices]
   IDeref

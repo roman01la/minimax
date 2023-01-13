@@ -62,7 +62,7 @@
           (recur (inc idx)))))
     (assert (zero? (.remaining mem)) "ByteBuffer size and number of arguments do not match")
     (.flip mem)
-    (bgfx/create-vertex-buffer (bgfx/make-ref mem) @layout)))
+    (bgfx/create-vertex-buffer (bgfx/make-ref-release mem) @layout)))
 
 (defrecord VertexBuffer [buffer vertices normals tangents texture-coords]
   IDeref

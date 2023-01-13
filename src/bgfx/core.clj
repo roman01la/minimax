@@ -1,6 +1,6 @@
 (ns bgfx.core
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.bgfx BGFX BGFXAttachment BGFXCaps BGFXInit BGFXStats)
+           (org.lwjgl.bgfx BGFX BGFXAttachment BGFXCaps BGFXInit BGFXReleaseFunctionCallback BGFXReleaseFunctionCallbackI BGFXStats)
            (org.lwjgl.system MemoryUtil)))
 
 (set! *warn-on-reflection* true)
@@ -176,8 +176,23 @@
   ([view-id program-handle depth flags]
    (BGFX/bgfx_submit view-id program-handle depth flags)))
 
+(defn create-release-callback []
+  (BGFXReleaseFunctionCallback/create
+    (proxy [BGFXReleaseFunctionCallback] []
+      (invoke [ptr user-data]
+        (MemoryUtil/nmemFree ptr)))))
+
+(def release
+  (delay (create-release-callback)))
+
 (defn make-ref [mem]
   (BGFX/bgfx_make_ref mem))
+
+(defn make-ref-release
+  ([mem]
+   (make-ref-release mem @release))
+  ([mem f]
+   (BGFX/bgfx_make_ref_release mem ^BGFXReleaseFunctionCallbackI f (long 0))))
 
 (defn blit
   ([view-id

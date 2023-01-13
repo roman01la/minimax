@@ -36,7 +36,7 @@
                                   {:width width
                                    :height height
                                    :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
-                                   :mem (bgfx/make-ref data)})]
+                                   :mem (bgfx/make-ref-release data)})]
                     {:name name
                      :data texture
                      :width width
