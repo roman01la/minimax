@@ -6,6 +6,8 @@
     [minimax.frame-buffer :as fb]
     [minimax.lib :as lib]
     [minimax.passes :as passes]
+    [minimax.pool :as pool]
+    [minimax.resources :as res]
     [minimax.texture :as t]
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.components :as mui]
@@ -97,7 +99,9 @@
     (ui.pmt/store-layout (:vnode el))
     (ui/ui-event el opts)
     (ui.pmt/draw (:vnode el))
-    (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))))
+    (Yoga/YGNodeFreeRecursive (-> el :vnode :ynode))
+    (pool/free res/colors)
+    (pool/free res/images)))
 
 (defn render [{:keys [^int width ^int height ^int dpr ^int vwidth ^int vheight] :as opts} render-root]
   (view/clear passes/ui (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 0x00000000)

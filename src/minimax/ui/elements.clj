@@ -1,12 +1,13 @@
 (ns minimax.ui.elements
   (:require [minimax.ui.primitives :as ui.pmt]
-            [minimax.ui.utils :as ui.utils])
-  (:import (org.lwjgl.nanovg NVGColor)))
+            [minimax.ui.utils :as ui.utils]
+            [minimax.pool :as pool]
+            [minimax.resources :as res]))
 
 (set! *warn-on-reflection* true)
 
 (defn rgba-tag [[r g b a]]
-  `(ui.utils/rgba ~r ~g ~b ~a (NVGColor/create)))
+  `(ui.utils/rgba ~r ~g ~b ~a (pool/alloc res/colors)))
 
 ;; UI elements
 (defprotocol IEventTarget

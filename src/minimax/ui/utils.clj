@@ -1,5 +1,7 @@
 (ns minimax.ui.utils
-  (:require [minimax.mem :as mem])
+  (:require [minimax.mem :as mem]
+            [minimax.pool :as pool]
+            [minimax.resources :as res])
   (:import (java.io File)
            (java.nio IntBuffer)
            (org.lwjgl.nanovg NVGColor NanoVG)))
@@ -38,16 +40,8 @@
 (defn create-image-from-file [^long vg ^File file]
   (mem/slet [^IntBuffer w [:int 1]
              ^IntBuffer h [:int 1]]
-    (let [img (NanoVG/nvgCreateImage vg (.getAbsolutePath file) 0)]
+    (let [^int img (pool/alloc res/images [(.getAbsolutePath file)])]
       (NanoVG/nvgImageSize vg img w h)
       {:handle img
        :width (.get w)
        :height (.get h)})))
-
-;; TODO: delete image (lifecycle)
-(let [cache (volatile! {})]
-  (defn create-image-from-file-cached [vg ^File file]
-    (let [path (.getAbsolutePath file)]
-      (when-not (get @cache path)
-        (vswap! cache assoc path (create-image-from-file vg file)))
-      (get @cache path))))

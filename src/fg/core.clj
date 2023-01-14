@@ -8,6 +8,7 @@
     [fg.clock :as clock]
     [minimax.objects.camera :as camera]
     [minimax.passes :as passes]
+    [minimax.pool :as pool]
     [minimax.ui :as ui]
     [fg.state :as state]
     [fg.listeners :as listeners]
@@ -227,6 +228,7 @@
     (vreset! curr-frame (bgfx/frame)))
 
   ;; Disposing the program
+  (pool/destroy-all)
   (ui/shutdown)
   (bgfx/shutdown)
   (glfw/destroy-window)

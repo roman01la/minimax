@@ -2,11 +2,12 @@
   (:require
     [clojure.java.io :as io]
     [minimax.mem :as mem]
+    [minimax.pool :as pool]
+    [minimax.resources :as res]
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.nanovg NVGColor NVGPaint NanoVG)
-           (org.lwjgl.system MemoryUtil)
+           (org.lwjgl.nanovg NVGPaint NanoVG)
            (org.lwjgl.util.yoga YGNode Yoga)))
 
 (set! *warn-on-reflection* true)
@@ -188,7 +189,7 @@
        :children children
        :parent-layout (atom [])})))
 
-(def debug-color (ui.utils/rgba 0 150 0 1 (NVGColor/create)))
+(def debug-color (ui.utils/rgba 0 150 0 1 (pool/alloc res/colors)))
 
 (defn debug-rect [vg x y w h]
   (doto ^long vg
@@ -250,7 +251,7 @@
 
 (defn image [props]
   (let [vg @ui.ctx/vg
-        img (ui.utils/create-image-from-file-cached vg (io/file (:src props)))]
+        img (ui.utils/create-image-from-file vg (io/file (:src props)))]
     (map->Image
       (assoc props
         :vg vg
