@@ -1,0 +1,6 @@
+[submodule "minimax_c/deps/glfw"]
+	path = minimax_c/deps/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "minimax_c/deps/bgfx.cmake"]
+	path = minimax_c/deps/bgfx.cmake
+	url = https://github.com/bkaradzic/bgfx.cmake.git
