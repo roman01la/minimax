@@ -6,7 +6,7 @@
     [minimax.frame-buffer :as fb]
     [minimax.lib :as lib]
     [minimax.passes :as passes]
-    [minimax.pool :as pool]
+    [minimax.pool.core :as pool]
     [minimax.resources :as res]
     [minimax.texture :as t]
     [minimax.ui.context :as ui.ctx]

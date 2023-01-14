@@ -2,7 +2,7 @@
   (:require
     [clojure.java.io :as io]
     [minimax.mem :as mem]
-    [minimax.pool :as pool]
+    [minimax.pool.core :as pool]
     [minimax.resources :as res]
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.utils :as ui.utils])

@@ -1,7 +1,7 @@
 (ns minimax.ui.elements
   (:require [minimax.ui.primitives :as ui.pmt]
             [minimax.ui.utils :as ui.utils]
-            [minimax.pool :as pool]
+            [minimax.pool.core :as pool]
             [minimax.resources :as res]))
 
 (set! *warn-on-reflection* true)

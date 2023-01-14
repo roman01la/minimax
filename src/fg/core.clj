@@ -8,7 +8,7 @@
     [fg.clock :as clock]
     [minimax.objects.camera :as camera]
     [minimax.passes :as passes]
-    [minimax.pool :as pool]
+    [minimax.pool.core :as pool]
     [minimax.ui :as ui]
     [fg.state :as state]
     [fg.listeners :as listeners]
@@ -25,7 +25,8 @@
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
            (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
-           (org.lwjgl.system Configuration MemoryUtil Platform)))
+           (org.lwjgl.system Configuration Platform))
+  (:gen-class))
 
 (set! *warn-on-reflection* true)
 

@@ -5,3 +5,4 @@
 *.iml
 *.log
 resources/shaders_out/
+target

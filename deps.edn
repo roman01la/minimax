@@ -21,4 +21,6 @@
         org.lwjgl/lwjgl-yoga$natives-macos-arm64 {:mvn/version "3.3.1"}
         org.lwjgl/lwjgl-openal$natives-macos-arm64 {:mvn/version "3.3.1"}
         org.lwjgl/lwjgl-jemalloc$natives-macos-arm64 {:mvn/version "3.3.1"}}
- :paths ["src" "resources"]}
+ :paths ["src" "resources"]
+ :aliases {:build {:extra-deps {org.clojure/tools.build {:mvn/version "0.9.1"}}
+                   :extra-paths ["dev"]}}}

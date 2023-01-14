@@ -1,6 +1,6 @@
 (ns minimax.ui.utils
   (:require [minimax.mem :as mem]
-            [minimax.pool :as pool]
+            [minimax.pool.core :as pool]
             [minimax.resources :as res])
   (:import (java.io File)
            (java.nio IntBuffer)
