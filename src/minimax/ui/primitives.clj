@@ -250,7 +250,7 @@
 
 (defn image [props]
   (let [vg @ui.ctx/vg
-        img (ui.utils/create-image-from-file vg (io/file (:src props)))]
+        img (ui.utils/create-image-from-file-cached vg (io/file (:src props)))]
     (map->Image
       (assoc props
         :vg vg

@@ -35,7 +35,6 @@
          (or (>= by2 ay2 by1)
              (>= by2 ay1 by1)))))
 
-;; TODO: cache and delete image (lifecycle)
 (defn create-image-from-file [^long vg ^File file]
   (mem/slet [^IntBuffer w [:int 1]
              ^IntBuffer h [:int 1]]
@@ -44,3 +43,11 @@
       {:handle img
        :width (.get w)
        :height (.get h)})))
+
+;; TODO: delete image (lifecycle)
+(let [cache (volatile! {})]
+  (defn create-image-from-file-cached [vg ^File file]
+    (let [path (.getAbsolutePath file)]
+      (when-not (get @cache path)
+        (vswap! cache assoc path (create-image-from-file vg file)))
+      (get @cache path))))

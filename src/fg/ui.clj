@@ -155,12 +155,13 @@
                    :text-color #ui/rgba [115 90 25 1]
                    :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
           "Welcome!")))
-    (ui/image {:src "logo.png"
-               :style {:position :absolute
-                       :left 16
-                       :bottom 16
-                       :width (/ 175 3)
-                       :height (/ 108 3)}})))
+    (ui/image
+      {:src "logo.png"
+       :style {:position :absolute
+               :left 16
+               :bottom 16
+               :width (/ 175 3)
+               :height (/ 108 3)}})))
 
 (defn tree-view [{:keys [style on-select object selected]}]
   (let [selected? (= selected object)]
