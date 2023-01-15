@@ -20,6 +20,7 @@
 #include "dbg.h"
 #include "state.h"
 #include "glfw_listeners.h"
+#include "model.h"
 
 void error_callback(int _error, const char *_description)
 {
@@ -94,6 +95,10 @@ int main(void)
 
     // setup bgfx
     init_bgfx(window, state);
+
+    const char *model_file = "/Users/romanliutikov/git/minimax/minimax_c/resources/models/castle.glb";
+
+    load_model(model_file);
 
     // render loop
     while (!glfwWindowShouldClose(window))

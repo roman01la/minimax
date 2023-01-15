@@ -76,6 +76,11 @@
         "unordered_set": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "any": "cpp",
+        "bit": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "forward_list": "cpp"
     }
 }

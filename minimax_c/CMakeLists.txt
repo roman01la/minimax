@@ -13,7 +13,7 @@ add_subdirectory(deps/bgfx.cmake)
 add_subdirectory(deps/assimp)
 add_subdirectory(deps/yoga)
 
-include_directories(src)
+include_directories(src ${Assimp_SOURCE_DIR}/include ${Assimp_SOURCE_DIR}/code)
 
 file(GLOB SRCFILES src/*.cpp)
 add_executable(minimax ${SRCFILES})
