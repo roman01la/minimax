@@ -75,14 +75,7 @@ void init_bgfx(GLFWwindow *window, State state)
 
 int main(void)
 {
-    // app state
-    State state;
-
-    state.width = 800;
-    state.height = 600;
-    state.is_minimized = false;
-    state.is_maximized = false;
-    state.background_color = 0xe9fcffff;
+    State state = create_state();
 
     // init GLFW window
     GLFWwindow *window = init_glfw(state);
@@ -97,7 +90,7 @@ int main(void)
     state.dpr = state.vwidth / state.width;
 
     // GLFW callbacks
-    setup_listeners(window);
+    setup_listeners(window, state);
 
     // setup bgfx
     init_bgfx(window, state);
