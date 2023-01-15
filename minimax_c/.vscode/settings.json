@@ -82,5 +82,6 @@
         "cinttypes": "cpp",
         "codecvt": "cpp",
         "forward_list": "cpp"
-    }
+    },
+    "memory-view.showMemoryPanel": true
 }
