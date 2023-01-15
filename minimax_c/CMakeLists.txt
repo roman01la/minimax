@@ -13,9 +13,9 @@ add_subdirectory(deps/bgfx.cmake)
 add_subdirectory(deps/assimp)
 add_subdirectory(deps/yoga)
 
-include_directories(src ${Assimp_SOURCE_DIR}/include ${Assimp_SOURCE_DIR}/code)
+include_directories(src ${Assimp_SOURCE_DIR}/include ${Assimp_SOURCE_DIR}/code deps/nanovg/src)
 
-file(GLOB SRCFILES src/*.cpp)
+file(GLOB SRCFILES src/*.cpp deps/nanovg/src/*.c)
 add_executable(minimax ${SRCFILES})
 
 set(ASSIMP_NO_EXPORT ON)
