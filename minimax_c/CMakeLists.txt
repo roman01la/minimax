@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(minimax VERSION 0.1.0)
+project(minimax VERSION 0.0.1)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(CTest)
 enable_testing()
 
 add_subdirectory(deps/glfw)
-include_directories(deps/glfw/include)
-
 add_subdirectory(deps/bgfx.cmake)
-include_directories(deps/bgfx.cmake/bgfx/include)
-include_directories(deps/bgfx.cmake/bx/include)
-include_directories(deps/bgfx.cmake/bimg/include)
+add_subdirectory(deps/assimp)
+add_subdirectory(deps/yoga)
 
-add_executable(minimax src/core.cpp)
+file(GLOB SRCFILES src/*.cpp)
+add_executable(minimax ${SRCFILES})
 
-target_link_libraries(minimax glfw bgfx bx bimg ${GLFW_LIBRARIES})
+set(ASSIMP_NO_EXPORT ON)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
+
+target_link_libraries(minimax glfw ${GLFW_LIBRARIES} bgfx bx bimg assimp yogacore)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
