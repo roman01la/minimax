@@ -32,9 +32,9 @@ private:
     float mtx[16];
     float lightMtx[16];
 
+public:
     bgfx::ProgramHandle program;
 
-public:
     void parseVertices(aiMesh *mesh);
     void parseIndices(aiMesh *mesh);
     void parseNormals(aiMesh *mesh);

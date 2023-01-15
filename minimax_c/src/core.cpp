@@ -21,6 +21,7 @@
 #include "state.h"
 #include "glfw_listeners.h"
 #include "model.h"
+#include "scene.h"
 
 void error_callback(int _error, const char *_description)
 {
@@ -98,7 +99,7 @@ int main(void)
 
     const char *model_file = "/Users/romanliutikov/git/minimax/minimax_c/resources/models/castle.glb";
 
-    load_model(model_file);
+    Scene *scene = load_model(model_file);
 
     // render loop
     while (!glfwWindowShouldClose(window))

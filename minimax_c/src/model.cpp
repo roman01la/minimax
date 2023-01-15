@@ -7,8 +7,11 @@
 #include "model.h"
 #include "dbg.h"
 #include "mesh.h"
+#include "program.h"
+#include "scene.h"
+#include "allocator.h"
 
-const aiScene *load_model(const char *path)
+Scene *load_model(const char *path)
 {
     Assimp::Importer importer;
 
@@ -18,14 +21,21 @@ const aiScene *load_model(const char *path)
     {
         DBG("Imported meshes count: %d", scene->mNumMeshes);
 
+        bgfx::ProgramHandle program = loadProgram(
+            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/vs_shadow.bin",
+            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/fs_shadow.bin");
+
+        Scene *_scene = BX_NEW(&allocator, Scene);
+
         for (size_t i = 0; i < scene->mNumMeshes; i++)
         {
             Mesh m = Mesh();
             m.from(scene->mMeshes[i]);
-            m.destroy();
+            m.program = program;
+            _scene->meshes[i] = m;
         }
 
-        return scene;
+        return _scene;
     }
     else
     {

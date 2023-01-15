@@ -195,7 +195,6 @@ void Mesh::submit(bgfx::ViewId id)
 
 void Mesh::destroy()
 {
-    // bgfx::destroy(program);
     bgfx::destroy(vb);
 
     // NOTE: Looks like index buffer gets destroyed automatically?
