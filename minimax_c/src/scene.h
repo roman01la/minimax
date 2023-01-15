@@ -1,9 +1,13 @@
 #pragma once
 
+#include <vector>
+
 #include "mesh.h"
 
 class Scene
 {
 public:
-    Mesh *meshes;
+    std::vector<Mesh *> meshes;
+
+    void destroy();
 };

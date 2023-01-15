@@ -114,6 +114,7 @@ int main(void)
     }
 
     // shutdown
+    scene->destroy();
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();

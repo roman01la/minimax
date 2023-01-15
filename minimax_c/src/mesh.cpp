@@ -4,13 +4,14 @@
 
 #include "mesh.h"
 #include "dbg.h"
+#include "allocator.h"
 
 void Mesh::parseVertices(aiMesh *mesh)
 {
     numVertices = mesh->mNumVertices;
 
     // TODO: free, smart pointer
-    vertices = (float *)malloc(mesh->mNumVertices * 3 * sizeof(float));
+    vertices = (float *)BX_ALLOC(&allocator, mesh->mNumVertices * 3 * sizeof(float));
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         aiVector3D vec = mesh->mVertices[i];
@@ -23,7 +24,7 @@ void Mesh::parseIndices(aiMesh *mesh)
 {
     numIndices = mesh->mNumFaces * 3;
     // TODO: free, smart pointer
-    indices = (int *)malloc(numIndices * sizeof(int));
+    indices = (int *)BX_ALLOC(&allocator, numIndices * sizeof(int));
     for (size_t i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
@@ -42,7 +43,7 @@ void Mesh::parseNormals(aiMesh *mesh)
     }
 
     // TODO: free, smart pointer
-    normals = (float *)malloc(mesh->mNumVertices * 3 * sizeof(float));
+    normals = (float *)BX_ALLOC(&allocator, mesh->mNumVertices * 3 * sizeof(float));
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         aiVector3D vec = mesh->mNormals[i];
@@ -57,7 +58,7 @@ void Mesh::parseTextureCoords(aiMesh *mesh)
     // reads only from the first slot (texture_coords0)
 
     // TODO: free, smart pointer
-    texture_coords = (float *)malloc(mesh->mNumVertices * 3 * sizeof(float));
+    texture_coords = (float *)BX_ALLOC(&allocator, mesh->mNumVertices * 3 * sizeof(float));
 
     aiVector3D *coords = mesh->mTextureCoords[0];
 
@@ -80,8 +81,6 @@ void Mesh::parseBoundingBox(aiMesh *mesh)
     aiAABB aabb = mesh->mAABB;
     aiVector3D min = aabb.mMin;
     aiVector3D max = aabb.mMax;
-
-    bounding_box = BoundingBox();
 
     bounding_box.min[0] = min.x;
     bounding_box.min[1] = min.y;
@@ -196,6 +195,7 @@ void Mesh::submit(bgfx::ViewId id)
 void Mesh::destroy()
 {
     bgfx::destroy(vb);
+    bgfx::destroy(program);
 
     // NOTE: Looks like index buffer gets destroyed automatically?
     // bgfx::destroy(ib);

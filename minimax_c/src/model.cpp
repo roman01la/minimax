@@ -1,3 +1,4 @@
+#include <vector>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -29,10 +30,10 @@ Scene *load_model(const char *path)
 
         for (size_t i = 0; i < scene->mNumMeshes; i++)
         {
-            Mesh m = Mesh();
-            m.from(scene->mMeshes[i]);
-            m.program = program;
-            _scene->meshes[i] = m;
+            Mesh *m = BX_NEW(&allocator, Mesh);
+            m->from(scene->mMeshes[i]);
+            m->program = program;
+            _scene->meshes.push_back(m);
         }
 
         return _scene;
