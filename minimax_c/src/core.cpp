@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <bx/bx.h>
+#include <bx/math.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <GLFW/glfw3.h>
@@ -101,6 +102,15 @@ int main(void)
 
     Scene *scene = load_model(model_file);
 
+    float viewMtx[16];
+    float projMtx[16];
+
+    const bx::Vec3 at = {0.0f, 1.0f, 0.0f};
+    const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
+
+    bx::mtxLookAt(viewMtx, eye, at);
+    bx::mtxProj(projMtx, 60.0f, state.width / state.height, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -108,7 +118,13 @@ int main(void)
 
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state.background_color, 1.0f, 0);
         bgfx::setViewRect(0, 0, 0, state.vwidth, state.vheight);
+        bgfx::setViewTransform(0, viewMtx, projMtx);
         bgfx::touch(0);
+
+        for (Mesh *mesh : scene->meshes)
+        {
+            mesh->submit(0);
+        }
 
         bgfx::frame();
     }

@@ -23,8 +23,8 @@ Scene *load_model(const char *path)
         DBG("Imported meshes count: %d", scene->mNumMeshes);
 
         bgfx::ProgramHandle program = loadProgram(
-            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/vs_shadow.bin",
-            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/fs_shadow.bin");
+            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/vs_test.bin",
+            "/Users/romanliutikov/git/minimax/minimax_c/resources/shaders_out/fs_test.bin");
 
         Scene *_scene = BX_NEW(&allocator, Scene);
 
