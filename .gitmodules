@@ -7,9 +7,6 @@
 [submodule "minimax_c/deps/assimp"]
 	path = minimax_c/deps/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "minimax_c/deps/nanovg"]
-	path = minimax_c/deps/nanovg
-	url = https://github.com/memononen/nanovg.git
 [submodule "minimax_c/deps/yoga"]
 	path = minimax_c/deps/yoga
 	url = https://github.com/facebook/yoga.git

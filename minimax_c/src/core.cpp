@@ -1,3 +1,7 @@
+#define STB_TRUETYPE_IMPLEMENTATION
+#include <stb/stb_truetype.h>
+#include "nanovg/nanovg.h"
+
 #include <stdio.h>
 #include <bx/bx.h>
 #include <bx/math.h>
@@ -19,6 +23,7 @@
 #include <GLFW/glfw3native.h>
 
 #include "dbg.h"
+#include "fs.h"
 #include "state.h"
 #include "glfw_listeners.h"
 #include "model.h"
@@ -76,7 +81,19 @@ void init_bgfx(GLFWwindow *window, State state)
     bgfx::init(init);
 }
 
-int main(void)
+int32_t createFont(NVGcontext *_ctx, const char *_name, const char *_filePath)
+{
+    uint32_t size;
+    void *data = load(_filePath, &size);
+    if (NULL == data)
+    {
+        return -1;
+    }
+
+    return nvgCreateFontMem(_ctx, _name, (uint8_t *)data, size, 0);
+}
+
+int main(int argc, char **argv)
 {
     State state = create_state();
 
@@ -111,15 +128,29 @@ int main(void)
     bx::mtxLookAt(viewMtx, eye, at);
     bx::mtxProj(projMtx, 60.0f, state.width / state.height, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state.background_color, 1.0f, 0);
+
+    // NanoVG
+    NVGcontext *nvg = nvgCreate(1, 0);
+
+    bgfx::setViewMode(0, bgfx::ViewMode::Sequential);
+
+    createFont(nvg, "IBMPlexMono Regular", "/Users/romanliutikov/git/minimax/minimax_c/resources/fonts/IBM_Plex_Mono/IBMPlexMono-Regular.ttf");
+
+    // /NanoVG
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
-        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state.background_color, 1.0f, 0);
         bgfx::setViewRect(0, 0, 0, state.vwidth, state.vheight);
-        bgfx::setViewTransform(0, viewMtx, projMtx);
+        // bgfx::setViewTransform(0, viewMtx, projMtx);
         bgfx::touch(0);
+
+        nvgBeginFrame(nvg, state.width, state.height, state.dpr);
+
+        nvgEndFrame(nvg);
 
         if (scene)
         {
@@ -134,6 +165,7 @@ int main(void)
 
     // shutdown
     delete scene;
+    nvgDelete(nvg);
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();
