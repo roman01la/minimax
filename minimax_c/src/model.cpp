@@ -16,7 +16,8 @@ Scene *load_model(const char *path)
 {
     Assimp::Importer importer;
 
-    const aiScene *scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+    // aiProcessPreset_TargetRealtime_MaxQuality
+    const aiScene *scene = importer.ReadFile(path, 0);
 
     if (scene)
     {

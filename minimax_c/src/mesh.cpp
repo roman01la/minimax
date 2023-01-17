@@ -192,7 +192,7 @@ void Mesh::submit(bgfx::ViewId id)
     bgfx::submit(id, program, BGFX_DISCARD_ALL);
 }
 
-void Mesh::destroy()
+Mesh::~Mesh()
 {
     bgfx::destroy(vb);
     bgfx::destroy(program);

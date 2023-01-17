@@ -51,5 +51,5 @@ public:
     void applyTransform(float mtx[16]);
     void submit(bgfx::ViewId id);
 
-    void destroy();
+    ~Mesh();
 };

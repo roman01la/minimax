@@ -105,7 +105,7 @@ int main(void)
     float viewMtx[16];
     float projMtx[16];
 
-    const bx::Vec3 at = {0.0f, 1.0f, 0.0f};
+    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
     const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
 
     bx::mtxLookAt(viewMtx, eye, at);
@@ -121,16 +121,19 @@ int main(void)
         bgfx::setViewTransform(0, viewMtx, projMtx);
         bgfx::touch(0);
 
-        for (Mesh *mesh : scene->meshes)
+        if (scene)
         {
-            mesh->submit(0);
+            for (Mesh *mesh : scene->meshes)
+            {
+                mesh->submit(0);
+            }
         }
 
         bgfx::frame();
     }
 
     // shutdown
-    scene->destroy();
+    delete scene;
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();

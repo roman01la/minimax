@@ -1,10 +1,10 @@
 #include "mesh.h"
 #include "scene.h"
 
-void Scene::destroy()
+Scene::~Scene()
 {
     for (Mesh *mesh : meshes)
     {
-        mesh->destroy();
+        delete mesh;
     }
 }

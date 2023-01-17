@@ -9,5 +9,5 @@ class Scene
 public:
     std::vector<Mesh *> meshes;
 
-    void destroy();
+    ~Scene();
 };
