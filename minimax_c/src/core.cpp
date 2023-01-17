@@ -1,7 +1,3 @@
-#define STB_TRUETYPE_IMPLEMENTATION
-#include <stb/stb_truetype.h>
-#include "nanovg/nanovg.h"
-
 #include <stdio.h>
 #include <bx/bx.h>
 #include <bx/math.h>
@@ -28,6 +24,7 @@
 #include "glfw_listeners.h"
 #include "model.h"
 #include "scene.h"
+#include "ui.h"
 
 void error_callback(int _error, const char *_description)
 {
@@ -81,17 +78,28 @@ void init_bgfx(GLFWwindow *window, State state)
     bgfx::init(init);
 }
 
-int32_t createFont(NVGcontext *_ctx, const char *_name, const char *_filePath)
+class Clock
 {
-    uint32_t size;
-    void *data = load(_filePath, &size);
-    if (NULL == data)
-    {
-        return -1;
-    }
+private:
+    double t;
 
-    return nvgCreateFontMem(_ctx, _name, (uint8_t *)data, size, 0);
-}
+public:
+    double dt;
+
+    Clock()
+    {
+        t = glfwGetTime();
+        dt = 0.016;
+    };
+    double step()
+    {
+        double nt = glfwGetTime();
+        dt = nt - t;
+        t = nt;
+
+        return dt;
+    };
+};
 
 int main(int argc, char **argv)
 {
@@ -109,11 +117,23 @@ int main(int argc, char **argv)
     glfwGetFramebufferSize(window, &state.vwidth, &state.vheight);
     state.dpr = state.vwidth / state.width;
 
-    // GLFW callbacks
-    setup_listeners(window, state);
-
     // setup bgfx
     init_bgfx(window, state);
+
+    // setup nanovg
+    NVGcontext *vg = minimax::ui::init();
+
+    if (!vg)
+    {
+        DBG("Initializing NanoVG failed!");
+        bgfx::shutdown();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return bx::kExitFailure;
+    }
+
+    // GLFW callbacks
+    setup_listeners(window, state);
 
     const char *model_file = "/Users/romanliutikov/git/minimax/minimax_c/resources/models/castle.glb";
 
@@ -130,27 +150,28 @@ int main(int argc, char **argv)
 
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state.background_color, 1.0f, 0);
 
-    // NanoVG
-    NVGcontext *nvg = nvgCreate(1, 0);
+    minimax::ui::Spring sp = minimax::ui::Spring(5, 1, 3, 0, 1);
 
-    bgfx::setViewMode(0, bgfx::ViewMode::Sequential);
-
-    createFont(nvg, "IBMPlexMono Regular", "/Users/romanliutikov/git/minimax/minimax_c/resources/fonts/IBM_Plex_Mono/IBMPlexMono-Regular.ttf");
-
-    // /NanoVG
+    Clock clock;
 
     // render loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
+        clock.step();
+
+        float t = sp.step(clock.dt * 4);
+
         bgfx::setViewRect(0, 0, 0, state.vwidth, state.vheight);
         // bgfx::setViewTransform(0, viewMtx, projMtx);
         bgfx::touch(0);
 
-        nvgBeginFrame(nvg, state.width, state.height, state.dpr);
+        nvgBeginFrame(vg, state.width, state.height, state.dpr);
 
-        nvgEndFrame(nvg);
+        minimax::ui::rect(vg, 16, 16, 100, 100 * t, nvgRGBA(29, 41, 48, 255));
+
+        nvgEndFrame(vg);
 
         if (scene)
         {
@@ -165,7 +186,7 @@ int main(int argc, char **argv)
 
     // shutdown
     delete scene;
-    nvgDelete(nvg);
+    nvgDelete(vg);
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();
