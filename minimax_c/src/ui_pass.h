@@ -10,7 +10,6 @@ class RenderPassUI : public RenderPass
 private:
     NVGcontext *vg;
     bgfx::FrameBufferHandle m_fb;
-    bgfx::TextureHandle m_texture;
 
     void createFrameBuffer(float width, float height)
     {
@@ -24,6 +23,7 @@ private:
 
 public:
     bgfx::ViewId m_viewId = 1;
+    bgfx::TextureHandle m_texture;
 
     void init(float width, float height)
     {
@@ -45,6 +45,7 @@ public:
         nvgBeginFrame(vg, width / dpr, height / dpr, dpr);
 
         minimax::ui::rect(vg, 16, 16, 100, 100, nvgRGBA(29, 41, 48, 255));
+        minimax::ui::rect(vg, 600, 400, 100, 100, nvgRGBA(255, 41, 48, 255));
 
         nvgEndFrame(vg);
     };

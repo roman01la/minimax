@@ -26,8 +26,9 @@
 #include "model.h"
 #include "scene.h"
 #include "ui.h"
-#include "deferred.h"
+#include "geometry_pass.h"
 #include "ui_pass.h"
+#include "combine_pass.h"
 
 void error_callback(int _error, const char *_description)
 {
@@ -109,13 +110,21 @@ Clock mm_clock;
 minimax::ui::Spring sp = minimax::ui::Spring(5, 1, 3, 0, 1);
 Scene *scene;
 
+RenderPassGeometry *renderPassGeometry = BX_NEW(&allocator, RenderPassGeometry);
 RenderPassUI *renderPassUI = BX_NEW(&allocator, RenderPassUI);
+RenderPassCombine *renderPassCombine = BX_NEW(&allocator, RenderPassCombine);
 
 void render()
 {
     mm_clock.step();
 
+    renderPassGeometry->render(state->vwidth, state->vheight);
     renderPassUI->render(state->vwidth, state->vheight, state->dpr);
+    renderPassCombine->render(state->vwidth, state->vheight,
+                              renderPassUI->m_texture,
+                              renderPassGeometry->m_texColor,
+                              renderPassGeometry->m_texPosition,
+                              renderPassGeometry->m_texNormal);
 
     bgfx::frame();
 };
@@ -124,7 +133,9 @@ void onResize()
 {
     bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4);
 
+    renderPassGeometry->resize(state->vwidth, state->vheight);
     renderPassUI->resize(state->vwidth, state->vheight);
+    renderPassCombine->resize(state->vwidth, state->vheight);
 
     render();
 };
@@ -149,10 +160,16 @@ int main(int argc, char **argv)
     init_bgfx(window, state);
 
     // setup ui pass
+    renderPassGeometry->init(state->vwidth, state->vheight);
     renderPassUI->init(state->vwidth, state->vheight);
-    if (!renderPassUI->m_isValid)
+    renderPassCombine->init(state->vwidth, state->vheight);
+
+    if (!renderPassGeometry->m_isValid || !renderPassUI->m_isValid || !renderPassCombine->m_isValid)
     {
-        DBG("Initializing NanoVG failed!");
+        DBG("Initializing render passes failed!");
+        delete renderPassGeometry;
+        delete renderPassUI;
+        delete renderPassCombine;
         delete state;
         bgfx::shutdown();
         glfwDestroyWindow(window);
@@ -167,16 +184,16 @@ int main(int argc, char **argv)
 
     scene = load_model(model_file);
 
-    float viewMtx[16];
-    float projMtx[16];
+    // float viewMtx[16];
+    // float projMtx[16];
 
-    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-    const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
+    // const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
+    // const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
 
-    bx::mtxLookAt(viewMtx, eye, at);
-    bx::mtxProj(projMtx, 60.0f, state->width / state->height, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    // bx::mtxLookAt(viewMtx, eye, at);
+    // bx::mtxProj(projMtx, 60.0f, state->width / state->height, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state->background_color, 1.0f, 0);
+    // bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state->background_color, 1.0f, 0);
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -189,8 +206,9 @@ int main(int argc, char **argv)
     // shutdown
     delete scene;
     delete state;
+    delete renderPassGeometry;
     delete renderPassUI;
-    minimax::deferred::destroy();
+    delete renderPassCombine;
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();

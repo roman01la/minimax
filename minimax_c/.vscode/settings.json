@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "*.sc": "hlsl",
     "__bit_reference": "cpp",
     "__bits": "cpp",
     "__config": "cpp",
@@ -81,7 +82,8 @@
     "bit": "cpp",
     "cinttypes": "cpp",
     "codecvt": "cpp",
-    "forward_list": "cpp"
+    "forward_list": "cpp",
+    "*.sh": "cpp"
   },
   "memory-view.showMemoryPanel": true,
   "cmake.configureOnOpen": false

@@ -6,7 +6,7 @@ class RenderPass
 {
 public:
     bgfx::ViewId m_viewId;
-    bool m_isValid;
+    bool m_isValid = false;
     void init(float width, float height){};
     void render(float width, float height){};
     void resize(float width, float height){};
