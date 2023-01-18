@@ -41,7 +41,7 @@ private:
     };
 
 public:
-    bgfx::ViewId m_viewId = 5;
+    bgfx::ViewId m_viewId = 0;
     bgfx::TextureHandle m_texColor;
     bgfx::TextureHandle m_texPosition;
     bgfx::TextureHandle m_texNormal;
