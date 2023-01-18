@@ -2,6 +2,7 @@
 
 #include <bgfx/bgfx.h>
 
+#include "dbg.h"
 #include "render_pass.h"
 
 class RenderPassGeometry : public RenderPass
@@ -40,16 +41,15 @@ private:
     };
 
 public:
-    bgfx::ViewId m_viewId = 0;
+    bgfx::ViewId m_viewId = 5;
     bgfx::TextureHandle m_texColor;
     bgfx::TextureHandle m_texPosition;
     bgfx::TextureHandle m_texNormal;
+    void (*renderFn)();
 
     void init(float width, float height)
     {
         createFrameBuffer(width, height);
-
-        bgfx::setViewClear(m_viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00ff00ff);
 
         m_isValid = true;
     };
@@ -58,6 +58,10 @@ public:
     {
         bgfx::setViewRect(m_viewId, 0, 0, width, height);
         bgfx::setViewFrameBuffer(m_viewId, m_fb);
+
+        bgfx::touch(m_viewId);
+
+        renderFn();
     };
 
     void resize(float width, float height)

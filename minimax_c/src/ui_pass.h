@@ -24,6 +24,7 @@ private:
 public:
     bgfx::ViewId m_viewId = 1;
     bgfx::TextureHandle m_texture;
+    void (*renderFn)(NVGcontext *vg);
 
     void init(float width, float height)
     {
@@ -43,11 +44,10 @@ public:
         bgfx::setViewFrameBuffer(m_viewId, m_fb);
 
         nvgBeginFrame(vg, width / dpr, height / dpr, dpr);
-
-        minimax::ui::rect(vg, 16, 16, 100, 100, nvgRGBA(29, 41, 48, 255));
-        minimax::ui::rect(vg, 600, 400, 100, 100, nvgRGBA(255, 41, 48, 255));
-
+        renderFn(vg);
         nvgEndFrame(vg);
+
+        bgfx::touch(m_viewId);
     };
 
     void resize(float width, float height)

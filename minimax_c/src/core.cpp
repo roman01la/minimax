@@ -140,6 +140,36 @@ void onResize()
     render();
 };
 
+void renderUI(NVGcontext *vg)
+{
+    minimax::ui::rect(vg, 16, 16, 100, 100, nvgRGBA(29, 41, 48, 255));
+    minimax::ui::rect(vg, 600, 400, 100, 100, nvgRGBA(255, 41, 48, 255));
+};
+
+const bgfx::Caps *caps;
+
+void renderScene()
+{
+    float viewMtx[16];
+    float projMtx[16];
+
+    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
+    const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
+
+    bx::mtxLookAt(viewMtx, eye, at);
+    bx::mtxProj(projMtx, 60.0f, state->width / state->height, 0.1f, 100.0f, caps->homogeneousDepth);
+
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state->background_color, 1.0f, 0);
+
+    if (scene)
+    {
+        for (Mesh *mesh : scene->meshes)
+        {
+            mesh->submit(renderPassGeometry->m_viewId);
+        }
+    }
+};
+
 int main(int argc, char **argv)
 {
     state = create_state();
@@ -177,23 +207,17 @@ int main(int argc, char **argv)
         return bx::kExitFailure;
     }
 
+    renderPassGeometry->renderFn = renderScene;
+    renderPassUI->renderFn = renderUI;
+
+    caps = bgfx::getCaps();
+
     // GLFW callbacks
     setup_listeners(window, state, onResize);
 
     const char *model_file = "/Users/romanliutikov/git/minimax/minimax_c/resources/models/castle.glb";
 
     scene = load_model(model_file);
-
-    // float viewMtx[16];
-    // float projMtx[16];
-
-    // const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-    // const bx::Vec3 eye = {0.0f, 1.0f, -2.5f};
-
-    // bx::mtxLookAt(viewMtx, eye, at);
-    // bx::mtxProj(projMtx, 60.0f, state->width / state->height, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-
-    // bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, state->background_color, 1.0f, 0);
 
     // render loop
     while (!glfwWindowShouldClose(window))
