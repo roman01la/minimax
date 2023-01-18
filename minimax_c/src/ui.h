@@ -66,10 +66,9 @@ namespace minimax::ui
 
     // /fonts
 
-    NVGcontext *init()
+    NVGcontext *init(bgfx::ViewId _viewId)
     {
-        NVGcontext *vg = nvgCreate(1, 0);
-        bgfx::setViewMode(0, bgfx::ViewMode::Sequential);
+        NVGcontext *vg = nvgCreate(1, _viewId);
 
         createFonts(vg);
 

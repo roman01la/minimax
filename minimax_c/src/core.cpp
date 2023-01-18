@@ -19,12 +19,15 @@
 #include <GLFW/glfw3native.h>
 
 #include "dbg.h"
+#include "allocator.h"
 #include "fs.h"
 #include "state.h"
 #include "glfw_listeners.h"
 #include "model.h"
 #include "scene.h"
 #include "ui.h"
+#include "deferred.h"
+#include "ui_pass.h"
 
 void error_callback(int _error, const char *_description)
 {
@@ -102,36 +105,28 @@ public:
 };
 
 State *state;
-NVGcontext *vg;
 Clock mm_clock;
 minimax::ui::Spring sp = minimax::ui::Spring(5, 1, 3, 0, 1);
 Scene *scene;
+
+RenderPassUI *renderPassUI = BX_NEW(&allocator, RenderPassUI);
 
 void render()
 {
     mm_clock.step();
 
-    float t = sp.step(mm_clock.dt * 4);
-
-    bgfx::setViewRect(0, 0, 0, state->vwidth, state->vheight);
-    // bgfx::setViewTransform(0, viewMtx, projMtx);
-    bgfx::touch(0);
-
-    nvgBeginFrame(vg, state->width, state->height, state->dpr);
-
-    minimax::ui::rect(vg, 16, 16, 100, 100 * t, nvgRGBA(29, 41, 48, 255));
-
-    nvgEndFrame(vg);
-
-    if (scene)
-    {
-        for (Mesh *mesh : scene->meshes)
-        {
-            mesh->submit(0);
-        }
-    }
+    renderPassUI->render(state->vwidth, state->vheight, state->dpr);
 
     bgfx::frame();
+};
+
+void onResize()
+{
+    bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4);
+
+    renderPassUI->resize(state->vwidth, state->vheight);
+
+    render();
 };
 
 int main(int argc, char **argv)
@@ -153,12 +148,12 @@ int main(int argc, char **argv)
     // setup bgfx
     init_bgfx(window, state);
 
-    // setup nanovg
-    vg = minimax::ui::init();
-
-    if (!vg)
+    // setup ui pass
+    renderPassUI->init(state->vwidth, state->vheight);
+    if (!renderPassUI->m_isValid)
     {
         DBG("Initializing NanoVG failed!");
+        delete state;
         bgfx::shutdown();
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -166,7 +161,7 @@ int main(int argc, char **argv)
     }
 
     // GLFW callbacks
-    setup_listeners(window, state, render);
+    setup_listeners(window, state, onResize);
 
     const char *model_file = "/Users/romanliutikov/git/minimax/minimax_c/resources/models/castle.glb";
 
@@ -194,7 +189,8 @@ int main(int argc, char **argv)
     // shutdown
     delete scene;
     delete state;
-    nvgDelete(vg);
+    delete renderPassUI;
+    minimax::deferred::destroy();
     bgfx::shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();
