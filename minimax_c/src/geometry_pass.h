@@ -29,7 +29,7 @@ private:
         m_texColor = textures[0];
         m_texPosition = textures[1];
         m_texNormal = textures[2];
-        m_fb = bgfx::createFrameBuffer(3, textures, true);
+        m_fb = bgfx::createFrameBuffer(BX_COUNTOF(textures), textures, true);
     };
 
     void destroyFrameBuffer()
