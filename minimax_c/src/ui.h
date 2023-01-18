@@ -6,6 +6,7 @@
 
 #include <bgfx/bgfx.h>
 #include <yoga/Yoga.h>
+#include <yoga/YGLayout.h>
 
 namespace minimax::ui
 {
@@ -70,6 +71,8 @@ namespace minimax::ui
         NVGcontext *vg = nvgCreate(1, 0);
         bgfx::setViewMode(0, bgfx::ViewMode::Sequential);
 
+        createFonts(vg);
+
         return vg;
     };
 
@@ -80,6 +83,70 @@ namespace minimax::ui
         nvgFillColor(vg, color);
         nvgFill(vg);
         nvgClosePath(vg);
+    };
+
+    struct Style
+    {
+        float width;
+        float height;
+        float x;
+        float y;
+        YGDirection flexDirection;
+    };
+
+    struct Layout
+    {
+        float width;
+        float height;
+        float x;
+        float y;
+    };
+
+    // Layout base node
+    class LNode
+    {
+    private:
+        std::vector<LNode> m_children;
+        LNode *m_parent;
+
+    public:
+        Style m_style;
+        YGNodeRef m_layoutNode;
+
+        void draw()
+        {
+            for (LNode child : m_children)
+            {
+                child.draw();
+            }
+        };
+
+        void addChild(LNode child)
+        {
+            int idx = m_children.size();
+            child.m_parent = this;
+            m_children.push_back(child);
+            YGNodeInsertChild(m_layoutNode, child.m_layoutNode, idx);
+        };
+
+        Layout getLayaout()
+        {
+            Layout layout;
+
+            // YGLayout l = m_layoutNode->getLayout();
+
+            return layout;
+        };
+    };
+
+    // Layout root node
+    class LRoot : public LNode
+    {
+    public:
+        void layout()
+        {
+            YGNodeCalculateLayout(m_layoutNode, m_style.width, m_style.height, m_style.flexDirection);
+        };
     };
 
 }

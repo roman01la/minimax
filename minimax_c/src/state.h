@@ -27,4 +27,4 @@ struct State
     int background_color;
 };
 
-State create_state();
+State *create_state();

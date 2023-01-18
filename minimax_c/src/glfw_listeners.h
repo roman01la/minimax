@@ -12,4 +12,4 @@ static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 static void minimize_callback(GLFWwindow *window, int iconified);
 static void maximize_callback(GLFWwindow *window, int maximized);
 
-void setup_listeners(GLFWwindow *window, State state);
+void setup_listeners(GLFWwindow *window, State *state, void render());
