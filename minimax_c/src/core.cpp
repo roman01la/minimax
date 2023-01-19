@@ -62,7 +62,6 @@ GLFWwindow *init_glfw(State *state)
 
 void init_bgfx(GLFWwindow *window, State *state)
 {
-    bgfx::renderFrame();
 
     bgfx::Init init;
 
@@ -114,9 +113,26 @@ RenderPassGeometry *renderPassGeometry = BX_NEW(&allocator, RenderPassGeometry);
 RenderPassUI *renderPassUI = BX_NEW(&allocator, RenderPassUI);
 RenderPassCombine *renderPassCombine = BX_NEW(&allocator, RenderPassCombine);
 
+int _width = 800 * 2;
+int _height = 600 * 2;
+
 void render()
 {
     mm_clock.step();
+
+    if (_width != state->width || _height != state->height)
+    {
+        state->width = _width;
+        state->height = _height;
+        state->vwidth = _width * state->dpr;
+        state->vheight = _height * state->dpr;
+
+        bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4);
+
+        renderPassGeometry->resize(state->vwidth, state->vheight);
+        renderPassUI->resize(state->vwidth, state->vheight);
+        renderPassCombine->resize(state->vwidth, state->vheight);
+    }
 
     renderPassGeometry->render(state->vwidth, state->vheight);
     renderPassUI->render(state->vwidth, state->vheight, state->dpr);
@@ -129,15 +145,16 @@ void render()
     bgfx::frame();
 };
 
-void onResize()
+void onResize(int width, int height)
 {
-    bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4);
+    _width = width;
+    _height = height;
 
-    renderPassGeometry->resize(state->vwidth, state->vheight);
-    renderPassUI->resize(state->vwidth, state->vheight);
-    renderPassCombine->resize(state->vwidth, state->vheight);
+    // renderPassGeometry->resize(state->vwidth, state->vheight);
+    // renderPassUI->resize(state->vwidth, state->vheight);
+    // renderPassCombine->resize(state->vwidth, state->vheight);
 
-    render();
+    // render();
 };
 
 void renderUI(NVGcontext *vg)

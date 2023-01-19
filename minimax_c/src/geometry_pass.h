@@ -22,9 +22,9 @@ private:
             BGFX_SAMPLER_V_CLAMP;
 
         bgfx::TextureHandle textures[3] = {
-            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8, flags),
-            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA16F, flags),
-            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8, flags)};
+            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::BGRA8, flags),
+            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::BGRA8, flags),
+            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::BGRA8, flags)};
 
         m_texColor = textures[0];
         m_texPosition = textures[1];

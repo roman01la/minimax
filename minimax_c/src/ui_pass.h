@@ -14,8 +14,8 @@ private:
     void createFrameBuffer(float width, float height)
     {
         bgfx::TextureHandle textures[2] = {
-            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT),
-            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | BGFX_TEXTURE_RT_WRITE_ONLY)};
+            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
+            bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_RT)};
 
         m_texture = textures[0];
         m_fb = bgfx::createFrameBuffer(2, textures, true);
