@@ -116,9 +116,18 @@ RenderPassCombine *renderPassCombine = BX_NEW(&allocator, RenderPassCombine);
 int _width = 800;
 int _height = 600;
 
+int frame = 0;
+
 void render()
 {
     mm_clock.step();
+
+    if (frame % 30 == 0)
+    {
+        renderPassGeometry->resize(state->vwidth, state->vheight);
+        renderPassUI->resize(state->vwidth, state->vheight);
+        renderPassCombine->resize(state->vwidth, state->vheight);
+    }
 
     if (_width != state->width || _height != state->height)
     {
@@ -127,7 +136,7 @@ void render()
         state->vwidth = _width * state->dpr;
         state->vheight = _height * state->dpr;
 
-        bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4);
+        bgfx::reset(state->vwidth, state->vheight, BGFX_RESET_VSYNC | BGFX_RESET_MSAA_X4);
 
         renderPassGeometry->resize(state->vwidth, state->vheight);
         renderPassUI->resize(state->vwidth, state->vheight);
@@ -142,7 +151,7 @@ void render()
                               renderPassGeometry->m_texPosition,
                               renderPassGeometry->m_texNormal);
 
-    bgfx::frame();
+    frame = bgfx::frame();
 };
 
 void onResize(int width, int height)
