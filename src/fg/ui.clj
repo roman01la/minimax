@@ -225,6 +225,6 @@
     (scene-graph scene selected)))
 
 (defui ui-root [width height scene selected]
-  (game-ui width height)
-  #_(debug-ui width height scene selected))
+  #_(game-ui width height)
+  (debug-ui width height scene selected))
 

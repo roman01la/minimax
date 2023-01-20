@@ -10,7 +10,7 @@
   (alloc [this]
     (pool/alloc this []))
   (alloc [this args]
-    (assert (seq free-items) (str "Resource pool has reached max size of " (count taken-items) " items"))
+    (assert (seq free-items) (str "Resource pool has reached max size of " (count taken-items) " items " (type (first taken-items))))
     (let [item (first free-items)]
       (set! free-items (disj free-items item))
       (set! taken-items (conj taken-items item))

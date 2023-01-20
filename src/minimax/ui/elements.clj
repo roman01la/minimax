@@ -6,8 +6,9 @@
 
 (set! *warn-on-reflection* true)
 
-(defn rgba-tag [[r g b a]]
-  `(ui.utils/rgba ~r ~g ~b ~a (pool/alloc res/colors)))
+(defn rgba-tag [v]
+  #_`(ui.utils/rgba ~r ~g ~b ~a (pool/alloc res/colors))
+  v)
 
 ;; UI elements
 (defprotocol IEventTarget

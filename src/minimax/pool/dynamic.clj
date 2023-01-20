@@ -14,7 +14,7 @@
   (alloc [this args]
     (if (empty? free-items)
       (do
-        (assert (>= max-size (count taken-items)) (str "Resource pool has reached max size of " max-size " items"))
+        (assert (>= max-size (count taken-items)) (str "Resource pool has reached max size of " max-size " items " (type (first taken-items))))
         (let [item (apply create-item args)]
           (set! taken-items (assoc taken-items args item))
           item))

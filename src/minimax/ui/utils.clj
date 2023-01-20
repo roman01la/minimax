@@ -8,12 +8,15 @@
 
 (set! *warn-on-reflection* true)
 
-(defn rgba ^NVGColor [r g b a ^NVGColor color]
-  (.r color (/ r 255))
-  (.g color (/ g 255))
-  (.b color (/ b 255))
-  (.a color a)
-  color)
+(defn rgba ^NVGColor
+  ([[r g b a] color]
+   (rgba r g b a color))
+  ([r g b a ^NVGColor color]
+   (.r color (/ r 255))
+   (.g color (/ g 255))
+   (.b color (/ b 255))
+   (.a color a)
+   color))
 
 (defn point-in-rect? [mx my x y w h]
   (and (>= mx x)

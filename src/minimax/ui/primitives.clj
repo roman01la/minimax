@@ -7,7 +7,7 @@
     [minimax.ui.context :as ui.ctx]
     [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.nanovg NVGPaint NanoVG)
+           (org.lwjgl.nanovg NVGColor NVGPaint NanoVG)
            (org.lwjgl.util.yoga YGNode Yoga)))
 
 (set! *warn-on-reflection* true)
@@ -85,13 +85,12 @@
         (f node v)))
     node))
 
-(defn measure-text [{:keys [font-size font-face text-color text-align]} text]
+(defn measure-text [{:keys [font-size font-face text-align]} text]
   (mem/slet [^FloatBuffer text-bounds [:float 4]]
 
     (let [^long vg @ui.ctx/vg]
       (NanoVG/nvgFontSize vg font-size)
       (NanoVG/nvgFontFace vg ^CharSequence font-face)
-      (NanoVG/nvgFillColor vg text-color)
       (NanoVG/nvgTextAlign vg text-align)
       (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds))
 
@@ -148,12 +147,19 @@
     (let [[rv rh] border-radius]
       (NanoVG/nvgRoundedRectVarying vg x y w h rh rh rv rv))))
 
+;; colors pool
+(def colors
+  {:background-color (NVGColor/calloc)
+   :border-color (NVGColor/calloc)
+   :text-color (NVGColor/calloc)})
+
 (defrecord Rect [vg ynode children parent-layout style clip?
                  on-mouse-down on-mouse-up on-mouse-over]
   IDrawable
   (draw [this]
     (let [[x y w h] (get-layout this)
           {:keys [background-color border-width border-color border-radius]} style]
+
       (NanoVG/nvgBeginPath vg)
       (if border-radius
         (draw-rounded-rect vg x y w h border-radius)
@@ -161,11 +167,13 @@
       (NanoVG/nvgClosePath vg)
 
       (when background-color
-        (NanoVG/nvgFillColor vg background-color)
+        (ui.utils/rgba background-color (:background-color colors))
+        (NanoVG/nvgFillColor vg (:background-color colors))
         (NanoVG/nvgFill vg))
 
       (when (and border-color border-width)
-        (NanoVG/nvgStrokeColor vg border-color)
+        (ui.utils/rgba border-color (:border-color colors))
+        (NanoVG/nvgStrokeColor vg (:border-color colors))
         (NanoVG/nvgStrokeWidth vg border-width)
         (NanoVG/nvgStroke vg))
 
@@ -205,10 +213,11 @@
     (let [{:keys [font-size font-face text-color text-align]} style
           [x y w h] (get-layout this)]
       (when debug? (debug-rect vg x y w h))
+      (ui.utils/rgba text-color (:text-color colors))
       (doto ^long vg
         (NanoVG/nvgFontSize font-size)
         (NanoVG/nvgFontFace ^CharSequence font-face)
-        (NanoVG/nvgFillColor text-color)
+        (NanoVG/nvgFillColor (:text-color colors))
         (NanoVG/nvgTextAlign text-align)
         (NanoVG/nvgText ^float x ^float y ^CharSequence text))))
   ILayout
