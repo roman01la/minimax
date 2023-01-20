@@ -113,8 +113,8 @@ RenderPassGeometry *renderPassGeometry = BX_NEW(&allocator, RenderPassGeometry);
 RenderPassUI *renderPassUI = BX_NEW(&allocator, RenderPassUI);
 RenderPassCombine *renderPassCombine = BX_NEW(&allocator, RenderPassCombine);
 
-int _width = 800 * 2;
-int _height = 600 * 2;
+int _width = 800;
+int _height = 600;
 
 void render()
 {
