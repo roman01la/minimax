@@ -4,6 +4,7 @@
     [fg.passes.geometry :as pass.geom]
     [minimax.lib :as lib]
     [fg.material :as mat]
+    [minimax.mem :as mem]
     [minimax.passes :as passes]
     [fg.passes.picking :as pass.picking]
     [fg.passes.shadow :as pass.shadow]
@@ -16,8 +17,7 @@
            (java.util ArrayList)
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.assimp AIMesh)
-           (org.lwjgl.bgfx BGFX BGFXCaps)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX BGFXCaps)))
 
 (set! *warn-on-reflection* true)
 
@@ -31,7 +31,7 @@
     BGFX/BGFX_DISCARD_STATE
     BGFX/BGFX_DISCARD_TRANSFORM))
 
-(def mtx-buff (MemoryUtil/memAllocFloat 16))
+(def mtx-buff (mem/alloc :float 16))
 
 (defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx state]
   (let [state (or

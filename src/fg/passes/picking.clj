@@ -1,6 +1,7 @@
 (ns fg.passes.picking
   (:require
     [bgfx.core :as bgfx]
+    [minimax.mem :as mem]
     [minimax.objects.camera :as camera]
     [minimax.object :as obj]
     [minimax.passes :as passes]
@@ -13,12 +14,11 @@
     [minimax.view :as view])
   (:import (java.nio FloatBuffer)
            (org.joml Matrix4f Vector3f)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 (def SIZE 8)
 
-(def ^FloatBuffer blit-data (MemoryUtil/memAllocFloat (* SIZE SIZE)))
+(def ^FloatBuffer blit-data (mem/alloc :float (* SIZE SIZE)))
 
 (def frame-buffer
   (delay

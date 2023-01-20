@@ -1,6 +1,7 @@
 (ns fg.passes.combine
   (:require
     [bgfx.core :as bgfx]
+    [minimax.mem :as mem]
     [minimax.objects.camera :as camera]
     [fg.deferred :as d]
     [minimax.object :as obj]
@@ -13,8 +14,7 @@
     [minimax.texture :as t]
     [minimax.view :as view])
   (:import (org.joml Vector3f)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 ;; SSAO
 (defn lerp [a b f]
@@ -22,7 +22,7 @@
 
 (def ssao-kernel
   (let [samples 64
-        buff (MemoryUtil/memAllocFloat (* samples 4))]
+        buff (mem/alloc :float (* samples 4))]
     (doseq [idx (range samples)]
       (let [sample (Vector3f. (- (* 2 (rand)) 1.0)
                               (- (* 2 (rand)) 1.0)
@@ -35,17 +35,17 @@
         (.put buff (.x sample))
         (.put buff (.y sample))
         (.put buff (.z sample))
-        (.put buff (double 0))))
+        (.put buff (float 0))))
     (.flip buff)
     buff))
 
 (def ssao-noise
   (let [n 16
-        mem (MemoryUtil/memAllocFloat (* n 3))]
+        mem (mem/alloc :float (* n 3))]
     (doseq [_ (range n)]
-      (.put mem ^double (- (* 2 (rand)) 1.0))
-      (.put mem ^double (- (* 2 (rand)) 1.0))
-      (.put mem (double 0)))
+      (.put mem (float (- (* 2 (rand)) 1.0)))
+      (.put mem (float (- (* 2 (rand)) 1.0)))
+      (.put mem (float 0)))
     (.flip mem)
     mem))
 

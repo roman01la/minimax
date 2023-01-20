@@ -5,6 +5,7 @@
   "Allocates a buffer of `type` with `count` items on a heap"
   [type count]
   (case type
+    :byte (MemoryUtil/memAlloc count)
     :float (MemoryUtil/memAllocFloat count)
     :int (MemoryUtil/memAllocInt count)
     :double (MemoryUtil/memAllocDouble count)

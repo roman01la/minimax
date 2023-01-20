@@ -1,22 +1,23 @@
 (ns minimax.vertex-buffer
   (:require
     [bgfx.core :as bgfx]
+    [minimax.mem :as mem]
     [minimax.vertex-layout :as vertex-layout])
   (:import (clojure.lang IDeref)
            (java.nio ByteBuffer)
            (java.util ArrayList)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 (set! *warn-on-reflection* true)
 
 (defn- alloc-memory
   ^ByteBuffer
   [{:keys [^ArrayList vertices ^ArrayList normals ^ArrayList tangents ^ArrayList texture-coords]}]
-  (MemoryUtil/memAlloc (* 4 (+ (.size vertices)
-                               (.size normals)
-                               (.size tangents)
-                               (.size texture-coords)))))
+  (mem/alloc :byte
+    (* 4 (+ (.size vertices)
+            (.size normals)
+            (.size tangents)
+            (.size texture-coords)))))
 
 (defn- create-vertex-layout [normals? texture-coords? tangents?]
   (vertex-layout/create

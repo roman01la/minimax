@@ -1,8 +1,8 @@
 (ns minimax.uniform
-  (:require [bgfx.core :as bgfx])
+  (:require [bgfx.core :as bgfx]
+            [minimax.mem :as mem])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 (set! *warn-on-reflection* true)
 
@@ -28,8 +28,8 @@
   ([name type num-elements]
    (let [uniform (bgfx/create-uniform name type num-elements)
          buff (condp = type
-                BGFX/BGFX_UNIFORM_TYPE_VEC4 (MemoryUtil/memAllocFloat 4)
-                BGFX/BGFX_UNIFORM_TYPE_MAT4 (MemoryUtil/memAllocFloat 16)
-                BGFX/BGFX_UNIFORM_TYPE_MAT3 (MemoryUtil/memAllocFloat 9)
+                BGFX/BGFX_UNIFORM_TYPE_VEC4 (mem/alloc :float 4)
+                BGFX/BGFX_UNIFORM_TYPE_MAT4 (mem/alloc :float 16)
+                BGFX/BGFX_UNIFORM_TYPE_MAT3 (mem/alloc :float 9)
                 nil)]
      (Uniform. name uniform buff))))

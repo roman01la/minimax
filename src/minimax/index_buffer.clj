@@ -1,16 +1,17 @@
 (ns minimax.index-buffer
-  (:require [bgfx.core :as bgfx])
+  (:require [bgfx.core :as bgfx]
+            [minimax.mem :as mem])
   (:import (clojure.lang IDeref)
+           (java.nio ByteBuffer IntBuffer)
            (java.util ArrayList)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 (set! *warn-on-reflection* true)
 
 (defn convert-topology-lines [indices]
   (let [ret (ArrayList.)
-        dst (MemoryUtil/memAllocInt (count indices))
-        source (MemoryUtil/memAllocInt (count indices))]
+        dst ^IntBuffer (mem/alloc :int (count indices))
+        source ^IntBuffer (mem/alloc :int (count indices))]
     (doseq [idx indices]
       (.put source ^int idx))
     (.flip source)
@@ -22,7 +23,7 @@
     ret))
 
 (defn- create* [^ArrayList indices]
-  (let [mem (MemoryUtil/memAlloc (* 2 (.size indices)))]
+  (let [mem ^ByteBuffer (mem/alloc :byte (* 2 (.size indices)))]
     (doseq [idx indices]
       (.putShort mem (short idx)))
     (assert (zero? (.remaining mem)) "ByteBuffer size and number of arguments do not match")

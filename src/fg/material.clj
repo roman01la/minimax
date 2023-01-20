@@ -3,11 +3,12 @@
             [fg.shader :as sd]
             [fg.passes.shadow :as pass.shadow]
             [minimax.assimp.texture :as t]
+            [minimax.mem :as mem]
             [minimax.uniform :as u])
-  (:import (org.joml Vector4f)
+  (:import (java.nio IntBuffer)
+           (org.joml Vector4f)
            (org.lwjgl.assimp AIColor4D AIMaterial AIScene AIString Assimp)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.bgfx BGFX)))
 
 (set! *warn-on-reflection* true)
 
@@ -27,7 +28,7 @@
             ^int type
             0
             ^AIString path
-            (MemoryUtil/memAllocInt 1)
+            ^IntBuffer (mem/alloc :int 1)
             nil nil nil nil nil)
         filename (.dataString path)]
     (if (= filename "")
