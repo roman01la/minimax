@@ -14,8 +14,7 @@
   BGFX/BGFX_TEXTURE_FORMAT_RGBA8)
 
 (def reset-flags
-  (bit-or BGFX/BGFX_RESET_VSYNC
-          BGFX/BGFX_RESET_HIDPI))
+  (bit-or 0 BGFX/BGFX_RESET_VSYNC))
 
 (state/add-state-listener :mouse-move [:mx :my]
   (fn [{:keys [mouse-button mouse-button-action mx my width at eye]}]

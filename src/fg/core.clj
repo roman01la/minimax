@@ -54,7 +54,7 @@
   (glfw/create-window
     {:width (:width @state/state)
      :height (:height @state/state)
-     :title "Minimax"}))
+     :title "minimax"}))
 
 (state/set-size (glfw/detect-dpr))
 
@@ -189,24 +189,16 @@
     (pass.picking/pick @curr-frame)
     (pass.picking/blit)))
 
-(def resize-frame (volatile! 0))
 (def fb-size (volatile! nil))
 
-(defn on-resize* [width height]
+(defn on-resize [width height]
   (swap! state/state assoc :vwidth width :vheight height)
   (swap! camera assoc :aspect (/ width height))
   (bgfx/reset width height listeners/reset-flags listeners/texture-format))
 
-;; resize every 20th frame
-(defn on-resize [width height]
-  (vreset! fb-size [width height])
-  (vswap! resize-frame inc)
-  (when (zero? (mod @resize-frame 20))
-    (on-resize* width height)
-    (run)
-    (vreset! curr-frame (bgfx/frame))))
-
-(listeners/set-listeners window on-resize)
+(listeners/set-listeners window
+  (fn [width height]
+    (vreset! fb-size [width height])))
 
 ;; resize to the latest size value in a rendering loop
 (defn maybe-set-size []
@@ -215,7 +207,7 @@
           {:keys [vwidth vheight]} @state/state]
       (when (or (not= fbw vwidth)
                 (not= fbh vheight))
-        (on-resize* fbw fbh)))))
+        (on-resize fbw fbh)))))
 
 (defn -main [& args]
   (fg.dev/start)

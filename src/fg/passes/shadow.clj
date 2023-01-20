@@ -15,8 +15,7 @@
     0
     BGFX/BGFX_STATE_WRITE_Z
     BGFX/BGFX_STATE_DEPTH_TEST_LESS
-    BGFX/BGFX_STATE_CULL_CW
-    BGFX/BGFX_STATE_MSAA))
+    BGFX/BGFX_STATE_CULL_CW))
 
 (defn create-shadow-map-fb [shadow-size]
   (fb/create
