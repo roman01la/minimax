@@ -3,8 +3,8 @@
 
 (set! *warn-on-reflection* true)
 
-(def width 800)
-(def height 600)
+(def width 1280)
+(def height 800)
 
 (def state
   (atom {;; window

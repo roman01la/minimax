@@ -1,5 +1,15 @@
 (ns minimax.mem
-  (:import (org.lwjgl.system MemoryStack)))
+  (:import (org.lwjgl.system MemoryStack MemoryUtil)))
+
+(defn alloc
+  "Allocates a buffer of `type` with `count` items on a heap"
+  [type count]
+  (case type
+    :float (MemoryUtil/memAllocFloat count)
+    :int (MemoryUtil/memAllocInt count)
+    :double (MemoryUtil/memAllocDouble count)
+    :short (MemoryUtil/memAllocShort count)
+    :long (MemoryUtil/memAllocLong count)))
 
 (defmacro slet
   "Allocates bindings on stack"

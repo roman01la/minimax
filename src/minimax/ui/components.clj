@@ -131,16 +131,39 @@
                :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
       title)))
 
-(defn widget [{:keys [width height on-header-click expanded?]} child]
-  (view
-    {:style {:width width}}
+(defn widget* [{:keys [style on-header-click expanded? title]} & children]
+  (apply view
+    {:style style}
     (widget-header
       {:on-mouse-down on-header-click
        :expanded? expanded?}
-      "Scene Inspector")
+      title)
+    children))
+
+(defn scroll-widget [{:keys [title width height on-header-click expanded?]} child]
+  (widget*
+    {:style {:width width}
+     :on-mouse-down on-header-click
+     :expanded? expanded?
+     :title title}
     (scroll-view
       {:style {:width width
                :height height
                :background-color #ui/rgba [35 35 35 1]
                :border-radius [0 0 5 5]}}
       child)))
+
+(defn widget
+  [{:keys [title style on-header-click expanded?]
+    :or {expanded? true}}
+   & children]
+  (widget*
+    {:style style
+     :on-mouse-down on-header-click
+     :expanded? expanded?
+     :title title}
+    (apply ui/view
+      {:style {:background-color #ui/rgba [35 35 35 1]
+               :border-radius [0 0 5 5]
+               :padding [0 8]}}
+      children)))
