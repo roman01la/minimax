@@ -9,7 +9,6 @@
 (defn ^ByteBuffer load-resource [^File f]
   (with-open [is (io/input-stream f)]
     (let [bytes ^ByteBuffer (mem/alloc :byte (.length f))]
-      (doseq [b (.readAllBytes is)]
-        (.put bytes ^byte b))
+      (.put bytes (.readAllBytes is))
       (.flip bytes)
       bytes)))
