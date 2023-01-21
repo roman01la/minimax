@@ -169,6 +169,13 @@
    :border-color (NVGColor/calloc)
    :text-color (NVGColor/calloc)})
 
+(defn- rect-path [vg x y w h border-radius]
+  (NanoVG/nvgBeginPath vg)
+  (if border-radius
+    (draw-rounded-rect vg x y w h border-radius)
+    (NanoVG/nvgRect vg x y w h))
+  (NanoVG/nvgClosePath vg))
+
 (defrecord Rect [vg ynode children parent-layout style clip?
                  on-mouse-down on-mouse-up on-mouse-over]
   IDrawable
@@ -176,11 +183,7 @@
     (let [[x y w h] (get-layout this)
           {:keys [background-color border-width border-color border-radius]} style]
 
-      (NanoVG/nvgBeginPath vg)
-      (if border-radius
-        (draw-rounded-rect vg x y w h border-radius)
-        (NanoVG/nvgRect vg x y w h))
-      (NanoVG/nvgClosePath vg)
+      (rect-path vg x y w h border-radius)
 
       (when background-color
         (ui.utils/rgba background-color (:background-color colors))
@@ -188,10 +191,16 @@
         (NanoVG/nvgFill vg))
 
       (when (and border-color border-width)
-        (ui.utils/rgba border-color (:border-color colors))
-        (NanoVG/nvgStrokeColor vg (:border-color colors))
-        (NanoVG/nvgStrokeWidth vg border-width)
-        (NanoVG/nvgStroke vg))
+        (let [x (+ x border-width)
+              y (+ y border-width)
+              w (- w (* 2 border-width))
+              h (- h (* 2 border-width))]
+          ;; insetting border
+          (rect-path vg x y w h border-radius)
+          (ui.utils/rgba border-color (:border-color colors))
+          (NanoVG/nvgStrokeColor vg (:border-color colors))
+          (NanoVG/nvgStrokeWidth vg border-width)
+          (NanoVG/nvgStroke vg)))
 
       (when clip? (NanoVG/nvgScissor vg x y w h))
       (run! draw children)

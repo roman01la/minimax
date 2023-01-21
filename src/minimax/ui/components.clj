@@ -44,7 +44,7 @@
         props
         {:position :relative
          :on-layout (fn [x y w h]
-                      (swap! state assoc :sh h))
+                      (swap! state assoc :sh h :wh w))
          :on-scroll (fn [sx sy]
                       (when scroll-bar?
                         (let [{:keys [py h]} @state
@@ -123,36 +123,41 @@
         {:style (assoc (:text/style props) :text-color text-color)}
         text))))
 
-(defn widget-header [{:keys [on-mouse-down expanded?]} title]
-  (ui/view
-    {:on-mouse-down on-mouse-down
-     :style {:align-items :center
-             :flex-direction :row
-             :padding [8 0]
-             :background-color #ui/rgba [50 50 50 1]
-             :border-radius (if expanded? [5 5 0 0] 5)}}
-    (ui/text
-      {:style {:font-size 12
-               :font-face "IBMPlexMono-Regular"
-               :text-color #ui/rgba [230 230 230 1]
-               :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
-      title)))
+(defn widget-header [{:keys [on-mouse-down expanded? title]} & children]
+  (apply ui/view {}
+    (ui/view
+      {:on-mouse-down on-mouse-down
+       :style {:align-items :center
+               :flex-direction :row
+               :padding [8 0]
+               :background-color #ui/rgba [50 50 50 1]
+               :border-radius (if expanded? [5 5 0 0] 5)}}
+      (ui/text
+        {:style {:font-size 12
+                 :font-face "IBMPlexMono-Regular"
+                 :text-color #ui/rgba [230 230 230 1]
+                 :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
+        title))
+    (when expanded?
+      children)))
 
-(defn widget* [{:keys [style on-header-click expanded? title]} & children]
+(defn widget* [{:keys [style on-header-click expanded? title header]} & children]
   (apply view
     {:style style}
-    (widget-header
+    (apply widget-header
       {:on-mouse-down on-header-click
-       :expanded? expanded?}
-      title)
+       :expanded? expanded?
+       :title title}
+      header)
     children))
 
-(defn scroll-widget [{:keys [title width height on-header-click expanded?]} & children]
+(defn scroll-widget [{:keys [title width height on-header-click expanded? header]} & children]
   (widget*
     {:style {:width width}
      :on-header-click on-header-click
      :expanded? expanded?
-     :title title}
+     :title title
+     :header header}
     (apply scroll-view
       {:style {:width width
                :height height
@@ -275,6 +280,7 @@
                      :left x2w
                      :top 0}}))
         ;; selection
+        #_
         (when (not= cursor-x1 cursor-x2)
           (ui/view
             {:style {:width (- x2w x1w)
