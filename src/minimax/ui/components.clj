@@ -193,7 +193,7 @@
       (f))
     @t))
 
-(defui text-input [{:keys [style on-change value placeholder]}]
+(defui text-input [{:keys [style on-change on-focus on-blur value placeholder]}]
   (let [text-style (select-keys style ks)
         style (apply dissoc style ks)
         state (use-state {:focus? false
@@ -258,8 +258,14 @@
                           nil)))]
     (ui/view
       {:style (merge style focus-style)
-       :on-mouse-down #(swap! state assoc :focus? true)
-       :on-mouse-down-outside #(swap! state assoc :focus? false)}
+       :on-mouse-down (fn []
+                        (when-not focus?
+                          (when on-focus (on-focus)))
+                        (swap! state assoc :focus? true))
+       :on-mouse-down-outside (fn []
+                                (when (and focus? on-blur)
+                                  (on-blur))
+                                (swap! state assoc :focus? false))}
       (ui/view
         {:on-key-down (when focus? on-key-down)
          :on-layout (fn [x y w h]
