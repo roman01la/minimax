@@ -1,5 +1,6 @@
 (ns fg.ui
   (:require
+    [minimax.audio.core :as audio]
     [minimax.ui]
     [minimax.ui.elements :as ui]
     [minimax.ui.animation :as ui.anim]
@@ -103,6 +104,24 @@
                    :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
           "Welcome!")))))
 
+(defui sound-button []
+  ;; TODO: hookup global state
+  (let [gain (mui/use-state 1)
+        mute? (zero? @gain)]
+    (ui/view
+      {:on-mouse-down (fn []
+                        (reset! gain (if mute? 1 0))
+                        (audio/set-gain @gain))
+       :style {:position :absolute
+               :right 16
+               :bottom 16}}
+      (ui/image
+        {:src (if mute?
+                "resources/images/sound_off.png"
+                "resources/images/sound_on.png")
+         :style {:width 32
+                 :height 32}}))))
+
 (defui ui-root [width height scene selected]
   (ui/root
     {:style {:width width
@@ -116,5 +135,6 @@
                :left 16
                :bottom 16
                :width (/ 175 3)
-               :height (/ 108 3)}})))
+               :height (/ 108 3)}})
+    (sound-button)))
 

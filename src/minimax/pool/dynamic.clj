@@ -12,16 +12,21 @@
   (alloc [this]
     (pool/alloc this []))
   (alloc [this args]
+    ;; TODO: Fix max check
     (if (empty? free-items)
       (do
         (assert (>= max-size (count taken-items)) (str "Resource pool has reached max size of " max-size " items " (type (first taken-items))))
         (let [item (apply create-item args)]
           (set! taken-items (assoc taken-items args item))
           item))
-      (let [item (get free-items args)]
-        (set! free-items (dissoc free-items args))
-        (set! taken-items (assoc taken-items args item))
-        item)))
+      (if-let [item (get free-items args)]
+        (do
+          (set! free-items (dissoc free-items args))
+          (set! taken-items (assoc taken-items args item))
+          item)
+        (let [item (apply create-item args)]
+          (set! taken-items (assoc taken-items args item))
+          item))))
   (free [this]
     (set! free-items (into free-items taken-items))
     (set! taken-items {}))
