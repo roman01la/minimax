@@ -150,7 +150,7 @@
 (defn scroll-widget [{:keys [title width height on-header-click expanded?]} & children]
   (widget*
     {:style {:width width}
-     :on-mouse-down on-header-click
+     :on-header-click on-header-click
      :expanded? expanded?
      :title title}
     (apply scroll-view
@@ -166,7 +166,7 @@
    & children]
   (widget*
     {:style style
-     :on-mouse-down on-header-click
+     :on-header-click on-header-click
      :expanded? expanded?
      :title title}
     (apply ui/view
