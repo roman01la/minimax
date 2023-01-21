@@ -94,6 +94,10 @@
     node))
 
 (defn measure-text [{:keys [font-size font-face text-align]} text]
+  (assert (number? font-size) "font-size should be a number")
+  (assert (string? font-face) "font-face should be a string")
+  (assert (int? text-align) "text-align should be an int")
+
   (mem/slet [^FloatBuffer text-bounds [:float 4]]
 
     (let [^long vg @ui.ctx/vg]
