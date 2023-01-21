@@ -31,5 +31,8 @@
 (defn rewind [name]
   (audio.ctx/rewind-source @!context name))
 
+(defn set-gain [value]
+  (audio.ctx/set-gain @!context value))
+
 (defn shutdown []
   (audio.ctx/destroy @!context))

@@ -2,7 +2,7 @@
   (:require [minimax.audio.source :as audio.source]
             [minimax.audio.utils :as audio.utils])
   (:import (java.util.function IntFunction)
-           (org.lwjgl.openal AL ALC ALC11 ALCapabilities EXTThreadLocalContext)
+           (org.lwjgl.openal AL AL11 ALC ALC11 ALCapabilities EXTThreadLocalContext)
            (org.lwjgl.system MemoryUtil)))
 
 (defn destroy-audio-context [context device ^ALCapabilities caps use-tlc?]
@@ -21,7 +21,8 @@
   (play-source [this name])
   (pause-source [this name])
   (stop-source [this name])
-  (rewind-source [this name]))
+  (rewind-source [this name])
+  (set-gain [this value]))
 
 (deftype AudioContext [context device caps use-tlc? ^:volatile-mutable sources]
   IAudioContext
@@ -41,7 +42,9 @@
   (stop-source [this name]
     (audio.source/stop (sources name)))
   (rewind-source [this name]
-    (audio.source/rewind (sources name))))
+    (audio.source/rewind (sources name)))
+  (set-gain [this value]
+    (AL11/alListenerf AL11/AL_GAIN value)))
 
 (defn create-audio-context []
   (let [device (ALC11/alcOpenDevice "")
