@@ -51,6 +51,10 @@
                       (f Yoga/YGEdgeRight right)
                       (f Yoga/YGEdgeBottom bottom)
                       (f Yoga/YGEdgeLeft left))
+    (= 3 (count v)) (let [[top h bottom] v]
+                      (f Yoga/YGEdgeTop top)
+                      (f Yoga/YGEdgeHorizontal h)
+                      (f Yoga/YGEdgeBottom bottom))
     (= 2 (count v)) (let [[v h] v]
                       (f Yoga/YGEdgeHorizontal h)
                       (f Yoga/YGEdgeVertical v))))
