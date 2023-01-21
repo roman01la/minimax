@@ -1,7 +1,9 @@
 (ns fg.ui.debug
   (:require
     [bgfx.core :as bgfx]
+    [clojure.string :as str]
     [minimax.mem :as mem]
+    [minimax.object :as obj]
     [minimax.ui.animation :as ui.anim]
     [minimax.ui.components :as mui]
     [minimax.ui.elements :as ui]
@@ -63,28 +65,32 @@
       (stats-text
         (format "UI Layout: %.2fms" (double (/ @minimax.ui/layout-time 1e6)))))))
 
+(defn tree-view-item [{:keys [on-select selected? object]}]
+  (mui/button-text
+    {:on-mouse-down #(on-select (when-not selected? object))
+     :style {:border-radius 2
+             :padding [4 8]
+             :margin [2 12 2 0]
+             :background-color (when selected? #ui/rgba [120 120 255 1])
+             :hover/background-color #ui/rgba [80 80 80 1]
+             :justify-content :center
+             :cursor :pointer}
+     :text/style (merge text-styles
+                        {:hover/text-color (when-not selected? #ui/rgba [120 120 255 1])})}
+    (condp = (type object)
+      Scene "<Scene>"
+      Mesh (str (:name object) " <Mesh>")
+      Group (str (:name object) " <Group>")
+      DirectionalLight (str (:name object) " <DirectionalLight>")
+      (type object))))
+
 (defn tree-view [{:keys [style on-select object selected]}]
   (let [selected? (= selected object)]
     (ui/view {:style style}
-      (ui/view
-        {}
-        (mui/button-text
-          {:on-mouse-down #(on-select (if selected? nil object))
-           :style {:border-radius 2
-                   :padding [4 8]
-                   :margin [2 12 2 0]
-                   :background-color (when selected? #ui/rgba [120 120 255 1])
-                   :hover/background-color #ui/rgba [80 80 80 1]
-                   :justify-content :center
-                   :cursor :pointer}
-           :text/style (merge text-styles
-                              {:hover/text-color (when-not selected? #ui/rgba [120 120 255 1])})}
-          (condp = (type object)
-            Scene "<Scene>"
-            Mesh (str (:name object) " <Mesh>")
-            Group (str (:name object) " <Group>")
-            DirectionalLight (str (:name object) " <DirectionalLight>")
-            (type object))))
+      (tree-view-item
+        {:on-select on-select
+         :selected? selected?
+         :object object})
       (for [obj (:children object)
             :when (not (:debug-skip? obj))]
         (tree-view
@@ -93,13 +99,22 @@
            :object obj
            :selected selected})))))
 
+(defn search-results [{:keys [scene on-select search-query selected]}]
+  (->> (obj/scene->seq scene)
+       (filter #(str/starts-with? (:name %) search-query))
+       (map #(tree-view-item
+               {:on-select on-select
+                :selected? (= selected %)
+                :object %}))))
+
 (def widget-spring (ui.anim/make-spring 5 1 3))
 (def widget-spring-f (volatile! (constantly 0)))
 
 (defui scene-graph [scene selected]
   (let [state (mui/use-state {:expanded? false :search-query ""})
         {:keys [expanded? search-query]} @state
-        spring-f @widget-spring-f]
+        spring-f @widget-spring-f
+        on-select #(reset! selected %)]
     (mui/scroll-widget
       {:title "Scene Inspector"
        :width 240
@@ -119,11 +134,17 @@
                    :on-change #(swap! state assoc :search-query %)
                    :placeholder "Search"
                    :value search-query})]}
-      (tree-view
-        {:style {:padding [8 0]}
-         :object scene
-         :on-select #(reset! selected %)
-         :selected @selected}))))
+      (if (not= "" search-query)
+        (search-results
+          {:scene scene
+           :on-select on-select
+           :search-query search-query
+           :selected @selected})
+        (tree-view
+          {:style {:padding [8 0]}
+           :object scene
+           :on-select on-select
+           :selected @selected})))))
 
 (defn root [width height scene selected]
   (ui/view
