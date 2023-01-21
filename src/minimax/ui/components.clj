@@ -191,12 +191,11 @@
 (defui text-input [{:keys [style on-change value placeholder]}]
   (let [text-style (select-keys style ks)
         style (apply dissoc style ks)
-        state (use-state {:value value
-                          :focus? false
+        state (use-state {:focus? false
                           :cursor-x1 (count value)
                           :cursor-x2 (count value)
                           :height 0})
-        {:keys [value focus? cursor-x1 cursor-x2 height]} @state
+        {:keys [focus? cursor-x1 cursor-x2 height]} @state
         focus-style (when focus?
                       {:border-width 2
                        :border-color #ui/rgba [120 120 255 1]})
@@ -214,29 +213,31 @@
         on-key-down (fn [key mods codepoint]
                       (cond
 
+                        ;; inserted char
                         codepoint
                         (let [ch (char codepoint)
                               value (str
                                       (subs value 0 cursor-x2)
                                       ch
                                       (subs value cursor-x2))]
-                          (doto state
-                            (swap! assoc :value value)
-                            (swap! update :cursor-x2 inc)))
+                          (swap! state update :cursor-x2 inc)
+                          (on-change value))
 
                         :else
                         (condp = key
+                          ;; range selection
+                          #_#_
                           GLFW/GLFW_KEY_LEFT_SHIFT
                           (swap! state update :cursor-x1 move-left)
 
+                          ;; deletion
                           GLFW/GLFW_KEY_BACKSPACE
                           (when (pos? (count value))
                             (let [value (str
                                           (subs value 0 (dec cursor-x2))
                                           (subs value cursor-x2))]
-                              (doto state
-                                (swap! assoc :value value)
-                                (swap! update :cursor-x2 dec))))
+                              (swap! state update :cursor-x2 dec)
+                              (on-change value)))
 
                           ;; caret movement
                           GLFW/GLFW_KEY_LEFT
