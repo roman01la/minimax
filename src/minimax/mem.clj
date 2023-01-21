@@ -1,6 +1,7 @@
 (ns minimax.mem
   (:import (org.lwjgl.system MemoryStack MemoryUtil)))
 
+;; TODO: free allocated memory
 (defn alloc
   "Allocates a buffer of `type` with `count` items on a heap"
   [type count]

@@ -41,13 +41,19 @@
   (ui-event [this {:keys [mx my mouse-button mouse-button-action key key-action key-mods char-codepoint] :as opts}]
     (let [[x y w h :as layout] (ui.pmt/get-layout vnode)
           mouse-over? (ui.utils/point-in-rect? mx my x y w h)
-          {:keys [on-mouse-over on-mouse-up on-mouse-down on-layout on-key-down on-key-up]} props]
+          {:keys [on-mouse-over on-mouse-up on-mouse-down
+                  on-mouse-down-outside on-mouse-up-outside
+                  on-layout on-key-down on-key-up]} props]
       (when on-layout (on-layout x y w h))
       (when on-mouse-over (on-mouse-over mouse-over?))
-      (when mouse-over?
+      (if mouse-over?
         (case mouse-button-action
           0 (when on-mouse-up (on-mouse-up))
           1 (when on-mouse-down (on-mouse-down))
+          nil)
+        (case mouse-button-action
+          0 (when on-mouse-up-outside (on-mouse-up-outside))
+          1 (when on-mouse-down-outside (on-mouse-down-outside))
           nil))
       (case key-action
         :press (when on-key-down (on-key-down key key-mods char-codepoint))
