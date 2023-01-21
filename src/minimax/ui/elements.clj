@@ -2,13 +2,17 @@
   (:require [minimax.ui.primitives :as ui.pmt]
             [minimax.ui.utils :as ui.utils]
             [minimax.pool.core :as pool]
-            [minimax.resources :as res]))
+            [minimax.resources :as res])
+  (:import (minimax.ui.primitives PercentValue)))
 
 (set! *warn-on-reflection* true)
 
 (defn rgba-tag [v]
   #_`(ui.utils/rgba ~r ~g ~b ~a (pool/alloc res/colors))
   v)
+
+(defn pc-tag [v]
+  `(PercentValue. ~v))
 
 ;; UI elements
 (defprotocol IEventTarget

@@ -55,6 +55,8 @@
                       (f Yoga/YGEdgeHorizontal h)
                       (f Yoga/YGEdgeVertical v))))
 
+(defrecord PercentValue [value])
+
 (def styles-mapping
   {:flex-direction #(Yoga/YGNodeStyleSetDirection %1 (get-in style-prop-mapping [:flex-direction %2]))
    :justify-content #(Yoga/YGNodeStyleSetJustifyContent %1 (get-in style-prop-mapping [:justify-content %2]))
@@ -70,8 +72,14 @@
    :position #(Yoga/YGNodeStyleSetPositionType %1 (get-in style-prop-mapping [:position %2]))
    :flex #(Yoga/YGNodeStyleSetFlex %1 %2)
 
-   :height #(Yoga/YGNodeStyleSetHeight %1 %2)
-   :width #(Yoga/YGNodeStyleSetWidth %1 %2)
+   :height (fn [node v]
+             (condp = (type v)
+               PercentValue (Yoga/YGNodeStyleSetHeightPercent node (:value v))
+               (Yoga/YGNodeStyleSetHeight node v)))
+   :width (fn [node v]
+            (condp = (type v)
+              PercentValue (Yoga/YGNodeStyleSetWidthPercent node (:value v))
+              (Yoga/YGNodeStyleSetWidth node v)))
 
    :top #(Yoga/YGNodeStyleSetPosition %1 Yoga/YGEdgeTop %2)
    :left #(Yoga/YGNodeStyleSetPosition %1 Yoga/YGEdgeLeft %2)
