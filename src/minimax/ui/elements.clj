@@ -67,8 +67,9 @@
   (ui-event [this {:keys [sx sy mx my] :as opts}]
     (let [[x y w h :as layout] (ui.pmt/get-layout vnode)
           mouse-over? (ui.utils/point-in-rect? mx my x y w h)
-          {:keys [on-scroll]} props
+          {:keys [on-scroll on-layout]} props
           opts (assoc opts :clip? true)]
+      (when on-layout (on-layout x y w h))
       (when (and mouse-over? on-scroll
                  (not (zero? (+ sx sy))))
         (on-scroll sx sy))
