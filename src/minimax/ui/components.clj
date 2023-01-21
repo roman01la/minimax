@@ -188,7 +188,7 @@
       (f))
     @t))
 
-(defui text-input [{:keys [style on-change value]}]
+(defui text-input [{:keys [style on-change value placeholder]}]
   (let [text-style (select-keys style ks)
         style (apply dissoc style ks)
         state (use-state {:value value
@@ -257,9 +257,13 @@
         {:on-key-down (when focus? on-key-down)
          :on-layout (fn [x y w h]
                       (swap! state assoc :height h))}
-        (ui/text
-          {:style text-style}
-          value)
+        (if (and (= "" value) placeholder (not focus?))
+          (ui/text
+            {:style (merge text-style {:text-color (:placeholder-color style)})}
+            placeholder)
+          (ui/text
+            {:style text-style}
+            value))
         (when focus?
           ;; caret
           (ui/view
