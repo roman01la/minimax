@@ -35,13 +35,17 @@
                :background-color #ui/rgba [100 100 100 1]}})))
 
 (defui scroll-view [props & children]
-  (let [state (use-state {:py 0 :h 0})
-        {:keys [width height]} (:style props)
+  (let [state (use-state {:py 0 :h 0 :sh 0 :wh 0})
+        height (:sh @state)
+        width (:wh @state)
         scroll-bar? (> (:h @state) height)]
     (ui/scroll-view
       (merge
         props
-        {:on-scroll (fn [sx sy]
+        {:position :relative
+         :on-layout (fn [x y w h]
+                      (swap! state assoc :sh h))
+         :on-scroll (fn [sx sy]
                       (when scroll-bar?
                         (let [{:keys [py h]} @state
                               npy (+ py (* sy 10))]
@@ -49,8 +53,7 @@
                             (cond
                               (pos? npy) 0
                               (neg? (+ npy (- h height))) (- height h)
-                              :else npy)))))
-         :position :relative})
+                              :else npy)))))})
       (apply ui/view
         {:on-layout (fn [x y w h]
                       (swap! state assoc :h h))
