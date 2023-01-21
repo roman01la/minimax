@@ -47,7 +47,7 @@
         gpu-mem-used (.gpuMemoryUsed stats)
         num-draw-calls (.numDraw stats)]
     (mui/widget
-      {:title "Perf"
+      {:title "Performance Monitor"
        :style {:justify-content :center
                :width 240
                :margin [0 0 8 0]}}
