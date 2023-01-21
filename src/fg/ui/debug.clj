@@ -97,17 +97,27 @@
 (def widget-spring-f (volatile! (constantly 0)))
 
 (defui scene-graph [scene selected]
-  (let [expanded? (mui/use-state false)]
+  (let [state (mui/use-state {:expanded? false :search-query ""})
+        {:keys [expanded? search-query]} @state
+        spring-f @widget-spring-f]
     (mui/scroll-widget
       {:title "Scene Inspector"
        :width 240
-       :height (* 500 (@widget-spring-f))
-       :expanded? @expanded?
+       :height #ui/% (* 60 (spring-f))
+       :expanded? expanded?
        :on-header-click (fn []
-                          (if-not @expanded?
+                          (if-not expanded?
                             (vreset! widget-spring-f #(widget-spring 0 1 0.16))
                             (vreset! widget-spring-f #(widget-spring 1 0 0.16)))
-                          (swap! expanded? not))}
+                          (swap! state update :expanded? not))}
+      (mui/text-input
+        {:style (merge text-styles
+                       {:padding 8
+                        :placeholder-color #ui/rgba [255 255 255 0.7]
+                        :background-color #ui/rgba [35 35 35 1]})
+         :on-change #(swap! state assoc :search-query %)
+         :placeholder "Search"
+         :value search-query})
       (tree-view
         {:style {:padding [8 0]}
          :object scene
@@ -122,11 +132,4 @@
              :flex-direction :column
              :padding 16}}
     (perf-stats)
-    (mui/text-input
-      {:style (merge text-styles
-                     {:padding 8
-                      :width 240
-                      :background-color #ui/rgba [35 35 35 1]})
-       :on-change println
-       :value "HEllo"})
     (scene-graph scene selected)))
