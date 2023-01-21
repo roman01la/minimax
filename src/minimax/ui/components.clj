@@ -258,7 +258,8 @@
                           nil)))]
     (ui/view
       {:style (merge style focus-style)
-       :on-mouse-down #(swap! state assoc :focus? true)}
+       :on-mouse-down #(swap! state assoc :focus? true)
+       :on-mouse-down-outside #(swap! state assoc :focus? false)}
       (ui/view
         {:on-key-down (when focus? on-key-down)
          :on-layout (fn [x y w h]
