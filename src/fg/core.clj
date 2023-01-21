@@ -7,6 +7,7 @@
     [fg.model :as md]
     [fg.clock :as clock]
     [minimax.objects.camera :as camera]
+    [minimax.audio.core :as audio]
     [minimax.passes :as passes]
     [minimax.pool.core :as pool]
     [minimax.ui :as ui]
@@ -87,6 +88,7 @@
 (log/debug (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
 (ui/init)
+(audio/init)
 
 (def camera
   (atom
@@ -205,6 +207,9 @@
 (defn -main [& args]
   (fg.dev/start)
 
+  ;; Add sound control UI
+  (audio/play :bg)
+
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)
     (GLFW/glfwPollEvents)
@@ -216,6 +221,7 @@
   ;; Disposing the program
   (pool/destroy-all)
   (ui/shutdown)
+  (audio/shutdown)
   (bgfx/shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
