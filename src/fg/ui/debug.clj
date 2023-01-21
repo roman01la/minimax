@@ -122,4 +122,11 @@
              :flex-direction :column
              :padding 16}}
     (perf-stats)
+    (mui/text-input
+      {:style (merge text-styles
+                     {:padding 8
+                      :width 240
+                      :background-color #ui/rgba [35 35 35 1]})
+       :on-change println
+       :value "HEllo"})
     (scene-graph scene selected)))

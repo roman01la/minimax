@@ -1,7 +1,11 @@
 (ns minimax.ui.components
-  (:require [minimax.ui.elements :as ui]
-            [minimax.glfw :as glfw])
-  (:import (org.lwjgl.nanovg NanoVG)))
+  (:require
+    [fg.clock :as clock]
+    [minimax.ui.elements :as ui]
+    [minimax.ui.primitives :as ui.pmt]
+    [minimax.glfw :as glfw])
+  (:import (org.lwjgl.glfw GLFW)
+           (org.lwjgl.nanovg NanoVG)))
 
 (def !id (atom 0))
 (def !current-element (atom nil))
@@ -30,7 +34,7 @@
                :border-radius (/ sbw 2)
                :background-color #ui/rgba [100 100 100 1]}})))
 
-(defui scroll-view [props child]
+(defui scroll-view [props & children]
   (let [state (use-state {:py 0 :h 0})
         {:keys [width height]} (:style props)
         scroll-bar? (> (:h @state) height)]
@@ -47,14 +51,14 @@
                               (neg? (+ npy (- h height))) (- height h)
                               :else npy)))))
          :position :relative})
-      (ui/view
+      (apply ui/view
         {:on-layout (fn [x y w h]
                       (swap! state assoc :h h))
          :style {:top (:py @state)
                  :left 0
                  :position :absolute
                  :width width}}
-        child)
+        children)
       (when scroll-bar?
         (scroll-bar (:py @state) (:h @state) height)))))
 
@@ -140,18 +144,18 @@
       title)
     children))
 
-(defn scroll-widget [{:keys [title width height on-header-click expanded?]} child]
+(defn scroll-widget [{:keys [title width height on-header-click expanded?]} & children]
   (widget*
     {:style {:width width}
      :on-mouse-down on-header-click
      :expanded? expanded?
      :title title}
-    (scroll-view
+    (apply scroll-view
       {:style {:width width
                :height height
                :background-color #ui/rgba [35 35 35 1]
                :border-radius [0 0 5 5]}}
-      child)))
+      children)))
 
 (defn widget
   [{:keys [title style on-header-click expanded?]
@@ -167,3 +171,107 @@
                :border-radius [0 0 5 5]
                :padding [0 8]}}
       children)))
+
+(def ^:private ks
+  [:text-color :text-align :font-size :font-face])
+
+(def measure-text (memoize ui.pmt/measure-text))
+
+(defn use-interval [f it]
+  (let [t (use-state (clock/time))
+        now (clock/time)]
+    (when (>= (- now t) it)
+      (reset! t now)
+      (f))
+    @t))
+
+(defui text-input [{:keys [style on-change value]}]
+  (let [text-style (select-keys style ks)
+        style (apply dissoc style ks)
+        state (use-state {:value value
+                          :focus? false
+                          :cursor-x1 (count value)
+                          :cursor-x2 (count value)
+                          :height 0})
+        {:keys [value focus? cursor-x1 cursor-x2 height]} @state
+        focus-style (when focus?
+                      {:border-width 2
+                       :border-color #ui/rgba [120 120 255 1]})
+        bbs (->> value
+                 (map #(nth (measure-text text-style (str %)) 0)))
+        x1w (->> bbs
+                 (take cursor-x1)
+                 (apply +))
+        x2w (->> bbs
+                 (take cursor-x2)
+                 (apply +))
+
+        move-left #(max (dec %) 0)
+        move-right #(min (inc %) (count value))
+        on-key-down (fn [key mods codepoint]
+                      (cond
+
+                        codepoint
+                        (let [ch (char codepoint)
+                              value (str
+                                      (subs value 0 cursor-x2)
+                                      ch
+                                      (subs value cursor-x2))]
+                          (doto state
+                            (swap! assoc :value value)
+                            (swap! update :cursor-x2 inc)))
+
+                        :else
+                        (condp = key
+                          GLFW/GLFW_KEY_LEFT_SHIFT
+                          (swap! state update :cursor-x1 move-left)
+
+                          GLFW/GLFW_KEY_BACKSPACE
+                          (when (pos? (count value))
+                            (let [value (str
+                                          (subs value 0 (dec cursor-x2))
+                                          (subs value cursor-x2))]
+                              (doto state
+                                (swap! assoc :value value)
+                                (swap! update :cursor-x2 dec))))
+
+                          ;; caret movement
+                          GLFW/GLFW_KEY_LEFT
+                          (doto state
+                            (swap! update :cursor-x1 move-left)
+                            (swap! update :cursor-x2 move-left))
+
+                          GLFW/GLFW_KEY_RIGHT
+                          (doto state
+                            (swap! update :cursor-x1 move-right)
+                            (swap! update :cursor-x2 move-right))
+
+                          nil)))]
+    (ui/view
+      {:style (merge style focus-style)
+       :on-mouse-down #(swap! state assoc :focus? true)}
+      (ui/view
+        {:on-key-down (when focus? on-key-down)
+         :on-layout (fn [x y w h]
+                      (swap! state assoc :height h))}
+        (ui/text
+          {:style text-style}
+          value)
+        (when focus?
+          ;; caret
+          (ui/view
+            {:style {:width 2
+                     :height height
+                     :background-color #ui/rgba [200 200 200 0.75]
+                     :position :absolute
+                     :left x2w
+                     :top 0}}))
+        ;; selection
+        (when (not= cursor-x1 cursor-x2)
+          (ui/view
+            {:style {:width (- x2w x1w)
+                     :height height
+                     :background-color #ui/rgba [200 200 200 0.3]
+                     :position :absolute
+                     :left x1w
+                     :top 0}}))))))

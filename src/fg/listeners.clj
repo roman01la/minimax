@@ -4,7 +4,7 @@
     [fg.state :as state])
   (:import (org.joml Vector3f)
            (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.glfw GLFW GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback
+           (org.lwjgl.glfw GLFW GLFWCharCallback GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback
                            GLFWMouseButtonCallback GLFWScrollCallback GLFWWindowIconifyCallback
                            GLFWWindowMaximizeCallback GLFWWindowSizeCallback)))
 
@@ -29,10 +29,19 @@
 (def key-callback
   (proxy [GLFWKeyCallback] []
     (invoke [window key scancode action mods]
-      (when (and (= key GLFW/GLFW_KEY_ESCAPE)
-                 (= action GLFW/GLFW_RELEASE))
-        (swap! state/state assoc :key key :key-action action)
-        (GLFW/glfwSetWindowShouldClose window true)))))
+      (let [action (condp = action
+                     GLFW/GLFW_PRESS :press
+                     GLFW/GLFW_REPEAT :repeat
+                     GLFW/GLFW_RELEASE :release)]
+        (swap! state/state assoc :key key :key-action action :key-mods mods)
+        (when (and (= key GLFW/GLFW_KEY_ESCAPE)
+                   (= action :release))
+          (GLFW/glfwSetWindowShouldClose window true))))))
+
+(def char-callback
+  (proxy [GLFWCharCallback] []
+    (invoke [window codepoint]
+      (swap! state/state assoc :char-codepoint codepoint))))
 
 
 (def window-resize-callback
@@ -74,6 +83,7 @@
 (defn set-listeners [window on-resize]
   (let [fb-resize-callback (create-fb-resize-callback on-resize)]
     (GLFW/glfwSetKeyCallback window key-callback)
+    (GLFW/glfwSetCharCallback window char-callback)
     (GLFW/glfwSetWindowSizeCallback window window-resize-callback)
     (GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
     (GLFW/glfwSetCursorPosCallback window mouse-move-callback)

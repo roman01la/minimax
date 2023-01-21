@@ -3,8 +3,8 @@
 
 (set! *warn-on-reflection* true)
 
-(def width 1280)
-(def height 800)
+(def width 800)
+(def height 600)
 
 (def state
   (atom {;; window
@@ -27,6 +27,8 @@
          ;; keys
          :key nil
          :key-action nil
+         :key-mods nil
+         :char-codepoint nil
          ;; view projection
          :at (Vector3f. 0.0 0.0 0.0)
          :eye (Vector3f. 7.0 6.0 0.0)
@@ -43,8 +45,17 @@
     (swap! state assoc
       :mouse-button-action nil
       :mouse-button nil))
+
   ;; reset mouse scroll
-  (swap! state assoc :sx 0 :sy 0))
+  (swap! state assoc :sx 0 :sy 0)
+
+  ;; reset pressed key
+  (when (:key-action @state)
+    (swap! state assoc
+           :char-codepoint nil
+           :key-mods nil
+           :key-action nil
+           :key nil)))
 
 (defn set-size [dpr]
   (swap! state assoc

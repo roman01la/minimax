@@ -34,10 +34,10 @@
 
 (defrecord UIView [vnode props children]
   IEventTarget
-  (ui-event [this {:keys [mx my mouse-button mouse-button-action] :as opts}]
+  (ui-event [this {:keys [mx my mouse-button mouse-button-action key key-action key-mods char-codepoint] :as opts}]
     (let [[x y w h :as layout] (ui.pmt/get-layout vnode)
           mouse-over? (ui.utils/point-in-rect? mx my x y w h)
-          {:keys [on-mouse-over on-mouse-up on-mouse-down on-layout]} props]
+          {:keys [on-mouse-over on-mouse-up on-mouse-down on-layout on-key-down on-key-up]} props]
       (when on-layout (on-layout x y w h))
       (when on-mouse-over (on-mouse-over mouse-over?))
       (when mouse-over?
@@ -45,6 +45,11 @@
           0 (when on-mouse-up (on-mouse-up))
           1 (when on-mouse-down (on-mouse-down))
           nil))
+      (case key-action
+        :press (when on-key-down (on-key-down key key-mods char-codepoint))
+        :repeat (when on-key-down (on-key-down key key-mods char-codepoint))
+        :release (when on-key-up (on-key-up key key-mods char-codepoint))
+        nil)
       (propagate-events opts layout children))))
 
 (defn view [props & children]
