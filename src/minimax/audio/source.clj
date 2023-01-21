@@ -42,6 +42,18 @@
   (AL11/alSourcePlay source)
   (audio.utils/check-al-error))
 
+(defn pause-audio-source [source]
+  (AL11/alSourcePause source)
+  (audio.utils/check-al-error))
+
+(defn stop-audio-source [source]
+  (AL11/alSourceStop source)
+  (audio.utils/check-al-error))
+
+(defn rewind-audio-source [source]
+  (AL11/alSourceRewind source)
+  (audio.utils/check-al-error))
+
 (defn destroy-audio-source [source buff]
   (AL11/alSourceStop source)
   (audio.utils/check-al-error)
@@ -54,14 +66,23 @@
 
 (defprotocol IAudioSource
   (destroy [this])
-  (play [this]))
+  (play [this])
+  (pause [this])
+  (stop [this])
+  (rewind [this]))
 
 (deftype AudioSource [source buff file]
   IAudioSource
   (destroy [this]
     (destroy-audio-source source buff))
   (play [this]
-    (play-audio-source source)))
+    (play-audio-source source))
+  (pause [this]
+    (pause-audio-source source))
+  (stop [this]
+    (stop-audio-source source))
+  (rewind [this]
+    (rewind-audio-source source)))
 
 (defn create-source [file]
   (let [[source buff] (create-audio-source file)]

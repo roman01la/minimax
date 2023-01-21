@@ -13,8 +13,23 @@
         (audio.ctx/add-source context name file)))
     (reset! !context context)))
 
+(defn add [name file]
+  (audio.ctx/add-source @!context name file))
+
+(defn remove [name]
+  (audio.ctx/remove-source @!context name))
+
 (defn play [name]
   (audio.ctx/play-source @!context name))
+
+(defn pause [name]
+  (audio.ctx/pause-source @!context name))
+
+(defn stop [name]
+  (audio.ctx/stop-source @!context name))
+
+(defn rewind [name]
+  (audio.ctx/rewind-source @!context name))
 
 (defn shutdown []
   (audio.ctx/destroy @!context))

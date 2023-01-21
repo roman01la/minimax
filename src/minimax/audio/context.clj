@@ -17,7 +17,11 @@
 (defprotocol IAudioContext
   (destroy [this])
   (add-source [this name file])
-  (play-source [this name]))
+  (remove-source [this name])
+  (play-source [this name])
+  (pause-source [this name])
+  (stop-source [this name])
+  (rewind-source [this name]))
 
 (deftype AudioContext [context device caps use-tlc? ^:volatile-mutable sources]
   IAudioContext
@@ -27,8 +31,17 @@
     (destroy-audio-context context device caps use-tlc?))
   (add-source [this name file]
     (set! sources (assoc sources name (audio.source/create-source file))))
+  (remove-source [this name]
+    (audio.source/destroy (sources name))
+    (set! sources (dissoc sources name)))
   (play-source [this name]
-    (audio.source/play (sources name))))
+    (audio.source/play (sources name)))
+  (pause-source [this name]
+    (audio.source/pause (sources name)))
+  (stop-source [this name]
+    (audio.source/stop (sources name)))
+  (rewind-source [this name]
+    (audio.source/rewind (sources name))))
 
 (defn create-audio-context []
   (let [device (ALC11/alcOpenDevice "")
