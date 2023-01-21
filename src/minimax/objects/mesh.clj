@@ -6,7 +6,6 @@
     [fg.material :as mat]
     [minimax.mem :as mem]
     [minimax.passes :as passes]
-    [fg.passes.picking :as pass.picking]
     [fg.passes.shadow :as pass.shadow]
     [minimax.assimp.mesh :as assimp.mesh]
     [minimax.index-buffer :as index-buffer]
@@ -38,7 +37,7 @@
                 state
                 (condp contains? id
                   #{(:id passes/shadow)} pass.shadow/render-state
-                  #{(:id passes/geometry) #_(:id passes/picking)} pass.geom/render-state))]
+                  #{(:id passes/geometry)} pass.geom/render-state))]
     (assert state "state should be set")
     (bgfx/set-vertex-buffer 0 vb 0 vc)
     (bgfx/set-index-buffer ib 0 ic)
@@ -67,20 +66,16 @@
   obj/IRenderable
   (render [this id]
     (when @visible?
-      (if (or (and (= id (:id passes/shadow)) (not cast-shadow?))
-              #_(and (= id (:id passes/picking)) (nil? pid)))
+      (if (and (= id (:id passes/shadow)) (not cast-shadow?))
         nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
         (let [shader (:shader material)
               shadow-shader (:shadow-shader material)
               program (condp = id
                         (:id passes/shadow) shadow-shader
-                        (:id passes/geometry) shader
-                        #_#_(:id passes/picking) @pass.picking/shader)]
+                        (:id passes/geometry) shader)]
           (assert program "shader should be set")
           (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
           (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
-          #_(when (= id (:id passes/picking))
-              (u/set-value @pass.picking/u-id pid))
           (mat/update-uniforms material light-mtx)
           (submit-mesh id
                        @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))

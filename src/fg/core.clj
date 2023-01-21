@@ -18,7 +18,6 @@
     [fg.passes.shadow :as pass.shadow]
     [fg.passes.geometry :as pass.geom]
     [fg.passes.combine :as pass.comb]
-    [fg.passes.picking :as pass.picking]
     [minimax.debug :as debug]
     [fg.ui])
   (:import (java.util.function Consumer)
@@ -173,21 +172,15 @@
 
     (pass.shadow/setup d-light) ;; setup pass shadow
     (pass.geom/setup camera) ;; render pass geometry
-    #_(pass.picking/setup camera) ;; picking pass
 
     (render dt t)
 
     (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
     (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
-    #_(obj/render @scene (:id passes/picking)) ;; picking id pass
 
     (ui/render @state/state render-ui) ;; ui pass
 
-    (pass.comb/render) ;; render combine pass
-
-    #_#_
-    (pass.picking/pick @curr-frame)
-    (pass.picking/blit)))
+    (pass.comb/render))) ;; render combine pass
 
 (def fb-size (volatile! nil))
 

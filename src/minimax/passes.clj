@@ -3,7 +3,6 @@
 
 (def shadow (view/create 0))
 (def geometry (view/create 1))
-(def picking (view/create 2))
-(def combine (view/create 3))
-(def blit (view/create 4))
-(def ui (view/create 5))
+(def combine (view/create 2))
+(def blit (view/create 3))
+(def ui (view/create 4))
