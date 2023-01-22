@@ -6,8 +6,8 @@
 ;; memoizes allocated object on args at alloc time
 ;; TODO: add object update code path
 (deftype DynamicResourcePool
-  [^:volatile-mutable taken-items ^:volatile-mutable free-items
-   max-size create-item free-item]
+         [^:volatile-mutable taken-items ^:volatile-mutable free-items
+          max-size create-item free-item]
   pool/IResourcePool
   (alloc [this]
     (pool/alloc this []))

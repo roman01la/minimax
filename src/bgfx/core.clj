@@ -100,11 +100,11 @@
    (create-frame-buffer-from-textures textures false))
   ([textures destroy-textures?]
    (mem/slet [^ShortBuffer textures-buff [:short (count textures)]]
-     (run! #(.put textures-buff ^short %) textures)
-     (.flip textures-buff)
-     (let [handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]
-       (assert (not= handle 0xffff) "create-frame-buffer-from-textures: the framebuffer is not valid")
-       handle))))
+             (run! #(.put textures-buff ^short %) textures)
+             (.flip textures-buff)
+             (let [handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]
+               (assert (not= handle 0xffff) "create-frame-buffer-from-textures: the framebuffer is not valid")
+               handle))))
 
 (defn get-texture [frame-buffer-handle attachment-idx]
   (BGFX/bgfx_get_texture frame-buffer-handle attachment-idx))
@@ -179,9 +179,9 @@
 
 (defn create-release-callback []
   (BGFXReleaseFunctionCallback/create
-    (proxy [BGFXReleaseFunctionCallback] []
-      (invoke [ptr user-data]
-        (MemoryUtil/nmemFree ptr)))))
+   (proxy [BGFXReleaseFunctionCallback] []
+     (invoke [ptr user-data]
+       (MemoryUtil/nmemFree ptr)))))
 
 (def release
   (delay (create-release-callback)))
@@ -248,10 +248,10 @@
     src-texture-handle src-mip src-x src-y src-z
     width height depth]
    (BGFX/bgfx_blit
-     view-id
-     dst-texture-handle dst-mip dst-x dst-y dst-z
-     src-texture-handle src-mip src-x src-y src-z
-     width height depth)))
+    view-id
+    dst-texture-handle dst-mip dst-x dst-y dst-z
+    src-texture-handle src-mip src-x src-y src-z
+    width height depth)))
 
 (defn vertex-layout-begin
   ([layout]

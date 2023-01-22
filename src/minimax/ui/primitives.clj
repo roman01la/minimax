@@ -1,11 +1,11 @@
 (ns minimax.ui.primitives
   (:require
-    [clojure.java.io :as io]
-    [minimax.mem :as mem]
-    [minimax.pool.core :as pool]
-    [minimax.resources :as res]
-    [minimax.ui.context :as ui.ctx]
-    [minimax.ui.utils :as ui.utils])
+   [clojure.java.io :as io]
+   [minimax.mem :as mem]
+   [minimax.pool.core :as pool]
+   [minimax.resources :as res]
+   [minimax.ui.context :as ui.ctx]
+   [minimax.ui.utils :as ui.utils])
   (:import (java.nio FloatBuffer)
            (org.lwjgl.nanovg NVGColor NVGPaint NanoVG)
            (org.lwjgl.util.yoga YGNode Yoga)))
@@ -104,19 +104,19 @@
 
   (mem/slet [^FloatBuffer text-bounds [:float 4]]
 
-    (let [^long vg @ui.ctx/vg]
-      (NanoVG/nvgFontSize vg font-size)
-      (NanoVG/nvgFontFace vg ^CharSequence font-face)
-      (NanoVG/nvgTextAlign vg text-align)
-      (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds))
+            (let [^long vg @ui.ctx/vg]
+              (NanoVG/nvgFontSize vg font-size)
+              (NanoVG/nvgFontFace vg ^CharSequence font-face)
+              (NanoVG/nvgTextAlign vg text-align)
+              (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds))
 
-    (let [xmin (.get text-bounds 0)
-          ymin (.get text-bounds 1)
-          xmax (.get text-bounds 2)
-          ymax (.get text-bounds 3)
-          w (+ (abs xmin) (abs xmax))
-          h (+ (abs ymin) (abs ymax))]
-      [w h])))
+            (let [xmin (.get text-bounds 0)
+                  ymin (.get text-bounds 1)
+                  xmax (.get text-bounds 2)
+                  ymax (.get text-bounds 3)
+                  w (+ (abs xmin) (abs xmax))
+                  h (+ (abs ymin) (abs ymax))]
+              [w h])))
 
 (defn create-text-node [styles text]
   (let [node (create-node styles)
@@ -215,12 +215,12 @@
 
 (defn rect [props & children]
   (map->Rect
-    (merge
-      props
-      {:vg @ui.ctx/vg
-       :ynode (create-node (:style props))
-       :children children
-       :parent-layout (atom [])})))
+   (merge
+    props
+    {:vg @ui.ctx/vg
+     :ynode (create-node (:style props))
+     :children children
+     :parent-layout (atom [])})))
 
 (def debug-color (ui.utils/rgba 0 150 0 1 (pool/alloc res/colors)))
 
@@ -253,12 +253,11 @@
 
 (defn text [props text]
   (map->Text
-    (assoc props
-      :vg @ui.ctx/vg
-      :ynode (create-text-node (:style props) text)
-      :text text
-      :parent-layout (atom []))))
-
+   (assoc props
+          :vg @ui.ctx/vg
+          :ynode (create-text-node (:style props) text)
+          :text text
+          :parent-layout (atom []))))
 
 (def ^:private image-paint (NVGPaint/create))
 
@@ -287,13 +286,11 @@
   (let [vg @ui.ctx/vg
         img (ui.utils/create-image-from-file vg (io/file (:src props)))]
     (map->Image
-      (assoc props
-        :vg vg
-        :ynode (create-node (:style props))
-        :parent-layout (atom [])
-        :img img))))
-
-
+     (assoc props
+            :vg vg
+            :ynode (create-node (:style props))
+            :parent-layout (atom [])
+            :img img))))
 
 (defrecord Root [ynode parent-layout style children]
   IDrawable
@@ -312,7 +309,7 @@
 
 (defn root [props & children]
   (map->Root
-    (assoc props
-      :ynode (create-node (:style props))
-      :parent-layout (atom [0 0 (-> props :style :width) (-> props :style :height)])
-      :children children)))
+   (assoc props
+          :ynode (create-node (:style props))
+          :parent-layout (atom [0 0 (-> props :style :width) (-> props :style :height)])
+          :children children)))

@@ -1,9 +1,9 @@
 (ns minimax.assimp.texture
   (:require
-    [bgfx.core :as bgfx]
-    [clojure.java.io :as io]
-    [minimax.texture :as t]
-    [minimax.mem :as mem])
+   [bgfx.core :as bgfx]
+   [clojure.java.io :as io]
+   [minimax.mem :as mem]
+   [minimax.texture :as t])
   (:import (java.nio IntBuffer)
            (java.util ArrayList)
            (org.lwjgl.assimp AIScene AITexture)
@@ -23,20 +23,20 @@
   (mem/slet [^IntBuffer x [:int 1]
              ^IntBuffer y [:int 1]
              ^IntBuffer channels [:int 1]]
-    (let [data (load x y channels)
-          width (.get x)
-          height (.get y)
-          channels (.get channels)]
-      (handle width height channels data))))
+            (let [data (load x y channels)
+                  width (.get x)
+                  height (.get y)
+                  channels (.get channels)]
+              (handle width height channels data))))
 
 (defn create-texture* [name load]
   (create-image load
                 (fn [width height channels data]
                   (let [texture (t/create-2d
-                                  {:width width
-                                   :height height
-                                   :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
-                                   :mem (bgfx/make-ref-release data)})]
+                                 {:width width
+                                  :height height
+                                  :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                                  :mem (bgfx/make-ref-release data)})]
                     {:name name
                      :data texture
                      :width width

@@ -4,8 +4,8 @@
 (set! *warn-on-reflection* true)
 
 (deftype StaticResourcePool
-  [^:volatile-mutable taken-items ^:volatile-mutable free-items
-   free-item]
+         [^:volatile-mutable taken-items ^:volatile-mutable free-items
+          free-item]
   pool/IResourcePool
   (alloc [this]
     (pool/alloc this []))

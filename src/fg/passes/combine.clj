@@ -1,16 +1,16 @@
 (ns fg.passes.combine
   (:require
-    [bgfx.core :as bgfx]
-    [minimax.objects.camera :as camera]
-    [fg.deferred :as d]
-    [minimax.object :as obj]
-    [minimax.passes :as passes]
-    [fg.passes.geometry :as pass.geom]
-    [fg.shader :as sd]
-    [fg.state :as state]
-    [minimax.ui :as ui]
-    [minimax.uniform :as u]
-    [minimax.view :as view])
+   [bgfx.core :as bgfx]
+   [fg.deferred :as d]
+   [fg.passes.geometry :as pass.geom]
+   [fg.shader :as sd]
+   [fg.state :as state]
+   [minimax.object :as obj]
+   [minimax.objects.camera :as camera]
+   [minimax.passes :as passes]
+   [minimax.ui :as ui]
+   [minimax.uniform :as u]
+   [minimax.view :as view])
   (:import (org.lwjgl.bgfx BGFX)))
 
 (def u-tex-screen
@@ -36,9 +36,9 @@
         v-height (:vheight @state/state)]
     (view/rect passes/combine 0 0 v-width v-height)
     (bgfx/set-state
-      (bit-or 0
-              BGFX/BGFX_STATE_WRITE_RGB
-              BGFX/BGFX_STATE_WRITE_A))
+     (bit-or 0
+             BGFX/BGFX_STATE_WRITE_RGB
+             BGFX/BGFX_STATE_WRITE_A))
     (obj/render screen-camera (:id passes/combine))
 
     (u/set-texture @u-tex-ui ui/texture 0)

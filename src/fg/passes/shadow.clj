@@ -1,29 +1,29 @@
 (ns fg.passes.shadow
   (:require
-    [bgfx.core :as bgfx]
-    [minimax.objects.camera :as camera]
-    [minimax.object :as obj]
-    [minimax.passes :as passes]
-    [fg.state :as state]
-    [minimax.frame-buffer :as fb]
-    [minimax.view :as view])
+   [bgfx.core :as bgfx]
+   [fg.state :as state]
+   [minimax.frame-buffer :as fb]
+   [minimax.object :as obj]
+   [minimax.objects.camera :as camera]
+   [minimax.passes :as passes]
+   [minimax.view :as view])
   (:import (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFX)))
 
 (def render-state
   (bit-or
-    0
-    BGFX/BGFX_STATE_WRITE_Z
-    BGFX/BGFX_STATE_DEPTH_TEST_LESS
-    BGFX/BGFX_STATE_CULL_CW))
+   0
+   BGFX/BGFX_STATE_WRITE_Z
+   BGFX/BGFX_STATE_DEPTH_TEST_LESS
+   BGFX/BGFX_STATE_CULL_CW))
 
 (defn create-shadow-map-fb [shadow-size]
   (fb/create
-    {:width shadow-size
-     :height shadow-size
-     :format BGFX/BGFX_TEXTURE_FORMAT_D24
-     :flags (bit-or BGFX/BGFX_TEXTURE_RT
-                    BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
+   {:width shadow-size
+    :height shadow-size
+    :format BGFX/BGFX_TEXTURE_FORMAT_D24
+    :flags (bit-or BGFX/BGFX_TEXTURE_RT
+                   BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
 
 (def shadow-map-fb
   ;; TODO: Maybe make it dependant on `:shadow-map-size` if the value is dynamic
@@ -35,9 +35,9 @@
 
 (def ortho-camera
   (camera/create-orthographic-camera
-    {:area 6
-     :near -100
-     :far 10}))
+   {:area 6
+    :near -100
+    :far 10}))
 
 (defn update-ortho-view-projection [id camera eye-vec3 at-vec3]
   (camera/look-at camera at-vec3 eye-vec3)
@@ -53,6 +53,6 @@
                                   (.negate ^Vector3f (:position d-light) (Vector3f.))
                                   (:at @state/state)))
   (view/clear passes/shadow
-    (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH BGFX/BGFX_CLEAR_STENCIL)
-    (:background-color @state/state))
+              (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH BGFX/BGFX_CLEAR_STENCIL)
+              (:background-color @state/state))
   (.mul ^Matrix4f @(:proj-mtx ortho-camera) ^Matrix4f (:view-mtx ortho-camera) ^Matrix4f shadow-mtx))

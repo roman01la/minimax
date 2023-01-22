@@ -16,8 +16,8 @@
       (.put source ^int idx))
     (.flip source)
     (BGFX/bgfx_topology_convert
-      BGFX/BGFX_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST
-      dst source true)
+     BGFX/BGFX_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST
+     dst source true)
     (while (pos? (.remaining dst))
       (.add ret (.get dst)))
     ret))

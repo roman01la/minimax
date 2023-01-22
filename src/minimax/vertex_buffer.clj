@@ -1,8 +1,8 @@
 (ns minimax.vertex-buffer
   (:require
-    [bgfx.core :as bgfx]
-    [minimax.mem :as mem]
-    [minimax.vertex-layout :as vertex-layout])
+   [bgfx.core :as bgfx]
+   [minimax.mem :as mem]
+   [minimax.vertex-layout :as vertex-layout])
   (:import (clojure.lang IDeref)
            (java.nio ByteBuffer)
            (java.util ArrayList)
@@ -14,17 +14,17 @@
   ^ByteBuffer
   [{:keys [^ArrayList vertices ^ArrayList normals ^ArrayList tangents ^ArrayList texture-coords]}]
   (mem/alloc :byte
-    (* 4 (+ (.size vertices)
-            (.size normals)
-            (.size tangents)
-            (.size texture-coords)))))
+             (* 4 (+ (.size vertices)
+                     (.size normals)
+                     (.size tangents)
+                     (.size texture-coords)))))
 
 (defn- create-vertex-layout [normals? texture-coords? tangents?]
   (vertex-layout/create
-    (cond-> [[BGFX/BGFX_ATTRIB_POSITION 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT]]
-            normals? (conj [BGFX/BGFX_ATTRIB_NORMAL 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
-            tangents? (conj [BGFX/BGFX_ATTRIB_TANGENT 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
-            texture-coords? (conj [BGFX/BGFX_ATTRIB_TEXCOORD0 2 BGFX/BGFX_ATTRIB_TYPE_FLOAT]))))
+   (cond-> [[BGFX/BGFX_ATTRIB_POSITION 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT]]
+     normals? (conj [BGFX/BGFX_ATTRIB_NORMAL 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
+     tangents? (conj [BGFX/BGFX_ATTRIB_TANGENT 3 BGFX/BGFX_ATTRIB_TYPE_FLOAT])
+     texture-coords? (conj [BGFX/BGFX_ATTRIB_TEXCOORD0 2 BGFX/BGFX_ATTRIB_TYPE_FLOAT]))))
 
 (defn- create*
   [{:keys [^ArrayList vertices ^ArrayList normals ^ArrayList tangents ^ArrayList texture-coords] :as opts}]
@@ -72,5 +72,5 @@
 
 (defn create [{:keys [vertices normals tangents texture-coords] :as opts}]
   (map->VertexBuffer
-    (-> (select-keys opts [:vertices :normals :tangents :texture-coords])
-        (assoc :buffer (create* opts)))))
+   (-> (select-keys opts [:vertices :normals :tangents :texture-coords])
+       (assoc :buffer (create* opts)))))

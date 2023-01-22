@@ -9,8 +9,8 @@
   (log/debug "Loading sounds...")
   (let [context (audio.ctx/create)]
     (time
-      (doseq [[name file] [[:bg (io/file (io/resource "sounds/bg.ogg"))]]]
-        (audio.ctx/add-source context name file)))
+     (doseq [[name file] [[:bg (io/file (io/resource "sounds/bg.ogg"))]]]
+       (audio.ctx/add-source context name file)))
     (reset! !context context)))
 
 (defn add [name file]

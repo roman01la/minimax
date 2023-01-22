@@ -1,7 +1,7 @@
 (ns fg.listeners
   (:require
-    [bgfx.core :as bgfx]
-    [fg.state :as state])
+   [bgfx.core :as bgfx]
+   [fg.state :as state])
   (:import (org.joml Vector3f)
            (org.lwjgl.bgfx BGFX)
            (org.lwjgl.glfw GLFW GLFWCharCallback GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback
@@ -17,14 +17,13 @@
   (bit-or 0 BGFX/BGFX_RESET_VSYNC))
 
 (state/add-state-listener :mouse-move [:mx :my]
-  (fn [{:keys [mouse-button mouse-button-action mx my width at eye]}]
-    #_
-    (condp = [mouse-button mouse-button-action]
-      [GLFW/GLFW_MOUSE_BUTTON_LEFT GLFW/GLFW_PRESS]
-      (let [p (- (/ mx width) 0.5)]
-        (.setComponent ^Vector3f at 0 p)
-        (.setComponent ^Vector3f eye 0 p))
-      nil)))
+                          (fn [{:keys [mouse-button mouse-button-action mx my width at eye]}]
+                            #_(condp = [mouse-button mouse-button-action]
+                                [GLFW/GLFW_MOUSE_BUTTON_LEFT GLFW/GLFW_PRESS]
+                                (let [p (- (/ mx width) 0.5)]
+                                  (.setComponent ^Vector3f at 0 p)
+                                  (.setComponent ^Vector3f eye 0 p))
+                                nil)))
 
 (def key-callback
   (proxy [GLFWKeyCallback] []
@@ -43,12 +42,10 @@
     (invoke [window codepoint]
       (swap! state/state assoc :char-codepoint codepoint))))
 
-
 (def window-resize-callback
   (proxy [GLFWWindowSizeCallback] []
     (invoke [window w h]
       (swap! state/state assoc :width w :height h))))
-
 
 (defn create-fb-resize-callback [on-resize]
   (proxy [GLFWFramebufferSizeCallback] []

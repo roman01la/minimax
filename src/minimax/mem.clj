@@ -26,8 +26,8 @@
                                       :int '.mallocInt
                                       :short '.mallocShort
                                       :long '.mallocLong)
-                                    ~stack-sym
-                                    ~c)])))
+                                   ~stack-sym
+                                   ~c)])))
            ret#  (do ~@body)]
        (MemoryStack/stackPop)
        ret#)))

@@ -1,7 +1,7 @@
 (ns minimax.program
   (:require
-    [bgfx.core :as bgfx]
-    [minimax.shader :as shader])
+   [bgfx.core :as bgfx]
+   [minimax.shader :as shader])
   (:import (clojure.lang IDeref)))
 
 (set! *warn-on-reflection* true)

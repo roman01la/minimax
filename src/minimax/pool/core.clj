@@ -14,6 +14,6 @@
 (defn destroy-all []
   (log/debug "Destroying resource pools...")
   (time
-    (doseq [pool @pools]
-      (destroy pool)))
+   (doseq [pool @pools]
+     (destroy pool)))
   (reset! pools #{}))

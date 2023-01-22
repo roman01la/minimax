@@ -29,8 +29,8 @@
 
 (defn create [{:keys [name children]}]
   (util.scene/add-parent-link
-    (map->Scene
-      {:name name
-       :mtx (Matrix4f.)
-       :children children
-       :parent (volatile! nil)})))
+   (map->Scene
+    {:name name
+     :mtx (Matrix4f.)
+     :children children
+     :parent (volatile! nil)})))

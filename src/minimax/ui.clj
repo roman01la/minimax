@@ -1,21 +1,21 @@
 (ns minimax.ui
   (:require
-    [bgfx.core :as bgfx]
-    [clojure.java.io :as io]
-    [fg.state :as state]
-    [minimax.frame-buffer :as fb]
-    [minimax.lib :as lib]
-    [minimax.passes :as passes]
-    [minimax.pool.core :as pool]
-    [minimax.resources :as res]
-    [minimax.texture :as t]
-    [minimax.ui.context :as ui.ctx]
-    [minimax.ui.components :as mui]
-    [minimax.ui.elements :as ui]
-    [minimax.ui.primitives :as ui.pmt]
-    [minimax.util.fs :as util.fs]
-    [minimax.view :as view]
-    [minimax.logger :as log])
+   [bgfx.core :as bgfx]
+   [clojure.java.io :as io]
+   [fg.state :as state]
+   [minimax.frame-buffer :as fb]
+   [minimax.lib :as lib]
+   [minimax.logger :as log]
+   [minimax.passes :as passes]
+   [minimax.pool.core :as pool]
+   [minimax.resources :as res]
+   [minimax.texture :as t]
+   [minimax.ui.components :as mui]
+   [minimax.ui.context :as ui.ctx]
+   [minimax.ui.elements :as ui]
+   [minimax.ui.primitives :as ui.pmt]
+   [minimax.util.fs :as util.fs]
+   [minimax.view :as view])
   (:import (org.lwjgl.bgfx BGFX)
            (org.lwjgl.nanovg NanoVG NanoVGBGFX)
            (org.lwjgl.util.yoga Yoga)))
@@ -30,16 +30,16 @@
 
 (defn create-frame-buffer [width height]
   (let [textures [(t/create-2d
-                    {:width width
-                     :height height
-                     :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
-                     :flags BGFX/BGFX_TEXTURE_RT})
+                   {:width width
+                    :height height
+                    :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                    :flags BGFX/BGFX_TEXTURE_RT})
                   (t/create-2d
-                    {:width width
-                     :height height
-                     :format BGFX/BGFX_TEXTURE_FORMAT_D24S8
-                     :flags (bit-or BGFX/BGFX_TEXTURE_RT
-                                    BGFX/BGFX_TEXTURE_RT_WRITE_ONLY)})]]
+                   {:width width
+                    :height height
+                    :format BGFX/BGFX_TEXTURE_FORMAT_D24S8
+                    :flags (bit-or BGFX/BGFX_TEXTURE_RT
+                                   BGFX/BGFX_TEXTURE_RT_WRITE_ONLY)})]]
 
     (fb/create-from-textures textures true)))
 
@@ -95,7 +95,7 @@
   (let [el (f)]
     (reset! !root el)
     (measure-time layout-time
-      (ui.pmt/layout (:vnode el)))
+                  (ui.pmt/layout (:vnode el)))
     (ui.pmt/store-layout (:vnode el))
     (ui/ui-event el opts)
     (ui.pmt/draw (:vnode el))

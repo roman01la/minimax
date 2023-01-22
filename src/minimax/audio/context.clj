@@ -58,9 +58,9 @@
             (assert (true? (ALC11/alcMakeContextCurrent context)) "Couldn't init OpenAL context."))
         _ (audio.utils/check-alc-error device)
         caps (AL/createCapabilities caps
-               (reify IntFunction
-                 (apply [this size]
-                   (MemoryUtil/memCallocPointer size))))]
+                                    (reify IntFunction
+                                      (apply [this size]
+                                        (MemoryUtil/memCallocPointer size))))]
     [context device caps use-tlc?]))
 
 (defn create []

@@ -20,13 +20,13 @@
 (defn create-perspective-camera
   [{:keys [fov aspect near far]}]
   (map->PerspectiveCamera
-    {:proj-mtx (Matrix4f.)
-     :view-mtx (Matrix4f.)
-     :fov fov
-     :aspect aspect
-     :near near
-     :far far
-     :parent (volatile! nil)}))
+   {:proj-mtx (Matrix4f.)
+    :view-mtx (Matrix4f.)
+    :fov fov
+    :aspect aspect
+    :near near
+    :far far
+    :parent (volatile! nil)}))
 
 (defrecord OrthographicCamera [proj-mtx view-mtx area near far]
   ICamera
@@ -41,12 +41,12 @@
 (defn create-orthographic-camera
   [{:keys [area near far]}]
   (map->OrthographicCamera
-    {:proj-mtx (atom (Matrix4f.))
-     :view-mtx (Matrix4f.)
-     :area area
-     :near near
-     :far far
-     :parent (volatile! nil)}))
+   {:proj-mtx (atom (Matrix4f.))
+    :view-mtx (Matrix4f.)
+    :area area
+    :near near
+    :far far
+    :parent (volatile! nil)}))
 
 (defrecord ScreenCamera []
   obj/IRenderable

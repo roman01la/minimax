@@ -45,7 +45,7 @@
 
 (defn add-child* [this child]
   (util.scene/add-parent-link
-    (update this :children conj child)))
+   (update this :children conj child)))
 
 (defn remove-child* [this child]
   (update this :children #(filterv (comp not #{child}) %)))

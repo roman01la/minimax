@@ -1,7 +1,7 @@
 (ns fg.material
   (:require [clojure.string :as str]
-            [fg.shader :as sd]
             [fg.passes.shadow :as pass.shadow]
+            [fg.shader :as sd]
             [minimax.assimp.texture :as t]
             [minimax.mem :as mem]
             [minimax.uniform :as u])
@@ -24,12 +24,12 @@
 (defn get-material-texture [^AIMaterial material type textures]
   (let [path (AIString/calloc)
         _ (Assimp/aiGetMaterialTexture
-            material
-            ^int type
-            0
-            ^AIString path
-            ^IntBuffer (mem/alloc :int 1)
-            nil nil nil nil nil)
+           material
+           ^int type
+           0
+           ^AIString path
+           ^IntBuffer (mem/alloc :int 1)
+           nil nil nil nil nil)
         filename (.dataString path)]
     (if (= filename "")
       @t/dummy-texture
@@ -76,14 +76,12 @@
 (defn create-standard-material
   [{:keys [ambient diffuse texture shader shadow-shader uniforms]}]
   (map->StandardMaterial
-    {:ambient ambient
-     :diffuse diffuse
-     :texture texture
-     :shader shader
-     :shadow-shader shadow-shader
-     :uniforms uniforms}))
-
-
+   {:ambient ambient
+    :diffuse diffuse
+    :texture texture
+    :shader shader
+    :shadow-shader shadow-shader
+    :uniforms uniforms}))
 
 (defrecord LineMaterial [diffuse shader uniforms]
   IMaterial
@@ -92,26 +90,24 @@
 
 (defn create-line-material [{:keys [color]}]
   (map->LineMaterial
-    {:diffuse color
-     :shader @line-shader
-     :uniforms {:color @u-color}}))
-
-
+   {:diffuse color
+    :shader @line-shader
+    :uniforms {:color @u-color}}))
 
 (defn create-material [^AIMaterial material textures]
   (let [ambient (get-material-color material Assimp/AI_MATKEY_COLOR_AMBIENT)
         diffuse (get-material-color material Assimp/AI_MATKEY_COLOR_DIFFUSE)
         texture (get-material-texture material Assimp/aiTextureType_DIFFUSE textures)]
     (create-standard-material
-      {:ambient ambient
-       :diffuse diffuse
-       :texture texture
-       :shader @diffuse-shader
-       :shadow-shader @shadow-shader
-       :uniforms {:color @u-color
-                  :texture @u-tex-diffuse
-                  :shadow @u-shadow
-                  :light-mtx @u-light-mtx}})))
+     {:ambient ambient
+      :diffuse diffuse
+      :texture texture
+      :shader @diffuse-shader
+      :shadow-shader @shadow-shader
+      :uniforms {:color @u-color
+                 :texture @u-tex-diffuse
+                 :shadow @u-shadow
+                 :light-mtx @u-light-mtx}})))
 
 (defn create-materials [^AIScene scene textures]
   (let [materials (.mMaterials scene)]

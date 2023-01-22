@@ -1,9 +1,9 @@
 (ns fg.shader
   (:require
-    [clojure.java.io :as io]
-    [clojure.java.shell :as sh]
-    [minimax.program :as program]
-    [fg.dev])
+   [clojure.java.io :as io]
+   [clojure.java.shell :as sh]
+   [fg.dev]
+   [minimax.program :as program])
   (:import (clojure.lang IDeref)))
 
 (set! *warn-on-reflection* true)

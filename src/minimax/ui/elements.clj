@@ -1,8 +1,8 @@
 (ns minimax.ui.elements
-  (:require [minimax.ui.primitives :as ui.pmt]
-            [minimax.ui.utils :as ui.utils]
-            [minimax.pool.core :as pool]
-            [minimax.resources :as res])
+  (:require [minimax.pool.core :as pool]
+            [minimax.resources :as res]
+            [minimax.ui.primitives :as ui.pmt]
+            [minimax.ui.utils :as ui.utils])
   (:import (minimax.ui.primitives PercentValue)))
 
 (set! *warn-on-reflection* true)
@@ -88,7 +88,6 @@
                         :props props
                         :children children})))
 
-
 (defrecord UIText [vnode props children]
   IEventTarget
   (ui-event [this opts]))
@@ -99,7 +98,6 @@
                   :props props
                   :children children})))
 
-
 (defrecord UIImage [vnode props]
   IEventTarget
   (ui-event [this opts]))
@@ -107,7 +105,6 @@
 (defn image [props]
   (map->UIImage {:vnode (ui.pmt/image props)
                  :props props}))
-
 
 (defrecord UIRoot [vnode props children]
   IEventTarget

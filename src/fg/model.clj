@@ -13,10 +13,10 @@
 
 (defn ^Matrix4f create-m4f [^AIMatrix4x4 m]
   (Matrix4f.
-    (.a1 m) (.b1 m) (.c1 m) (.d1 m)
-    (.a2 m) (.b2 m) (.c2 m) (.d2 m)
-    (.a3 m) (.b3 m) (.c3 m) (.d3 m)
-    (.a4 m) (.b4 m) (.c4 m) (.d4 m)))
+   (.a1 m) (.b1 m) (.c1 m) (.d1 m)
+   (.a2 m) (.b2 m) (.c2 m) (.d2 m)
+   (.a3 m) (.b3 m) (.c3 m) (.d3 m)
+   (.a4 m) (.b4 m) (.c4 m) (.d4 m)))
 
 (defn create-scene-graph* [^PointerBuffer meshes materials ^AINode node]
   (let [name (.dataString (.mName node))
@@ -33,21 +33,21 @@
     (case (count cmeshes)
       ;; single mesh node — mesh
       1 (util.scene/add-parent-link
-          (assoc (first cmeshes) :children children))
+         (assoc (first cmeshes) :children children))
       ;; zero mesh node — group/empty
       0 (util.scene/add-parent-link
-          (obj.group/create
-            {:name name
-             :children children
-             :lmtx mtx}))
+         (obj.group/create
+          {:name name
+           :children children
+           :lmtx mtx}))
       ;; multi mesh node (mesh with multiple materials) — group
       (util.scene/add-parent-link
-        (obj.group/create
-          {:name name
+       (obj.group/create
+        {:name name
            ;; reset local transform on child meshes
-           :children (-> (mapv #(assoc % :lmtx (Matrix4f.)) cmeshes)
-                         (into children))
-           :lmtx mtx})))))
+         :children (-> (mapv #(assoc % :lmtx (Matrix4f.)) cmeshes)
+                       (into children))
+         :lmtx mtx})))))
 
 (defn create-scene-graph [^AIScene scene materials]
   (create-scene-graph* (.mMeshes scene) materials (.mRootNode scene)))

@@ -1,26 +1,26 @@
 (ns fg.core
   (:require
-    [bgfx.core :as bgfx]
-    [minimax.logger :as log]
-    [minimax.object :as obj]
-    [fg.dev]
-    [fg.model :as md]
-    [fg.clock :as clock]
-    [minimax.objects.camera :as camera]
-    [minimax.audio.core :as audio]
-    [minimax.passes :as passes]
-    [minimax.pool.core :as pool]
-    [minimax.ui :as ui]
-    [fg.state :as state]
-    [fg.listeners :as listeners]
-    [minimax.objects.light :as light]
-    [minimax.objects.scene :as scene]
-    [minimax.glfw :as glfw]
-    [fg.passes.shadow :as pass.shadow]
-    [fg.passes.geometry :as pass.geom]
-    [fg.passes.combine :as pass.comb]
-    [minimax.debug :as debug]
-    [fg.ui])
+   [bgfx.core :as bgfx]
+   [fg.clock :as clock]
+   [fg.dev]
+   [fg.listeners :as listeners]
+   [fg.model :as md]
+   [fg.passes.combine :as pass.comb]
+   [fg.passes.geometry :as pass.geom]
+   [fg.passes.shadow :as pass.shadow]
+   [fg.state :as state]
+   [fg.ui]
+   [minimax.audio.core :as audio]
+   [minimax.debug :as debug]
+   [minimax.glfw :as glfw]
+   [minimax.logger :as log]
+   [minimax.object :as obj]
+   [minimax.objects.camera :as camera]
+   [minimax.objects.light :as light]
+   [minimax.objects.scene :as scene]
+   [minimax.passes :as passes]
+   [minimax.pool.core :as pool]
+   [minimax.ui :as ui])
   (:import (java.util.function Consumer)
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)
@@ -52,21 +52,21 @@
 
 (def window
   (glfw/create-window
-    {:width (:width @state/state)
-     :height (:height @state/state)
-     :title "minimax"}))
+   {:width (:width @state/state)
+    :height (:height @state/state)
+    :title "minimax"}))
 
 (state/set-size (glfw/detect-dpr))
 
 (let [^BGFXInit init (bgfx/create-init)]
   (.resolution init
-    (reify Consumer
-      (accept [this it]
-        (-> ^BGFXResolution it
-            (.width (:vwidth @state/state))
-            (.height (:vheight @state/state))
-            (.reset listeners/reset-flags)
-            (.format listeners/texture-format)))))
+               (reify Consumer
+                 (accept [this it]
+                   (-> ^BGFXResolution it
+                       (.width (:vwidth @state/state))
+                       (.height (:vheight @state/state))
+                       (.reset listeners/reset-flags)
+                       (.format listeners/texture-format)))))
 
   (condp = (Platform/get)
     Platform/MACOSX
@@ -92,17 +92,17 @@
 
 (def camera
   (atom
-    (camera/create-perspective-camera
-      {:fov 60
-       :aspect (/ (:vwidth @state/state) (:vheight @state/state))
-       :near 0.1
-       :far 100})))
+   (camera/create-perspective-camera
+    {:fov 60
+     :aspect (/ (:vwidth @state/state) (:vheight @state/state))
+     :near 0.1
+     :far 100})))
 
 (def d-light
   (light/create-directional-light
-    {:name "u_light_pos"
-     :position (:light-pos @state/state)
-     :color (Vector3f. 1.0 1.0 1.0)}))
+   {:name "u_light_pos"
+    :position (:light-pos @state/state)
+    :color (Vector3f. 1.0 1.0 1.0)}))
 
 (def model
   (do
@@ -116,8 +116,8 @@
 ;; scene
 (def scene
   (atom (scene/create
-          {:name "MainScene"
-           :children [d-light (:scene model) debug-box]})))
+         {:name "MainScene"
+          :children [d-light (:scene model) debug-box]})))
 
 (def castle-obj
   (obj/find-by-name @scene "castle_root"))
@@ -157,9 +157,9 @@
       (let [[root & objs] (reverse (obj/obj->parent-seq obj []))
             mtx (->> objs
                      (reduce
-                       (fn [mtx obj]
-                         (obj/apply-matrix* mtx (:lmtx obj) mtx))
-                       (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
+                      (fn [mtx obj]
+                        (obj/apply-matrix* mtx (:lmtx obj) mtx))
+                      (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
         (debug/set-object-transform obj debug-box mtx)))))
 
 (defn render-ui []
@@ -192,8 +192,8 @@
   (bgfx/reset width height listeners/reset-flags listeners/texture-format))
 
 (listeners/set-listeners window
-  (fn [width height]
-    (vreset! fb-size [width height])))
+                         (fn [width height]
+                           (vreset! fb-size [width height])))
 
 ;; resize to the latest size value in a rendering loop
 (defn maybe-set-size []

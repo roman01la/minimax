@@ -32,11 +32,9 @@
 (defn set-view-transform [view-id view-mtx proj-mtx]
   (mem/slet [view-buff [:float 16]
              proj-buff [:float 16]]
-    (bgfx/set-view-transform view-id
-                             (when view-mtx (.get ^Matrix4f view-mtx ^FloatBuffer view-buff))
-                             (when proj-mtx (.get ^Matrix4f proj-mtx ^FloatBuffer proj-buff)))))
-
-
+            (bgfx/set-view-transform view-id
+                                     (when view-mtx (.get ^Matrix4f view-mtx ^FloatBuffer view-buff))
+                                     (when proj-mtx (.get ^Matrix4f proj-mtx ^FloatBuffer proj-buff)))))
 
 (defn int->rgba
   "Encodes integer as RGBA value in Vector4f"

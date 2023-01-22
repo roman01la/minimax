@@ -43,8 +43,8 @@
   (when (or (= 0 (:mouse-button-action @state))
             (= 1 (:mouse-button-action @state)))
     (swap! state assoc
-      :mouse-button-action nil
-      :mouse-button nil))
+           :mouse-button-action nil
+           :mouse-button nil))
 
   ;; reset mouse scroll
   (swap! state assoc :sx 0 :sy 0)

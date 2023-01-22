@@ -1,17 +1,17 @@
 (ns minimax.objects.mesh
   (:require
-    [bgfx.core :as bgfx]
-    [fg.passes.geometry :as pass.geom]
-    [minimax.lib :as lib]
-    [fg.material :as mat]
-    [minimax.mem :as mem]
-    [minimax.passes :as passes]
-    [fg.passes.shadow :as pass.shadow]
-    [minimax.assimp.mesh :as assimp.mesh]
-    [minimax.index-buffer :as index-buffer]
-    [minimax.object :as obj]
-    [minimax.uniform :as u]
-    [minimax.vertex-buffer :as vertex-buffer])
+   [bgfx.core :as bgfx]
+   [fg.material :as mat]
+   [fg.passes.geometry :as pass.geom]
+   [fg.passes.shadow :as pass.shadow]
+   [minimax.assimp.mesh :as assimp.mesh]
+   [minimax.index-buffer :as index-buffer]
+   [minimax.lib :as lib]
+   [minimax.mem :as mem]
+   [minimax.object :as obj]
+   [minimax.passes :as passes]
+   [minimax.uniform :as u]
+   [minimax.vertex-buffer :as vertex-buffer])
   (:import (java.nio FloatBuffer)
            (java.util ArrayList)
            (org.joml Matrix4f Vector3f)
@@ -22,22 +22,22 @@
 
 (def discard-state
   (bit-or
-    #_BGFX/BGFX_DISCARD_ALL
-    0
-    BGFX/BGFX_DISCARD_INDEX_BUFFER
-    BGFX/BGFX_DISCARD_VERTEX_STREAMS
-    BGFX/BGFX_DISCARD_BINDINGS
-    BGFX/BGFX_DISCARD_STATE
-    BGFX/BGFX_DISCARD_TRANSFORM))
+   #_BGFX/BGFX_DISCARD_ALL
+   0
+   BGFX/BGFX_DISCARD_INDEX_BUFFER
+   BGFX/BGFX_DISCARD_VERTEX_STREAMS
+   BGFX/BGFX_DISCARD_BINDINGS
+   BGFX/BGFX_DISCARD_STATE
+   BGFX/BGFX_DISCARD_TRANSFORM))
 
 (def mtx-buff (mem/alloc :float 16))
 
 (defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx state]
   (let [state (or
-                state
-                (condp contains? id
-                  #{(:id passes/shadow)} pass.shadow/render-state
-                  #{(:id passes/geometry)} pass.geom/render-state))]
+               state
+               (condp contains? id
+                 #{(:id passes/shadow)} pass.shadow/render-state
+                 #{(:id passes/geometry)} pass.geom/render-state))]
     (assert state "state should be set")
     (bgfx/set-vertex-buffer 0 vb 0 vc)
     (bgfx/set-index-buffer ib 0 ic)
@@ -52,10 +52,10 @@
       tz (if (.homogeneousDepth caps) 0.5 0.0)]
   (def crop-mtx
     (Matrix4f.
-      0.5 0.0 0.0 0.0
-      0.0 sy  0.0 0.0
-      0.0 0.0 sz  0.0
-      0.5 0.5 tz  1.0)))
+     0.5 0.0 0.0 0.0
+     0.0 sy  0.0 0.0
+     0.0 0.0 sz  0.0
+     0.5 0.5 tz  1.0)))
 
 ;; Mesh node - a mesh ¯\_(ツ)_/¯
 (defrecord Mesh [name id pid cast-shadow? state
@@ -126,18 +126,18 @@
         vbh (vertex-buffer/create parsed-mesh)
         ibh (index-buffer/create (:indices parsed-mesh))]
     (map->Mesh
-      {:name name
-       :id (.hashCode mesh)
-       :pid (lib/int->rgba (.hashCode mesh))
-       :vertex-buffer vbh
-       :index-buffer ibh
-       :lmtx lmtx
-       :mtx (Matrix4f.)
-       :light-mtx (Matrix4f.)
-       :tvec (Vector3f.)
-       :material material
-       :children []
-       :parent (volatile! nil)
-       :cast-shadow? true
-       :visible? (volatile! true)
-       :bounding-box (:bounding-box parsed-mesh)})))
+     {:name name
+      :id (.hashCode mesh)
+      :pid (lib/int->rgba (.hashCode mesh))
+      :vertex-buffer vbh
+      :index-buffer ibh
+      :lmtx lmtx
+      :mtx (Matrix4f.)
+      :light-mtx (Matrix4f.)
+      :tvec (Vector3f.)
+      :material material
+      :children []
+      :parent (volatile! nil)
+      :cast-shadow? true
+      :visible? (volatile! true)
+      :bounding-box (:bounding-box parsed-mesh)})))

@@ -20,10 +20,10 @@
 (defn create-directional-light [{:keys [name position color]}]
   (let [u-position (u/create name BGFX/BGFX_UNIFORM_TYPE_VEC4)]
     (map->DirectionalLight
-      {:name name
-       :color color
-       :position position
-       :mtx (Matrix4f.)
-       :lmtx (Matrix4f.)
-       :uniforms {:position u-position}
-       :parent (volatile! nil)})))
+     {:name name
+      :color color
+      :position position
+      :mtx (Matrix4f.)
+      :lmtx (Matrix4f.)
+      :uniforms {:position u-position}
+      :parent (volatile! nil)})))

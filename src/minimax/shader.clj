@@ -1,8 +1,8 @@
 (ns minimax.shader
   (:require
-    [bgfx.core :as bgfx]
-    [clojure.java.io :as io]
-    [minimax.util.fs :as util.fs])
+   [bgfx.core :as bgfx]
+   [clojure.java.io :as io]
+   [minimax.util.fs :as util.fs])
   (:import (clojure.lang IDeref)))
 
 (set! *warn-on-reflection* true)

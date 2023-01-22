@@ -9,7 +9,7 @@
   (begin [this])
   (end [this])
   (add [this attribute n-elements element-type]
-       [this attribute n-elements element-type normalized?]))
+    [this attribute n-elements element-type normalized?]))
 
 (deftype VertexLayout [layout]
   IVertexLayout
