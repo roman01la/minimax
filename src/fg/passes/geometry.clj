@@ -79,12 +79,6 @@
     [geometry-fb]
     vector))
 
-(def u-tex-position
-  (delay (u/create "s_texPosition" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
-
-(def u-tex-normal
-  (delay (u/create "s_texNormal" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
-
 (defn setup [camera]
   (let [v-width (:vwidth @state/state)
         v-height (:vheight @state/state)]

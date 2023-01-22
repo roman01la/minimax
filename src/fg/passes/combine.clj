@@ -1,7 +1,6 @@
 (ns fg.passes.combine
   (:require
     [bgfx.core :as bgfx]
-    [minimax.mem :as mem]
     [minimax.objects.camera :as camera]
     [fg.deferred :as d]
     [minimax.object :as obj]
@@ -11,61 +10,17 @@
     [fg.state :as state]
     [minimax.ui :as ui]
     [minimax.uniform :as u]
-    [minimax.texture :as t]
     [minimax.view :as view])
-  (:import (org.joml Vector3f)
-           (org.lwjgl.bgfx BGFX)))
-
-;; SSAO
-(defn lerp [a b f]
-  (+ a (* f (- b a))))
-
-(def ssao-kernel
-  (let [samples 64
-        buff (mem/alloc :float (* samples 4))]
-    (doseq [idx (range samples)]
-      (let [sample (Vector3f. (- (* 2 (rand)) 1.0)
-                              (- (* 2 (rand)) 1.0)
-                              (rand))
-            scale (/ idx samples)
-            scale (lerp 0.1 1.0 (* scale scale))]
-        (.normalize sample)
-        (.mul sample ^float (rand))
-        (.mul sample ^float scale)
-        (.put buff (.x sample))
-        (.put buff (.y sample))
-        (.put buff (.z sample))
-        (.put buff (float 0))))
-    (.flip buff)
-    buff))
-
-(def ssao-noise
-  (let [n 16
-        mem (mem/alloc :float (* n 3))]
-    (doseq [_ (range n)]
-      (.put mem (float (- (* 2 (rand)) 1.0)))
-      (.put mem (float (- (* 2 (rand)) 1.0)))
-      (.put mem (float 0)))
-    (.flip mem)
-    mem))
-
-(def ssao-noise-texture
-  (delay
-    (t/create-2d
-      {:width 4
-       :height 4
-       :format BGFX/BGFX_TEXTURE_FORMAT_RGBA16F
-       :mem (bgfx/make-ref-release ssao-noise)})))
-
-(def u-ssao-noise
-  (delay (u/create "s_ssaoNoise" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
-
-(def u-ssao-samples
-  (delay (u/create "u_ssao_samples" BGFX/BGFX_UNIFORM_TYPE_VEC4 64)))
-;; /SSAO
+  (:import (org.lwjgl.bgfx BGFX)))
 
 (def u-tex-screen
   (delay (u/create "s_texScreen" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
+
+(def u-tex-position
+  (delay (u/create "s_texPosition" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
+
+(def u-tex-normal
+  (delay (u/create "s_texNormal" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
 
 (def u-tex-ui
   (delay (u/create "s_texUI" BGFX/BGFX_UNIFORM_TYPE_SAMPLER)))
@@ -89,11 +44,8 @@
     (u/set-texture @u-tex-ui ui/texture 0)
     (u/set-texture @u-tex-screen pass.geom/screen-texture 1)
 
-    #_(u/set-value @u-ssao-samples ssao-kernel 64)
-    #_(u/set-texture @u-ssao-noise @ssao-noise-texture 1)
-
-    (u/set-texture @pass.geom/u-tex-position pass.geom/position-texture 2)
-    (u/set-texture @pass.geom/u-tex-normal pass.geom/normal-texture 3)
+    (u/set-texture @u-tex-position pass.geom/position-texture 2)
+    (u/set-texture @u-tex-normal pass.geom/normal-texture 3)
 
     (d/screen-space-quad)
     (bgfx/submit (:id passes/combine) @combine-shader)))
