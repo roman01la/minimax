@@ -1,4 +1,4 @@
-(ns minimax.view
+(ns minimax.renderer.view
   (:require [bgfx.core :as bgfx]
             [minimax.lib :as lib]))
 

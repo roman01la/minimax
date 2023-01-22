@@ -3,7 +3,7 @@
    [clojure.java.io :as io]
    [clojure.java.shell :as sh]
    [fg.dev]
-   [minimax.program :as program])
+   [minimax.renderer.program :as program])
   (:import (clojure.lang IDeref)))
 
 (set! *warn-on-reflection* true)

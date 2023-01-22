@@ -1,6 +1,6 @@
 (ns fg.deferred
   (:require [bgfx.core :as bgfx]
-            [minimax.vertex-layout :as vertex-layout])
+            [minimax.renderer.vertex-layout :as vertex-layout])
   (:import (org.lwjgl.bgfx BGFX BGFXTransientIndexBuffer BGFXTransientVertexBuffer)))
 
 (defn create-transient-mesh [layout n-elements vertices indices]

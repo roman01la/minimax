@@ -8,6 +8,7 @@
    [minimax.objects.light]
    [minimax.objects.mesh]
    [minimax.objects.scene]
+   [minimax.renderer.ui]
    [minimax.ui.animation :as ui.anim]
    [minimax.ui.components :as mui :refer [defui]]
    [minimax.ui.elements :as ui])
@@ -66,7 +67,7 @@
      (stats-text
       (format "Draw calls: %d" num-draw-calls))
      (stats-text
-      (format "UI Layout: %.2fms" (double (/ @minimax.ui/layout-time 1e6)))))))
+      (format "UI Layout: %.2fms" (double (/ @minimax.renderer.ui/layout-time 1e6)))))))
 
 (defn tree-view-item [{:keys [on-select selected? object]}]
   (mui/button-text

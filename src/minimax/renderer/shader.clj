@@ -1,4 +1,4 @@
-(ns minimax.shader
+(ns minimax.renderer.shader
   (:require
    [bgfx.core :as bgfx]
    [clojure.java.io :as io]

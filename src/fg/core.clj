@@ -20,7 +20,7 @@
    [minimax.objects.scene :as scene]
    [minimax.passes :as passes]
    [minimax.pool.core :as pool]
-   [minimax.ui :as ui])
+   [minimax.renderer.ui :as ui])
   (:import (java.util.function Consumer)
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFXInit BGFXResolution)

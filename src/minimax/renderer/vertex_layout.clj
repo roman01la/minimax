@@ -1,4 +1,4 @@
-(ns minimax.vertex-layout
+(ns minimax.renderer.vertex-layout
   (:require [bgfx.core :as bgfx])
   (:import (clojure.lang IDeref)
            (org.lwjgl.bgfx BGFXVertexLayout)))

@@ -1,8 +1,8 @@
-(ns minimax.vertex-buffer
+(ns minimax.renderer.vertex-buffer
   (:require
    [bgfx.core :as bgfx]
    [minimax.mem :as mem]
-   [minimax.vertex-layout :as vertex-layout])
+   [minimax.renderer.vertex-layout :as vertex-layout])
   (:import (clojure.lang IDeref)
            (java.nio ByteBuffer)
            (java.util ArrayList)

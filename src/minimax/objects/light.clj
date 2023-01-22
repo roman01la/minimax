@@ -1,6 +1,6 @@
 (ns minimax.objects.light
   (:require [minimax.object :as obj]
-            [minimax.uniform :as u])
+            [minimax.renderer.uniform :as u])
   (:import (org.joml Matrix4f)
            (org.lwjgl.bgfx BGFX)))
 

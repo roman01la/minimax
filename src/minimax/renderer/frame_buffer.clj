@@ -1,4 +1,4 @@
-(ns minimax.frame-buffer
+(ns minimax.renderer.frame-buffer
   (:require [bgfx.core :as bgfx])
   (:import (clojure.lang IDeref)))
 

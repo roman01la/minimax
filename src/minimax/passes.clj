@@ -1,5 +1,5 @@
 (ns minimax.passes
-  (:require [minimax.view :as view]))
+  (:require [minimax.renderer.view :as view]))
 
 (def shadow (view/create 0))
 (def geometry (view/create 1))

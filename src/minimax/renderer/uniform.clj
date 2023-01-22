@@ -1,4 +1,4 @@
-(ns minimax.uniform
+(ns minimax.renderer.uniform
   (:require [bgfx.core :as bgfx]
             [minimax.mem :as mem])
   (:import (java.nio FloatBuffer)

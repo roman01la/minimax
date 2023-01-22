@@ -1,9 +1,9 @@
 (ns minimax.debug
   (:require
    [fg.material :as mat]
-   [minimax.index-buffer :as index-buffer]
    [minimax.objects.mesh :as obj.mesh]
-   [minimax.vertex-buffer :as vertex-buffer])
+   [minimax.renderer.index-buffer :as index-buffer]
+   [minimax.renderer.vertex-buffer :as vertex-buffer])
   (:import (java.util ArrayList)
            (org.joml Matrix4f Vector3f Vector4f)
            (org.lwjgl.bgfx BGFX)))

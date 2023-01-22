@@ -8,9 +8,9 @@
    [minimax.object :as obj]
    [minimax.objects.camera :as camera]
    [minimax.passes :as passes]
-   [minimax.ui :as ui]
-   [minimax.uniform :as u]
-   [minimax.view :as view])
+   [minimax.renderer.ui :as ui]
+   [minimax.renderer.uniform :as u]
+   [minimax.renderer.view :as view])
   (:import (org.lwjgl.bgfx BGFX)))
 
 (def u-tex-screen

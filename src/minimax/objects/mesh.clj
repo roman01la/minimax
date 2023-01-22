@@ -5,13 +5,13 @@
    [fg.passes.geometry :as pass.geom]
    [fg.passes.shadow :as pass.shadow]
    [minimax.assimp.mesh :as assimp.mesh]
-   [minimax.index-buffer :as index-buffer]
    [minimax.lib :as lib]
    [minimax.mem :as mem]
    [minimax.object :as obj]
    [minimax.passes :as passes]
-   [minimax.uniform :as u]
-   [minimax.vertex-buffer :as vertex-buffer])
+   [minimax.renderer.index-buffer :as index-buffer]
+   [minimax.renderer.uniform :as u]
+   [minimax.renderer.vertex-buffer :as vertex-buffer])
   (:import (java.nio FloatBuffer)
            (java.util ArrayList)
            (org.joml Matrix4f Vector3f)

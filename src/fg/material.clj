@@ -4,7 +4,7 @@
             [fg.shader :as sd]
             [minimax.assimp.texture :as t]
             [minimax.mem :as mem]
-            [minimax.uniform :as u])
+            [minimax.renderer.uniform :as u])
   (:import (java.nio IntBuffer)
            (org.joml Vector4f)
            (org.lwjgl.assimp AIColor4D AIMaterial AIScene AIString Assimp)

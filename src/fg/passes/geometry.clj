@@ -2,14 +2,14 @@
   (:require
    [bgfx.core :as bgfx]
    [fg.state :as state]
-   [minimax.frame-buffer :as fb]
    [minimax.lib :as lib]
    [minimax.object :as obj]
    [minimax.objects.camera :as camera]
    [minimax.passes :as passes]
-   [minimax.texture :as t]
-   [minimax.uniform :as u]
-   [minimax.view :as view])
+   [minimax.renderer.frame-buffer :as fb]
+   [minimax.renderer.texture :as t]
+   [minimax.renderer.uniform :as u]
+   [minimax.renderer.view :as view])
   (:import (org.lwjgl.bgfx BGFX)))
 
 (def render-state

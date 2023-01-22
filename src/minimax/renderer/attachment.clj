@@ -1,4 +1,4 @@
-(ns minimax.attachment
+(ns minimax.renderer.attachment
   (:require [bgfx.core :as bgfx])
   (:import (clojure.lang IDeref)
            (org.lwjgl.bgfx BGFXAttachment)))

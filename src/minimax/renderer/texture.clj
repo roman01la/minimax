@@ -1,4 +1,4 @@
-(ns minimax.texture
+(ns minimax.renderer.texture
   (:refer-clojure :exclude [read])
   (:require [bgfx.core :as bgfx])
   (:import (clojure.lang IDeref)))

@@ -2,11 +2,11 @@
   (:require
    [bgfx.core :as bgfx]
    [fg.state :as state]
-   [minimax.frame-buffer :as fb]
    [minimax.object :as obj]
    [minimax.objects.camera :as camera]
    [minimax.passes :as passes]
-   [minimax.view :as view])
+   [minimax.renderer.frame-buffer :as fb]
+   [minimax.renderer.view :as view])
   (:import (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFX)))
 

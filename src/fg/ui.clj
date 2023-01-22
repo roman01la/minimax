@@ -2,7 +2,7 @@
   (:require
    [fg.ui.debug :as ui.debug]
    [minimax.audio.core :as audio]
-   [minimax.ui]
+   [minimax.renderer.ui]
    [minimax.ui.animation :as ui.anim]
    [minimax.ui.components :as mui :refer [defui]]
    [minimax.ui.elements :as ui])

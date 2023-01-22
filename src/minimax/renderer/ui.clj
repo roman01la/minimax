@@ -1,21 +1,21 @@
-(ns minimax.ui
+(ns minimax.renderer.ui
   (:require
    [bgfx.core :as bgfx]
    [clojure.java.io :as io]
    [fg.state :as state]
-   [minimax.frame-buffer :as fb]
    [minimax.lib :as lib]
    [minimax.logger :as log]
    [minimax.passes :as passes]
    [minimax.pool.core :as pool]
+   [minimax.renderer.frame-buffer :as fb]
+   [minimax.renderer.texture :as t]
+   [minimax.renderer.view :as view]
    [minimax.resources :as res]
-   [minimax.texture :as t]
    [minimax.ui.components :as mui]
    [minimax.ui.context :as ui.ctx]
    [minimax.ui.elements :as ui]
    [minimax.ui.primitives :as ui.pmt]
-   [minimax.util.fs :as util.fs]
-   [minimax.view :as view])
+   [minimax.util.fs :as util.fs])
   (:import (org.lwjgl.bgfx BGFX)
            (org.lwjgl.nanovg NanoVG NanoVGBGFX)
            (org.lwjgl.util.yoga Yoga)))

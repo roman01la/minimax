@@ -3,7 +3,7 @@
    [bgfx.core :as bgfx]
    [clojure.java.io :as io]
    [minimax.mem :as mem]
-   [minimax.texture :as t])
+   [minimax.renderer.texture :as t])
   (:import (java.nio IntBuffer)
            (java.util ArrayList)
            (org.lwjgl.assimp AIScene AITexture)
