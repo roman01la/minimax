@@ -1,8 +1,7 @@
 (ns minimax.glfw
   (:require [minimax.mem :as mem])
   (:import (java.nio FloatBuffer)
-           (org.lwjgl.glfw Callbacks GLFW)
-           (org.lwjgl.system MemoryUtil)))
+           (org.lwjgl.glfw Callbacks GLFW)))
 
 (set! *warn-on-reflection* true)
 

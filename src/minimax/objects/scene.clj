@@ -1,5 +1,6 @@
 (ns minimax.objects.scene
   (:require [minimax.object :as obj]
+            [minimax.objects.light]
             [minimax.util.scene :as util.scene])
   (:import (minimax.objects.light DirectionalLight)
            (org.joml Matrix4f)))

@@ -4,8 +4,11 @@
    [clojure.string :as str]
    [minimax.mem :as mem]
    [minimax.object :as obj]
+   [minimax.objects.group]
+   [minimax.objects.light]
+   [minimax.objects.mesh]
+   [minimax.objects.scene]
    [minimax.ui.animation :as ui.anim]
-   [minimax.ui.components :as mui]
    [minimax.ui.components :as mui :refer [defui]]
    [minimax.ui.elements :as ui])
   (:import (java.nio FloatBuffer)
@@ -82,7 +85,7 @@
      Mesh (str (:name object) " <Mesh>")
      Group (str (:name object) " <Group>")
      DirectionalLight (str (:name object) " <DirectionalLight>")
-     (type object))))
+     (str (type object)))))
 
 (defn tree-view [{:keys [style on-select object selected]}]
   (let [selected? (= selected object)]
