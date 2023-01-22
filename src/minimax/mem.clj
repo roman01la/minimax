@@ -14,20 +14,26 @@
     :long (MemoryUtil/memAllocLong count)))
 
 (defmacro slet
-  "Allocates bindings on stack"
+  "Allocates bindings on stack.
+  Values in bindings can be:
+  - A tuple of keyword of a primitive type #{:double :float :int :short :long} and buffer size
+  - Name of a class that supports stack allocation via a static method `malloc(MemoryStack stack)`"
   [bindings & body]
   (let [stack-sym (gensym "stack")]
     `(let [~stack-sym (MemoryStack/stackPush)
            ~@(->> (partition 2 bindings)
-                  (mapcat (fn [[sym [type c]]]
-                            [sym `(~(case type
-                                      :double '.mallocDouble
-                                      :float '.mallocFloat
-                                      :int '.mallocInt
-                                      :short '.mallocShort
-                                      :long '.mallocLong)
-                                   ~stack-sym
-                                   ~c)])))
+                  (mapcat (fn [[sym v]]
+                            (if (symbol? v)
+                              [sym `(~(symbol (str v) "/malloc") ~stack-sym)]
+                              (let [[type c] v]
+                                [sym `(~(case type
+                                          :double '.mallocDouble
+                                          :float '.mallocFloat
+                                          :int '.mallocInt
+                                          :short '.mallocShort
+                                          :long '.mallocLong)
+                                       ~stack-sym
+                                       ~c)])))))
            ret#  (do ~@body)]
        (MemoryStack/stackPop)
        ret#)))

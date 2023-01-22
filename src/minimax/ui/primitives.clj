@@ -165,9 +165,9 @@
 
 ;; colors pool
 (def colors
-  {:background-color (NVGColor/calloc)
-   :border-color (NVGColor/calloc)
-   :text-color (NVGColor/calloc)})
+  {:background-color (NVGColor/malloc)
+   :border-color (NVGColor/malloc)
+   :text-color (NVGColor/malloc)})
 
 (defn- rect-path [vg x y w h border-radius]
   (NanoVG/nvgBeginPath vg)

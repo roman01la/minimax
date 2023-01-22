@@ -87,7 +87,7 @@
   ([attachments]
    (create-frame-buffer-from-attachments attachments false))
   ([attachments destroy-textures?]
-   (let [attachments-buff (BGFXAttachment/create (count attachments))
+   (let [attachments-buff (BGFXAttachment/create (count attachments)) ;; TODO: alloc on stack instead
          _ (run! #(.put attachments-buff ^BGFXAttachment %) attachments)
          _ (.flip attachments-buff)
          handle (BGFX/bgfx_create_frame_buffer_from_attachment attachments-buff destroy-textures?)]

@@ -1,5 +1,6 @@
 (ns fg.deferred
   (:require [bgfx.core :as bgfx]
+            [minimax.mem :as mem]
             [minimax.renderer.vertex-layout :as vertex-layout])
   (:import (org.lwjgl.bgfx BGFX BGFXTransientIndexBuffer BGFXTransientVertexBuffer)))
 
@@ -8,21 +9,21 @@
         n-indices (count indices)]
     (when (and (= n-verts (bgfx/get-transient-vertex-buffer n-verts layout))
                (= n-indices (bgfx/get-transient-index-buffer n-indices)))
-      (let [vb (BGFXTransientVertexBuffer/create)
-            ib (BGFXTransientIndexBuffer/create)
-            _ (bgfx/alloc-transient-vertex-buffer vb n-verts layout)
-            _ (bgfx/alloc-transient-index-buffer ib n-indices)
-            vertex (.data vb)
-            index (.data ib)]
+      (mem/slet [vb BGFXTransientVertexBuffer
+                 ib BGFXTransientIndexBuffer]
+                (let [_ (bgfx/alloc-transient-vertex-buffer vb n-verts layout)
+                      _ (bgfx/alloc-transient-index-buffer ib n-indices)
+                      vertex (.data vb)
+                      index (.data ib)]
 
-        (run! #(.putFloat vertex %) vertices)
-        (run! #(.putShort index %) indices)
+                  (run! #(.putFloat vertex %) vertices)
+                  (run! #(.putShort index %) indices)
 
-        (.flip vertex)
-        (.flip index)
+                  (.flip vertex)
+                  (.flip index)
 
-        (bgfx/set-transient-vertex-buffer 0 vb 0 n-verts)
-        (bgfx/set-transient-index-buffer ib 0 n-indices)))))
+                  (bgfx/set-transient-vertex-buffer 0 vb 0 n-verts)
+                  (bgfx/set-transient-index-buffer ib 0 n-indices))))))
 
 (def layout
   (vertex-layout/create

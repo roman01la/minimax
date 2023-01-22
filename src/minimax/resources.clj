@@ -9,7 +9,7 @@
 
 (def colors
   (pool.static/create 32
-                      #(NVGColor/calloc)
+                      #(NVGColor/malloc)
                       #(.free ^NVGColor %)))
 
 (def images
