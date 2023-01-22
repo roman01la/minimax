@@ -3,4 +3,4 @@
 set -e
 set -o pipefail
 
-clojure -Adev -M -m cljfmt.main fix --sort-ns-references
+clojure -Adev -M -m cljfmt.main fix --sort-ns-references --indents cljfmt.edn

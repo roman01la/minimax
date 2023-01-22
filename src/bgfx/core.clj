@@ -100,11 +100,11 @@
    (create-frame-buffer-from-textures textures false))
   ([textures destroy-textures?]
    (mem/slet [^ShortBuffer textures-buff [:short (count textures)]]
-             (run! #(.put textures-buff ^short %) textures)
-             (.flip textures-buff)
-             (let [handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]
-               (assert (not= handle 0xffff) "create-frame-buffer-from-textures: the framebuffer is not valid")
-               handle))))
+     (run! #(.put textures-buff ^short %) textures)
+     (.flip textures-buff)
+     (let [handle (BGFX/bgfx_create_frame_buffer_from_handles textures-buff ^boolean destroy-textures?)]
+       (assert (not= handle 0xffff) "create-frame-buffer-from-textures: the framebuffer is not valid")
+       handle))))
 
 (defn get-texture [frame-buffer-handle attachment-idx]
   (BGFX/bgfx_get_texture frame-buffer-handle attachment-idx))

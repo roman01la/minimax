@@ -43,8 +43,8 @@
 (defn create-image-from-file [vg ^File file]
   (mem/slet [^IntBuffer w [:int 1]
              ^IntBuffer h [:int 1]]
-            (let [img (pool/alloc res/images [(.getAbsolutePath file)])]
-              (NanoVG/nvgImageSize ^long vg ^int img w h)
-              {:handle img
-               :width (.get w)
-               :height (.get h)})))
+    (let [img (pool/alloc res/images [(.getAbsolutePath file)])]
+      (NanoVG/nvgImageSize ^long vg ^int img w h)
+      {:handle img
+       :width (.get w)
+       :height (.get h)})))

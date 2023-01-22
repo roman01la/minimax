@@ -17,26 +17,26 @@
 
 (defn get-material-color [^AIMaterial material ^CharSequence key]
   (mem/slet [color AIColor4D]
-            (if (zero? (Assimp/aiGetMaterialColor material key Assimp/aiTextureType_NONE 0 ^AIColor4D color))
-              (Vector4f. (.r color) (.g color) (.b color) (.a color))
-              default-color)))
+    (if (zero? (Assimp/aiGetMaterialColor material key Assimp/aiTextureType_NONE 0 ^AIColor4D color))
+      (Vector4f. (.r color) (.g color) (.b color) (.a color))
+      default-color)))
 
 (defn get-material-texture [^AIMaterial material type textures]
   (mem/slet [path AIString]
-            (let [_ (Assimp/aiGetMaterialTexture
-                     material
-                     ^int type
-                     0
-                     ^AIString path
-                     ^IntBuffer (mem/alloc :int 1)
-                     nil nil nil nil nil)
-                  filename (.dataString path)]
-              (if (= filename "")
-                @t/dummy-texture
-                (do
-                  (assert (str/starts-with? filename "*"))
-                  (let [idx (Integer/parseInt (subs filename 1) 10)]
-                    (nth textures idx)))))))
+    (let [_ (Assimp/aiGetMaterialTexture
+             material
+             ^int type
+             0
+             ^AIString path
+             ^IntBuffer (mem/alloc :int 1)
+             nil nil nil nil nil)
+          filename (.dataString path)]
+      (if (= filename "")
+        @t/dummy-texture
+        (do
+          (assert (str/starts-with? filename "*"))
+          (let [idx (Integer/parseInt (subs filename 1) 10)]
+            (nth textures idx)))))))
 
 ;; uniforms
 (def u-color

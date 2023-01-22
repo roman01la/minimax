@@ -23,11 +23,11 @@
   (mem/slet [^IntBuffer x [:int 1]
              ^IntBuffer y [:int 1]
              ^IntBuffer channels [:int 1]]
-            (let [data (load x y channels)
-                  width (.get x)
-                  height (.get y)
-                  channels (.get channels)]
-              (handle width height channels data))))
+    (let [data (load x y channels)
+          width (.get x)
+          height (.get y)
+          channels (.get channels)]
+      (handle width height channels data))))
 
 (defn create-texture* [name load]
   (create-image load

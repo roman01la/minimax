@@ -104,19 +104,19 @@
 
   (mem/slet [^FloatBuffer text-bounds [:float 4]]
 
-            (let [^long vg @ui.ctx/vg]
-              (NanoVG/nvgFontSize vg font-size)
-              (NanoVG/nvgFontFace vg ^CharSequence font-face)
-              (NanoVG/nvgTextAlign vg text-align)
-              (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds))
+    (let [^long vg @ui.ctx/vg]
+      (NanoVG/nvgFontSize vg font-size)
+      (NanoVG/nvgFontFace vg ^CharSequence font-face)
+      (NanoVG/nvgTextAlign vg text-align)
+      (NanoVG/nvgTextBounds vg (float 0) (float 0) ^CharSequence text text-bounds))
 
-            (let [xmin (.get text-bounds 0)
-                  ymin (.get text-bounds 1)
-                  xmax (.get text-bounds 2)
-                  ymax (.get text-bounds 3)
-                  w (+ (abs xmin) (abs xmax))
-                  h (+ (abs ymin) (abs ymax))]
-              [w h])))
+    (let [xmin (.get text-bounds 0)
+          ymin (.get text-bounds 1)
+          xmax (.get text-bounds 2)
+          ymax (.get text-bounds 3)
+          w (+ (abs xmin) (abs xmax))
+          h (+ (abs ymin) (abs ymax))]
+      [w h])))
 
 (defn create-text-node [styles text]
   (let [node (create-node styles)

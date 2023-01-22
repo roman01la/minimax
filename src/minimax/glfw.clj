@@ -32,6 +32,6 @@
 (defn detect-dpr []
   (mem/slet [^FloatBuffer x [:float 1]
              ^FloatBuffer y [:float 1]]
-            (GLFW/glfwGetMonitorContentScale
-             (GLFW/glfwGetPrimaryMonitor) x y)
-            (.get x)))
+    (GLFW/glfwGetMonitorContentScale
+     (GLFW/glfwGetPrimaryMonitor) x y)
+    (.get x)))
