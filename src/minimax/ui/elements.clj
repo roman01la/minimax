@@ -30,6 +30,7 @@
   (ui.utils/rects-intersect? (ui.pmt/get-layout (:vnode child)) layout))
 
 (defn propagate-events [opts layout children]
+  ;; TODO: fix offset clipping in scroll view
   (doseq [child children]
     (if-not (:clip? opts)
       (ui-event child opts)
