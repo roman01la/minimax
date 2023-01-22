@@ -1,4 +1,5 @@
 (ns minimax.audio.core
+  (:refer-clojure :exclude [remove])
   (:require [clojure.java.io :as io]
             [minimax.audio.context :as audio.ctx]
             [minimax.logger :as log]))
