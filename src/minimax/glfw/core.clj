@@ -1,4 +1,4 @@
-(ns minimax.glfw
+(ns minimax.glfw.core
   (:require [minimax.mem :as mem])
   (:import (java.nio FloatBuffer)
            (org.lwjgl.glfw Callbacks GLFW)))

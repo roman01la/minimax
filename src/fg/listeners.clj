@@ -1,90 +1,49 @@
 (ns fg.listeners
   (:require
-   [bgfx.core :as bgfx]
-   [fg.state :as state])
-  (:import (org.joml Vector3f)
-           (org.lwjgl.bgfx BGFX)
-           (org.lwjgl.glfw GLFW GLFWCharCallback GLFWCursorPosCallback GLFWFramebufferSizeCallback GLFWKeyCallback
-                           GLFWMouseButtonCallback GLFWScrollCallback GLFWWindowIconifyCallback
-                           GLFWWindowMaximizeCallback GLFWWindowSizeCallback)))
+   [fg.state :as state]
+   [minimax.glfw.listeners :as listeners])
+  (:import (org.lwjgl.glfw GLFW)))
 
 (set! *warn-on-reflection* true)
 
-(def texture-format
-  BGFX/BGFX_TEXTURE_FORMAT_RGBA8)
+(defn key-callback [window key scancode action mods]
+  (let [action (condp = action
+                 GLFW/GLFW_PRESS :press
+                 GLFW/GLFW_REPEAT :repeat
+                 GLFW/GLFW_RELEASE :release)]
+    (swap! state/state assoc :key key :key-action action :key-mods mods)
+    (when (and (= key GLFW/GLFW_KEY_ESCAPE)
+               (= action :release))
+      (GLFW/glfwSetWindowShouldClose window true))))
 
-(def reset-flags
-  (bit-or 0 BGFX/BGFX_RESET_VSYNC))
+(defn char-callback [window codepoint]
+  (swap! state/state assoc :char-codepoint codepoint))
 
-(state/add-state-listener :mouse-move [:mx :my]
-                          (fn [{:keys [mouse-button mouse-button-action mx my width at eye]}]
-                            #_(condp = [mouse-button mouse-button-action]
-                                [GLFW/GLFW_MOUSE_BUTTON_LEFT GLFW/GLFW_PRESS]
-                                (let [p (- (/ mx width) 0.5)]
-                                  (.setComponent ^Vector3f at 0 p)
-                                  (.setComponent ^Vector3f eye 0 p))
-                                nil)))
+(defn window-resize-callback [window w h]
+  (swap! state/state assoc :width w :height h))
 
-(def key-callback
-  (proxy [GLFWKeyCallback] []
-    (invoke [window key scancode action mods]
-      (let [action (condp = action
-                     GLFW/GLFW_PRESS :press
-                     GLFW/GLFW_REPEAT :repeat
-                     GLFW/GLFW_RELEASE :release)]
-        (swap! state/state assoc :key key :key-action action :key-mods mods)
-        (when (and (= key GLFW/GLFW_KEY_ESCAPE)
-                   (= action :release))
-          (GLFW/glfwSetWindowShouldClose window true))))))
+(defn mouse-move-callback [window x y]
+  (swap! state/state assoc :mx x :my y))
 
-(def char-callback
-  (proxy [GLFWCharCallback] []
-    (invoke [window codepoint]
-      (swap! state/state assoc :char-codepoint codepoint))))
+(defn mouse-press-callback [window button action mods]
+  (swap! state/state assoc :mouse-button button :mouse-button-action action))
 
-(def window-resize-callback
-  (proxy [GLFWWindowSizeCallback] []
-    (invoke [window w h]
-      (swap! state/state assoc :width w :height h))))
+(defn mouse-scroll-callback [window x y]
+  (swap! state/state assoc :sx x :sy y))
 
-(defn create-fb-resize-callback [on-resize]
-  (proxy [GLFWFramebufferSizeCallback] []
-    (invoke [window width height]
-      (on-resize width height))))
+(defn minimize-callback [window minimized?]
+  (swap! state/state assoc :minimized? minimized?))
 
-(def mouse-move-callback
-  (proxy [GLFWCursorPosCallback] []
-    (invoke [window x y]
-      (swap! state/state assoc :mx x :my y))))
-
-(def mouse-press-callback
-  (proxy [GLFWMouseButtonCallback] []
-    (invoke [window button action mods]
-      (swap! state/state assoc :mouse-button button :mouse-button-action action))))
-
-(def mouse-scroll-callback
-  (proxy [GLFWScrollCallback] []
-    (invoke [window x y]
-      (swap! state/state assoc :sx x :sy y))))
-
-(def minimize-callback
-  (proxy [GLFWWindowIconifyCallback] []
-    (invoke [window minimized?]
-      (swap! state/state assoc :minimized? minimized?))))
-
-(def maximize-callback
-  (proxy [GLFWWindowMaximizeCallback] []
-    (invoke [window maximized?]
-      (swap! state/state assoc :maximized? maximized?))))
+(defn maximize-callback [window maximized?]
+  (swap! state/state assoc :maximized? maximized?))
 
 (defn set-listeners [window on-resize]
-  (let [fb-resize-callback (create-fb-resize-callback on-resize)]
-    (GLFW/glfwSetKeyCallback window key-callback)
-    (GLFW/glfwSetCharCallback window char-callback)
-    (GLFW/glfwSetWindowSizeCallback window window-resize-callback)
-    (GLFW/glfwSetFramebufferSizeCallback window fb-resize-callback)
-    (GLFW/glfwSetCursorPosCallback window mouse-move-callback)
-    (GLFW/glfwSetMouseButtonCallback window mouse-press-callback)
-    (GLFW/glfwSetScrollCallback window mouse-scroll-callback)
-    (GLFW/glfwSetWindowIconifyCallback window minimize-callback)
-    (GLFW/glfwSetWindowMaximizeCallback window maximize-callback)))
+  (listeners/add-listener :key window key-callback)
+  (listeners/add-listener :char window char-callback)
+  (listeners/add-listener :window-size window window-resize-callback)
+  (listeners/add-listener :frame-buffer-size window on-resize)
+  (listeners/add-listener :cursor-position window mouse-move-callback)
+  (listeners/add-listener :mouse-button window mouse-press-callback)
+  (listeners/add-listener :scroll window mouse-scroll-callback)
+  (listeners/add-listener :window-minimize window minimize-callback)
+  (listeners/add-listener :window-maximize window maximize-callback))

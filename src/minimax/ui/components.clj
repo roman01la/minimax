@@ -1,7 +1,7 @@
 (ns minimax.ui.components
   (:require
    [fg.clock :as clock]
-   [minimax.glfw :as glfw]
+   [minimax.glfw.core :as glfw]
    [minimax.ui.elements :as ui]
    [minimax.ui.primitives :as ui.pmt])
   (:import (org.lwjgl.glfw GLFW)

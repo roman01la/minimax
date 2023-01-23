@@ -12,7 +12,7 @@
    [fg.ui]
    [minimax.audio.core :as audio]
    [minimax.debug :as debug]
-   [minimax.glfw :as glfw]
+   [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
    [minimax.object :as obj]
    [minimax.objects.camera :as camera]
@@ -23,7 +23,7 @@
    [minimax.renderer.ui :as ui])
   (:import (java.util.function Consumer)
            (org.joml Matrix4f Vector3f)
-           (org.lwjgl.bgfx BGFXInit BGFXResolution)
+           (org.lwjgl.bgfx BGFX BGFXInit BGFXResolution)
            (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
            (org.lwjgl.system Configuration Platform))
   (:gen-class))
@@ -58,6 +58,9 @@
 
 (state/set-size (glfw/detect-dpr))
 
+(def reset-flags
+  BGFX/BGFX_RESET_VSYNC)
+
 (let [^BGFXInit init (bgfx/create-init)]
   (.resolution init
                (reify Consumer
@@ -65,8 +68,7 @@
                    (-> ^BGFXResolution it
                        (.width (:vwidth @state/state))
                        (.height (:vheight @state/state))
-                       (.reset listeners/reset-flags)
-                       (.format listeners/texture-format)))))
+                       (.reset reset-flags)))))
 
   (condp = (Platform/get)
     Platform/MACOSX
@@ -189,10 +191,10 @@
 (defn on-resize [width height]
   (swap! state/state assoc :vwidth width :vheight height)
   (swap! camera assoc :aspect (/ width height))
-  (bgfx/reset width height listeners/reset-flags listeners/texture-format))
+  (bgfx/reset width height reset-flags))
 
 (listeners/set-listeners window
-                         (fn [width height]
+                         (fn [_ width height]
                            (vreset! fb-size [width height])))
 
 ;; resize to the latest size value in a rendering loop
