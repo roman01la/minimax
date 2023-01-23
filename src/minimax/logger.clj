@@ -15,4 +15,8 @@
 (defmacro time [& body]
   (when debug?
     (let [{:keys [line column]} (meta &form)]
-      `(debug* ~*file* ~line ~column (with-out-str (clojure.core/time (do ~@body)))))))
+      `(let [s# (new java.io.StringWriter)
+             ret# (binding [*out* s#]
+                    (clojure.core/time (do ~@body)))]
+         (debug* ~*file* ~line ~column (str s#))
+         ret#))))
