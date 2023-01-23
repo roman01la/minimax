@@ -76,7 +76,7 @@
 
     ;; loading UI fonts
     (log/debug "Loading fonts...")
-    (time (load-fonts! vg))))
+    (log/time (load-fonts! vg))))
 
 (def layout-time (volatile! 0))
 

@@ -109,7 +109,7 @@
 (def model
   (do
     (log/debug "Importing model...")
-    (time (md/load-model "models/castle.glb"))))
+    (log/time (md/load-model "models/castle.glb"))))
 
 ;; debug
 (def selected-object (atom nil))

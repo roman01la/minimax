@@ -13,7 +13,6 @@
 
 (defn destroy-all []
   (log/debug "Destroying resource pools...")
-  (time
-   (doseq [pool @pools]
-     (destroy pool)))
+  (log/time
+   (run! destroy @pools))
   (reset! pools #{}))
