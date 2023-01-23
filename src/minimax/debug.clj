@@ -69,6 +69,7 @@
       :cast-shadow? false
       :state lines-state
       :debug-skip? true
+      :instanced? (volatile! false)
       :visible? (volatile! false)})))
 
 (def debug-box

@@ -125,13 +125,38 @@
 (def cloud-1-obj
   (obj/find-by-name @scene "cloud_1"))
 
+(vreset! (:instanced? cloud-1-obj) true)
+
+(let [n 4
+      ^Matrix4f lmtx (:lmtx cloud-1-obj)
+      mtxs (for [idx (range n)]
+             (let [mtx (.set (Matrix4f.) lmtx)]
+               (.translate mtx (* idx 0.1) 0 0)
+               mtx))]
+  (vreset! (:instances cloud-1-obj) mtxs)
+  (vreset! (:mtx-instances cloud-1-obj) (repeatedly n #(Matrix4f.))))
+
+
 (def cloud-2-obj
   (obj/find-by-name @scene "cloud_2"))
+
+(vreset! (:visible? cloud-2-obj) false)
+
+(defn render-debug-box []
+  (vreset! (:visible? debug-box) (some? @selected-object))
+  (when-let [obj @selected-object]
+    (let [[root & objs] (reverse (obj/obj->parent-seq obj []))
+          mtx (.set (Matrix4f.) ^Matrix4f (:mtx root))]
+      (->> objs
+           (reduce
+             #(obj/apply-matrix* %1 (:lmtx obj) %2)
+             mtx)
+           (debug/set-object-transform obj debug-box)))))
 
 (defn render [dt t]
   (let [t (* t 10)
         pos1 (obj/position cloud-1-obj)
-        pos2 (obj/position cloud-2-obj)
+        #_#_pos2 (obj/position cloud-2-obj)
         y (-> (Math/sin (/ t 2))
               (/ 100))
         x (-> (Math/sin (/ t 10))
@@ -139,11 +164,13 @@
         z (-> (Math/cos (/ t 10))
               (/ 100))]
 
+    #_#_#_#_
     (obj/rotate-y cloud-1-obj (* dt 0.3))
     (obj/set-position-y cloud-1-obj (+ (.y pos1) y))
     (obj/set-position-x cloud-1-obj (+ (.x pos1) x))
     (obj/set-position-z cloud-1-obj (+ (.z pos1) z))
 
+    #_#_#_#_
     (obj/rotate-y cloud-2-obj (* dt -0.3))
     (obj/set-position-y cloud-2-obj (+ (.y pos2) y))
     (obj/set-position-x cloud-2-obj (+ (.x pos2) z))
@@ -151,16 +178,7 @@
 
     (obj/rotate-y castle-obj (* dt 0.1))
 
-    (vreset! (:visible? debug-box) (some? @selected-object))
-
-    (when-let [obj @selected-object]
-      (let [[root & objs] (reverse (obj/obj->parent-seq obj []))
-            mtx (->> objs
-                     (reduce
-                      (fn [mtx obj]
-                        (obj/apply-matrix* mtx (:lmtx obj) mtx))
-                      (.set (Matrix4f.) ^Matrix4f (:mtx root))))]
-        (debug/set-object-transform obj debug-box mtx)))))
+    (render-debug-box)))
 
 (defn render-ui []
   (fg.ui/ui-root (:width @state/state) (:height @state/state) @scene selected-object))

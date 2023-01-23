@@ -5,12 +5,11 @@
    [fg.passes.geometry :as pass.geom]
    [fg.passes.shadow :as pass.shadow]
    [minimax.assimp.mesh :as assimp.mesh]
-   [minimax.lib :as lib]
    [minimax.mem :as mem]
    [minimax.object :as obj]
    [minimax.passes :as passes]
    [minimax.renderer.index-buffer :as index-buffer]
-   [minimax.renderer.uniform :as u]
+   [minimax.renderer.instancing :as instancing]
    [minimax.renderer.vertex-buffer :as vertex-buffer])
   (:import (java.nio FloatBuffer)
            (java.util ArrayList)
@@ -30,18 +29,29 @@
    BGFX/BGFX_DISCARD_STATE
    BGFX/BGFX_DISCARD_TRANSFORM))
 
-(def mtx-buff (mem/alloc :float 16))
+(defn- get-state [state id]
+  (or
+    state
+    (condp contains? id
+      #{(:id passes/shadow)} pass.shadow/render-state
+      #{(:id passes/geometry)} pass.geom/render-state)))
 
 (defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx state]
-  (let [state (or
-               state
-               (condp contains? id
-                 #{(:id passes/shadow)} pass.shadow/render-state
-                 #{(:id passes/geometry)} pass.geom/render-state))]
+  (mem/slet [mtx-buff [:float 16]]
+    (let [state (get-state state id)]
+      (assert state "state should be set")
+      (bgfx/set-vertex-buffer 0 vb 0 vc)
+      (bgfx/set-index-buffer ib 0 ic)
+      (bgfx/set-transform (.get mtx ^FloatBuffer mtx-buff))
+      (bgfx/set-state state)
+      (bgfx/submit id shader 0 discard-state))))
+
+(defn submit-mesh-instanced [id vb vc ib ic shader mtxs state]
+  (let [state (get-state state id)]
     (assert state "state should be set")
     (bgfx/set-vertex-buffer 0 vb 0 vc)
     (bgfx/set-index-buffer ib 0 ic)
-    (bgfx/set-transform (.get mtx ^FloatBuffer mtx-buff))
+    (instancing/set-instance-data-buffer mtxs)
     (bgfx/set-state state)
     (bgfx/submit id shader 0 discard-state)))
 
@@ -62,28 +72,38 @@
                  vertex-buffer index-buffer
                  ^Matrix4f lmtx ^Matrix4f mtx material children
                  tvec ^Matrix4f light-mtx
-                 bounding-box visible?]
+                 bounding-box visible? instanced? instances mtx-instances]
   obj/IRenderable
   (render [this id]
     (when @visible?
       (if (and (= id (:id passes/shadow)) (not cast-shadow?))
-        nil ;; skip shadow pass when `cast-shadow?` is set to `false` or :pid is not set
-        (let [shader (:shader material)
-              shadow-shader (:shadow-shader material)
+        nil ;; skip shadow pass when `cast-shadow?` is set to `false`
+        (let [{:keys [shader shader-instanced shadow-shader]} material
               program (condp = id
                         (:id passes/shadow) shadow-shader
-                        (:id passes/geometry) shader)]
+                        (:id passes/geometry) (if @instanced? shader-instanced shader))]
           (assert program "shader should be set")
           (.mul pass.shadow/shadow-mtx ^Matrix4f mtx ^Matrix4f light-mtx)
           (.mul ^Matrix4f crop-mtx ^Matrix4f light-mtx ^Matrix4f light-mtx)
           (mat/update-uniforms material light-mtx)
-          (submit-mesh id
-                       @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
-                       @index-buffer (.size ^ArrayList (:indices index-buffer))
-                       program
-                       mtx
-                       state)
-          (obj/render* id mtx children)))))
+          (if @instanced?
+            (submit-mesh-instanced
+              id
+              @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
+              @index-buffer (.size ^ArrayList (:indices index-buffer))
+              program
+              @mtx-instances
+              state)
+            (submit-mesh
+              id
+              @vertex-buffer (.size ^ArrayList (:vertices vertex-buffer))
+              @index-buffer (.size ^ArrayList (:indices index-buffer))
+              program
+              mtx
+              state))
+
+          (when-not @instanced?
+            (obj/render* id mtx children))))))
   obj/IObject3D
   (add-child [this child]
     (obj/add-child* this child))
@@ -98,7 +118,14 @@
   (replace-by-name [this name obj]
     (obj/replace-by-name* this name obj))
   (apply-transform [this inmtx]
-    (obj/apply-matrix* inmtx lmtx mtx))
+    (if @instanced?
+      (loop [idx (dec (count @instances))]
+        (when (>= idx 0)
+          (let [lmtx (nth @instances idx)
+                mtx (nth @mtx-instances idx)]
+            (obj/apply-matrix* inmtx lmtx mtx)
+            (recur (dec idx)))))
+      (obj/apply-matrix* inmtx lmtx mtx)))
   (rotate-y [this v]
     (obj/rotate-y* lmtx v))
   (position [this]
@@ -128,7 +155,6 @@
     (map->Mesh
      {:name name
       :id (.hashCode mesh)
-      :pid (lib/int->rgba (.hashCode mesh))
       :vertex-buffer vbh
       :index-buffer ibh
       :lmtx lmtx
@@ -140,4 +166,7 @@
       :parent (volatile! nil)
       :cast-shadow? true
       :visible? (volatile! true)
+      :instanced? (volatile! false)
+      :instances (volatile! [])
+      :mtx-instances (volatile! [])
       :bounding-box (:bounding-box parsed-mesh)})))

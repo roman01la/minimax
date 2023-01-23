@@ -22,13 +22,14 @@
       default-color)))
 
 (defn get-material-texture [^AIMaterial material type textures]
-  (mem/slet [path AIString]
+  (mem/slet [path AIString
+             mapping [:int 1]]
     (let [_ (Assimp/aiGetMaterialTexture
              material
              ^int type
              0
              ^AIString path
-             ^IntBuffer (mem/alloc :int 1)
+             ^IntBuffer mapping
              nil nil nil nil nil)
           filename (.dataString path)]
       (if (= filename "")
@@ -55,6 +56,9 @@
 (def diffuse-shader
   (sd/load-program "fs_geometry" "vs_geometry"))
 
+(def diffuse-shader-instanced
+  (sd/load-program "fs_geometry_inst" "vs_geometry_inst"))
+
 (def shadow-shader
   (sd/load-program "fs_shadow" "vs_shadow"))
 
@@ -74,12 +78,13 @@
     (u/set-texture (:texture uniforms) (:data texture) 1)))
 
 (defn create-standard-material
-  [{:keys [ambient diffuse texture shader shadow-shader uniforms]}]
+  [{:keys [ambient diffuse texture shader shader-instanced shadow-shader uniforms]}]
   (map->StandardMaterial
    {:ambient ambient
     :diffuse diffuse
     :texture texture
     :shader shader
+    :shader-instanced shader-instanced
     :shadow-shader shadow-shader
     :uniforms uniforms}))
 
@@ -103,6 +108,7 @@
       :diffuse diffuse
       :texture texture
       :shader @diffuse-shader
+      :shader-instanced @diffuse-shader-instanced
       :shadow-shader @shadow-shader
       :uniforms {:color @u-color
                  :texture @u-tex-diffuse
