@@ -9,18 +9,18 @@
 (set! *warn-on-reflection* true)
 
 (defn convert-topology-lines [indices]
-  (let [ret (ArrayList.)
-        dst ^IntBuffer (mem/alloc :int (count indices))
-        source ^IntBuffer (mem/alloc :int (count indices))]
-    (doseq [idx indices]
-      (.put source ^int idx))
-    (.flip source)
-    (BGFX/bgfx_topology_convert
-     BGFX/BGFX_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST
-     dst source true)
-    (while (pos? (.remaining dst))
-      (.add ret (.get dst)))
-    ret))
+  (mem/slet [^IntBuffer dst [:int (count indices)]
+             ^IntBuffer source [:int (count indices)]]
+    (let [ret (ArrayList.)]
+      (doseq [idx indices]
+        (.put source ^int idx))
+      (.flip source)
+      (BGFX/bgfx_topology_convert
+       BGFX/BGFX_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST
+       dst source true)
+      (while (pos? (.remaining dst))
+        (.add ret (.get dst)))
+      ret)))
 
 (defn- create* [^ArrayList indices]
   (let [mem ^ByteBuffer (mem/alloc :byte (* 2 (.size indices)))]

@@ -10,7 +10,6 @@
    [minimax.object :as obj]
    [minimax.passes :as passes]
    [minimax.renderer.index-buffer :as index-buffer]
-   [minimax.renderer.uniform :as u]
    [minimax.renderer.vertex-buffer :as vertex-buffer])
   (:import (java.nio FloatBuffer)
            (java.util ArrayList)
@@ -30,20 +29,19 @@
    BGFX/BGFX_DISCARD_STATE
    BGFX/BGFX_DISCARD_TRANSFORM))
 
-(def mtx-buff (mem/alloc :float 16))
-
 (defn submit-mesh [id vb vc ib ic shader ^Matrix4f mtx state]
-  (let [state (or
-               state
-               (condp contains? id
-                 #{(:id passes/shadow)} pass.shadow/render-state
-                 #{(:id passes/geometry)} pass.geom/render-state))]
-    (assert state "state should be set")
-    (bgfx/set-vertex-buffer 0 vb 0 vc)
-    (bgfx/set-index-buffer ib 0 ic)
-    (bgfx/set-transform (.get mtx ^FloatBuffer mtx-buff))
-    (bgfx/set-state state)
-    (bgfx/submit id shader 0 discard-state)))
+  (mem/slet [mtx-buff [:float 16]]
+    (let [state (or
+                 state
+                 (condp contains? id
+                   #{(:id passes/shadow)} pass.shadow/render-state
+                   #{(:id passes/geometry)} pass.geom/render-state))]
+      (assert state "state should be set")
+      (bgfx/set-vertex-buffer 0 vb 0 vc)
+      (bgfx/set-index-buffer ib 0 ic)
+      (bgfx/set-transform (.get mtx ^FloatBuffer mtx-buff))
+      (bgfx/set-state state)
+      (bgfx/submit id shader 0 discard-state))))
 
 (def ^BGFXCaps caps (bgfx/get-caps))
 

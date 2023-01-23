@@ -22,13 +22,14 @@
       default-color)))
 
 (defn get-material-texture [^AIMaterial material type textures]
-  (mem/slet [path AIString]
+  (mem/slet [path AIString
+             mapping [:int 1]]
     (let [_ (Assimp/aiGetMaterialTexture
              material
              ^int type
              0
              ^AIString path
-             ^IntBuffer (mem/alloc :int 1)
+             ^IntBuffer mapping
              nil nil nil nil nil)
           filename (.dataString path)]
       (if (= filename "")

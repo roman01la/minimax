@@ -10,11 +10,15 @@
   (set-value [this value] [this value num-elements])
   (set-texture [this value stage] [this value stage flags]))
 
-(deftype Uniform [name uniform buff]
+(deftype Uniform [name uniform type]
   IUniform
   (set-value [this value]
-    (.get value ^FloatBuffer buff)
-    (bgfx/set-uniform uniform buff))
+    (mem/slet [buff [:float (condp = type
+                              BGFX/BGFX_UNIFORM_TYPE_VEC4 4
+                              BGFX/BGFX_UNIFORM_TYPE_MAT4 16
+                              BGFX/BGFX_UNIFORM_TYPE_MAT3 9)]]
+      (.get value ^FloatBuffer buff)
+      (bgfx/set-uniform uniform buff)))
   (set-value [this value num-elements]
     (bgfx/set-uniform uniform value num-elements))
   (set-texture [this value stage]
@@ -26,10 +30,5 @@
   ([name type]
    (create name type 1))
   ([name type num-elements]
-   (let [uniform (bgfx/create-uniform name type num-elements)
-         buff (condp = type
-                BGFX/BGFX_UNIFORM_TYPE_VEC4 (mem/alloc :float 4)
-                BGFX/BGFX_UNIFORM_TYPE_MAT4 (mem/alloc :float 16)
-                BGFX/BGFX_UNIFORM_TYPE_MAT3 (mem/alloc :float 9)
-                nil)]
-     (Uniform. name uniform buff))))
+   (let [uniform (bgfx/create-uniform name type num-elements)]
+     (Uniform. name uniform type))))
