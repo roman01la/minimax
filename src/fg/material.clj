@@ -66,19 +66,20 @@
 (defprotocol IMaterial
   (update-uniforms [this light-mtx]))
 
-(defrecord StandardMaterial [ambient diffuse texture shader shadow-shader uniforms]
+(defrecord StandardMaterial [ambient diffuse shadow texture shader shadow-shader uniforms]
   IMaterial
   (update-uniforms [this light-mtx]
     (u/set-value (:color uniforms) diffuse)
     (u/set-value (:light-mtx uniforms) light-mtx)
-    (u/set-texture (:shadow uniforms) pass.shadow/shadow-map-texture 4)
+    (u/set-texture (:shadow uniforms) shadow 4)
     (u/set-texture (:texture uniforms) (:data texture) 1)))
 
 (defn create-standard-material
-  [{:keys [ambient diffuse texture shader shadow-shader uniforms]}]
+  [{:keys [ambient diffuse shadow texture shader shadow-shader uniforms]}]
   (map->StandardMaterial
    {:ambient ambient
     :diffuse diffuse
+    :shadow shadow
     :texture texture
     :shader shader
     :shadow-shader shadow-shader
@@ -102,6 +103,7 @@
     (create-standard-material
      {:ambient ambient
       :diffuse diffuse
+      :shadow pass.shadow/shadow-map-texture
       :texture texture
       :shader @diffuse-shader
       :shadow-shader @shadow-shader
