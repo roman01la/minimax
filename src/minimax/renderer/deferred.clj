@@ -1,4 +1,4 @@
-(ns fg.deferred
+(ns minimax.renderer.deferred
   (:require [bgfx.core :as bgfx]
             [minimax.mem :as mem]
             [minimax.renderer.vertex-layout :as vertex-layout])

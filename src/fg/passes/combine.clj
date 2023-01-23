@@ -1,13 +1,13 @@
 (ns fg.passes.combine
   (:require
    [bgfx.core :as bgfx]
-   [fg.deferred :as d]
    [fg.passes.geometry :as pass.geom]
    [fg.shader :as sd]
    [fg.state :as state]
    [minimax.object :as obj]
    [minimax.objects.camera :as camera]
    [minimax.passes :as passes]
+   [minimax.renderer.deferred :as d]
    [minimax.renderer.ui :as ui]
    [minimax.renderer.uniform :as u]
    [minimax.renderer.view :as view])
