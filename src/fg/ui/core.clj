@@ -1,4 +1,4 @@
-(ns fg.ui
+(ns fg.ui.core
   (:require
    [fg.ui.debug :as ui.debug]
    [minimax.audio.core :as audio]

@@ -9,7 +9,7 @@
    [fg.passes.geometry :as pass.geom]
    [fg.passes.shadow :as pass.shadow]
    [fg.state :as state]
-   [fg.ui]
+   [fg.ui.core]
    [minimax.audio.core :as audio]
    [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
@@ -165,7 +165,7 @@
         (debug/set-object-transform obj debug-box mtx)))))
 
 (defn render-ui []
-  (fg.ui/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
+  (fg.ui.core/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
 
 ;; Rendering loop
 (def curr-frame (volatile! 0))
