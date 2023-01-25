@@ -111,44 +111,42 @@
                :selected? (= selected %)
                :object %}))))
 
-(def widget-spring (ui.anim/make-spring 5 1 3))
-(def widget-spring-f (volatile! (constantly 0)))
-
 (defui scene-graph [scene selected]
-  (let [expanded? (mui/use-state :expanded? false)
-        search-query (mui/use-state :search-query "")
-        spring-f @widget-spring-f
-        on-select #(reset! selected %)]
-    (mui/scroll-widget
-     {:title "Scene Inspector"
-      :width 240
-      :height #ui/% (* 60 (spring-f))
-      :expanded? @expanded?
-      :on-header-click (fn []
-                         (if-not @expanded?
-                           (vreset! widget-spring-f #(widget-spring 0 1 0.16))
-                           (vreset! widget-spring-f #(widget-spring 1 0 0.16)))
-                         (swap! expanded? not))
-      :header [(mui/text-input
-                {:style (merge text-styles
-                               {:padding 8
-                                :placeholder-color #ui/rgba [255 255 255 0.7]
-                                :background-color #ui/rgba [60 60 60 1]
-                                :width #ui/% 100})
-                 :on-change #(reset! search-query %)
-                 :placeholder "Search"
-                 :value @search-query})]}
-     (if (not= "" @search-query)
-       (search-results
-        {:scene scene
-         :on-select on-select
-         :search-query @search-query
-         :selected @selected})
-       (tree-view
-        {:style {:padding [8 0]}
-         :object scene
-         :on-select on-select
-         :selected @selected})))))
+  (mui/hlet [expanded? (mui/use-state false)
+             search-query (mui/use-state "")
+             spring-f (mui/use-state (fn [] (constantly 0)))
+             spring (mui/use-memo #(ui.anim/make-spring 5 1 3) [])]
+    (let [on-select #(reset! selected %)]
+      (mui/scroll-widget
+       {:title "Scene Inspector"
+        :width 240
+        :height #ui/% (* 60 (@spring-f))
+        :expanded? @expanded?
+        :on-header-click (fn []
+                           (if-not @expanded?
+                             (reset! spring-f #(spring 0 1 0.16))
+                             (reset! spring-f #(spring 1 0 0.16)))
+                           (swap! expanded? not))
+        :header [(mui/text-input
+                  {:style (merge text-styles
+                                 {:padding 8
+                                  :placeholder-color #ui/rgba [255 255 255 0.7]
+                                  :background-color #ui/rgba [60 60 60 1]
+                                  :width #ui/% 100})
+                   :on-change #(reset! search-query %)
+                   :placeholder "Search"
+                   :value @search-query})]}
+       (if (not= "" @search-query)
+         (search-results
+          {:scene scene
+           :on-select on-select
+           :search-query @search-query
+           :selected @selected})
+         (tree-view
+          {:style {:padding [8 0]}
+           :object scene
+           :on-select on-select
+           :selected @selected}))))))
 
 (defn root [width height scene selected]
   (ui/view

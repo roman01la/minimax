@@ -8,14 +8,48 @@
   (:import (org.lwjgl.glfw GLFW)
            (org.lwjgl.nanovg NanoVG)))
 
-(def !id (atom 0))
-(def !current-element (atom nil))
-(def !registry (atom {}))
+(def !id (ms/atom 0))
+(def !current-element (ms/atom nil))
+(def !registry (ms/atom {}))
 
-(defn use-state [name v]
-  (when-not (get-in @!registry [@!current-element name])
-    (swap! !registry assoc-in [@!current-element name] (ms/atom v)))
-  (get-in @!registry [@!current-element name]))
+(defn- get-from-registry [path]
+  (get-in @!registry (into [@!current-element] path)))
+
+(defn- put-into-registry [path v]
+  (swap! !registry assoc-in (into [@!current-element] path) v))
+
+(defn use-state
+  ([v]
+   (throw (UnsupportedOperationException. "use-state")))
+  ([name v]
+   (when-not (get-from-registry [:state name])
+     (put-into-registry [:state name] (ms/atom (if (fn? v) (v) v))))
+   (get-from-registry [:state name])))
+
+(defn use-memo
+  ([f deps]
+   (throw (UnsupportedOperationException. "use-memo")))
+  ([name f deps]
+   (when-not (get-from-registry [:memo name])
+     (put-into-registry [:memo name] (f)))
+   (get-from-registry [:memo name])))
+
+(defn use-callback
+  ([f deps]
+   (throw (UnsupportedOperationException. "use-callback")))
+  ([name f deps]
+   (when-not (get-from-registry [:callback name])
+     (put-into-registry [:callback name] f))
+   (get-from-registry [:callback name])))
+
+(defmacro hlet [bindings & body]
+  `(let [~@(->> bindings
+                (partition 2)
+                (mapcat
+                 (fn [[sym [f & args]]]
+                   [sym `(~f ~(keyword sym) ~@args)])))]
+
+     ~@body))
 
 (defmacro defui [name args & body]
   `(defn ~name ~args
