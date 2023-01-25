@@ -38,7 +38,7 @@
 (def click (atom 0))
 
 (defui button [props child-text]
-  (let [state (mui/use-state {:hover? false :pressed? false})]
+  (let [state (mui/use-state :state {:hover? false :pressed? false})]
     (mui/view
      {:on-mouse-down (fn []
                        (swap! state assoc :pressed? true)
@@ -106,7 +106,7 @@
 
 (defui sound-button []
   ;; TODO: hookup global state
-  (let [gain (mui/use-state 1)
+  (let [gain (mui/use-state :gain 1)
         mute? (zero? @gain)]
     (ui/view
      {:on-mouse-down (fn []

@@ -2,6 +2,7 @@
   (:require
    [fg.clock :as clock]
    [minimax.glfw.core :as glfw]
+   [minimax.state :as ms]
    [minimax.ui.elements :as ui]
    [minimax.ui.primitives :as ui.pmt])
   (:import (org.lwjgl.glfw GLFW)
@@ -11,10 +12,10 @@
 (def !current-element (atom nil))
 (def !registry (atom {}))
 
-(defn use-state [v]
-  (when-not (contains? @!registry @!current-element)
-    (swap! !registry assoc @!current-element (atom v)))
-  (get @!registry @!current-element))
+(defn use-state [name v]
+  (when-not (get-in @!registry [@!current-element name])
+    (swap! !registry assoc-in [@!current-element name] (ms/atom v)))
+  (get-in @!registry [@!current-element name]))
 
 (defmacro defui [name args & body]
   `(defn ~name ~args
@@ -35,7 +36,7 @@
               :background-color #ui/rgba [100 100 100 1]}})))
 
 (defui scroll-view [props & children]
-  (let [state (use-state {:py 0 :h 0 :sh 0 :wh 0})
+  (let [state (use-state :state {:py 0 :h 0 :sh 0 :wh 0})
         height (:sh @state)
         width (:wh @state)
         scroll-bar? (> (:h @state) height)]
@@ -66,7 +67,7 @@
        (scroll-bar (:py @state) (:h @state) height)))))
 
 (defui view [{:keys [on-mouse-enter on-mouse-leave] :as props} & children]
-  (let [mouse-over? (use-state false)
+  (let [mouse-over? (use-state :mouse-over? false)
         {:keys [cursor]} (:style props)
         props (assoc props
                      :on-mouse-over (fn [hover?]
@@ -80,7 +81,7 @@
     (apply ui/view props children)))
 
 (defui button [props & children]
-  (let [state (use-state {:hover? false :pressed? false})
+  (let [state (use-state :state {:hover? false :pressed? false})
         {:keys [hover? pressed?]} @state
         style (:style props)
         background-color (or (when hover?
@@ -99,7 +100,7 @@
            children)))
 
 (defui button-text [props text]
-  (let [state (use-state {:hover? false :pressed? false})
+  (let [state (use-state :state {:hover? false :pressed? false})
         {:keys [hover? pressed?]} @state
         text-style (:text/style props)
         {:keys [on-mouse-down on-mouse-up]} props
@@ -186,7 +187,7 @@
 (def measure-text (memoize ui.pmt/measure-text))
 
 (defn use-interval [f it]
-  (let [t (use-state (clock/time))
+  (let [t (use-state :time (clock/time))
         now (clock/time)]
     (when (>= (- now t) it)
       (reset! t now)
@@ -196,10 +197,10 @@
 (defui text-input [{:keys [style on-change on-focus on-blur value placeholder]}]
   (let [text-style (select-keys style ks)
         style (apply dissoc style ks)
-        state (use-state {:focus? false
-                          :cursor-x1 (count value)
-                          :cursor-x2 (count value)
-                          :height 0})
+        state (use-state :state {:focus? false
+                                 :cursor-x1 (count value)
+                                 :cursor-x2 (count value)
+                                 :height 0})
         {:keys [focus? cursor-x1 cursor-x2 height]} @state
         focus-style (when focus?
                       {:border-width 2
