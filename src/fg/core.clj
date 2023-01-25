@@ -165,7 +165,7 @@
         (debug/set-object-transform obj debug-box mtx)))))
 
 (defn render-ui []
-  (fg.ui.core/ui-root (:width @state/state) (:height @state/state) @scene selected-object))
+  (fg.ui.core/ui-root @state/state @scene selected-object))
 
 ;; Rendering loop
 (def curr-frame (volatile! 0))
@@ -210,7 +210,7 @@
   (fg.dev/start)
 
   ;; TODO: Add sound control UI
-  (audio/play :bg)
+  #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)

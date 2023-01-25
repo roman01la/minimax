@@ -122,7 +122,7 @@
        :style {:width 32
                :height 32}}))))
 
-(defui ui-root [width height scene selected]
+(defui ui-root [{:keys [width height]} scene selected]
   (ui/root
    {:style {:width width
             :height height
