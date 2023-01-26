@@ -116,14 +116,12 @@
           h (+ (abs ymin) (abs ymax))]
       [w h])))
 
-(defn create-text-node [styles text]
-  (let [node (create-node styles)
-        [w h] (measure-text styles text)
+(defn set-text-layout [node style text]
+  (let [[w h] (measure-text style text)
         set-width (styles-mapping :width)
         set-height (styles-mapping :height)]
     (set-width node w)
-    (set-height node h)
-    node))
+    (set-height node h)))
 
 (defn insert-children [ynode children]
   (doseq [idx (range (count children))]
@@ -244,7 +242,8 @@
         (NanoVG/nvgTextAlign text-align)
         (NanoVG/nvgText ^float x ^float y ^CharSequence text))))
   ILayout
-  (layout [this])
+  (layout [this]
+    (set-text-layout ynode style text))
   (store-layout [this])
   (get-layout [this]
     (get-layout* ynode @parent-layout)))
@@ -253,7 +252,7 @@
   (map->Text
    (assoc props
           :vg @ui.ctx/vg
-          :ynode (create-text-node (:style props) text)
+          :ynode (create-node (:style props))
           :text text
           :parent-layout (atom []))))
 
