@@ -5,6 +5,7 @@
    [minimax.renderer.ui]
    [minimax.ui.animation :as ui.anim]
    [minimax.ui.components :as mui :refer [defui]]
+   [minimax.ui.diff :as diff :refer [$]]
    [minimax.ui.elements :as ui])
   (:import (org.lwjgl.nanovg NanoVG)))
 
@@ -104,37 +105,40 @@
                :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
       "Welcome!")))))
 
-(defui sound-button []
+(defn sound-button [_]
   ;; TODO: hookup global state
-  (let [gain (mui/use-state :gain 1)
+  (let [gain (diff/use-state :gain 1)
         mute? (zero? @gain)]
-    (ui/view
-     {:on-mouse-down (fn []
-                       (reset! gain (if mute? 1 0))
-                       (audio/set-gain @gain))
-      :style {:position :absolute
-              :right 16
-              :bottom 16}}
-     (ui/image
-      {:src (if mute?
-              "resources/images/sound_off.png"
-              "resources/images/sound_on.png")
-       :style {:width 32
-               :height 32}}))))
+    ($ :view
+       {:on-mouse-down (fn []
+                         (reset! gain (if mute? 1 0))
+                         (audio/set-gain @gain))
+        :style {:position :absolute
+                :right 16
+                :bottom 16}}
+       ($ :image
+          {:src (if mute?
+                  "resources/images/sound_off.png"
+                  "resources/images/sound_on.png")
+           :style {:width 32
+                   :height 32}}))))
 
-(defui ui-root [{:keys [width height]} scene selected]
-  (ui/root
-   {:style {:width width
-            :height height
-            :flex-direction :column}}
-   #_(game-ui width height)
-   (ui.debug/root width height scene selected)
-   (ui/image
-    {:src "logo.png"
-     :style {:position :absolute
-             :left 16
-             :bottom 16
-             :width (/ 175 3)
-             :height (/ 108 3)}})
-   (sound-button)))
-
+(defn test-root [{:keys [width height]} scene selected]
+  ($ :root
+     {:style {:width width
+              :height height
+              :flex-direction :column}}
+     #_(game-ui width height)
+     ($ ui.debug/root
+        {:width width
+         :height height
+         :scene scene
+         :selected selected})
+     ($ :image
+        {:src "logo.png"
+         :style {:position :absolute
+                 :left 16
+                 :bottom 16
+                 :width (/ 175 3)
+                 :height (/ 108 3)}})
+     ($ sound-button)))

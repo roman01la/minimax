@@ -1,7 +1,7 @@
 (ns minimax.ui.diff
   (:require [minimax.state :as ms]))
 
-(def !current-instance (ms/atom nil))
+(def ^:private !current-instance (ms/atom nil))
 
 (defprotocol IElement)
 
@@ -11,7 +11,7 @@
 (defrecord ComponentElement [type props]
   IElement)
 
-(defn- wrap [v]
+(defn wrap [v]
   (if (sequential? v) v [v]))
 
 (defn- evaluate-once [el]
@@ -55,7 +55,7 @@
            :state state)))
 
 (defn- reconcile-primitive-element [el]
-  (assoc el :return (mapv evaluate (-> el :props :children))))
+  (->> el :props :children (mapv evaluate) (assoc el :return)))
 
 (defn- evaluate
   ([el]
@@ -77,33 +77,30 @@
 
 ;; Hooks
 (defn- insert-state [type name state]
-  (swap! !current-instance assoc-in [type name] state))
+  (swap! !current-instance assoc-in [type name] state)
+  state)
 
 (defn- get-state [type name]
   (-> @!current-instance type name))
 
-(defn- create-set-state [name]
-  (fn [v]
-    (if (fn? v)
-      (swap! !current-instance update-in [:state name] v)
-      (swap! !current-instance assoc-in [:state name] v))))
-
 ;;  ==== Public API ====
 
 ;; createElement
-(defn $ [type props & children]
-  (let [props (assoc props :children children)]
+(defn $ [type & args]
+  (let [props (if (and (map? (first args))
+                       (not (record? (first args))))
+                (-> (first args)
+                    (assoc :children (rest args)))
+                {:children args})]
     (if (keyword? type)
       (PrimitiveElement. type props)
       (ComponentElement. type props))))
 
 ;; Hooks
 (defn use-state [name v]
-  (when-not (get-state :state name)
-    (let [set-state (create-set-state name)]
-      (insert-state :state name {:value v :set-state set-state})))
-  (let [{:keys [value set-state]} (get-state :state name)]
-    [value set-state]))
+  (or (get-state :state name)
+      ;; TODO: immutable state
+      (insert-state :state name (ms/atom v))))
 
 ;; Render loop
 (defn- render-root [root el]

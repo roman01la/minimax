@@ -11,6 +11,7 @@
    [minimax.renderer.ui]
    [minimax.ui.animation :as ui.anim]
    [minimax.ui.components :as mui :refer [defui]]
+   [minimax.ui.diff :as diff :refer [$]]
    [minimax.ui.elements :as ui])
   (:import (java.nio FloatBuffer)
            (minimax.objects.group Group)
@@ -37,12 +38,12 @@
    :text-color #ui/rgba [230 230 230 1]
    :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)})
 
-(defn stats-text [text]
-  (ui/text
-   {:style (merge text-styles {:margin [4 0]})}
-   text))
+(defn stats-text [{:keys [children]}]
+  ($ :text
+     {:style (merge text-styles {:margin [4 0]})}
+     children))
 
-(defn perf-stats []
+(defn perf-stats [_]
   (let [stats (bgfx/get-stats)
         to-ms-cpu (double (/ 1000 (.cpuTimerFreq stats)))
         to-ms-gpu (double (/ 1000 (.gpuTimerFreq stats)))
@@ -52,22 +53,22 @@
         max-gpu-latency (.maxGpuLatency stats)
         gpu-mem-used (.gpuMemoryUsed stats)
         num-draw-calls (.numDraw stats)]
-    (mui/widget
-     {:title "Performance Monitor"
-      :style {:justify-content :center
-              :width 240
-              :margin [0 0 8 0]}}
-     (stats-text
-      (format "FPS: %d" frame-ms))
-     (stats-text
-      (format "Submit CPU %.1f, GPU %.1f (L: %d)" cpu-submit gpu-submit max-gpu-latency))
-     (when (not= (- Long/MAX_VALUE) gpu-mem-used)
-       (stats-text
-        (format "GPU mem: %d" gpu-mem-used)))
-     (stats-text
-      (format "Draw calls: %d" num-draw-calls))
-     (stats-text
-      (format "UI Layout: %.2fms" (double (/ @minimax.renderer.ui/layout-time 1e6)))))))
+    ($ mui/widget
+       {:title "Performance Monitor"
+        :style {:justify-content :center
+                :width 240
+                :margin [0 0 8 0]}}
+       ($ stats-text
+          (format "FPS: %d" frame-ms))
+       ($ stats-text
+          (format "Submit CPU %.1f, GPU %.1f (L: %d)" cpu-submit gpu-submit max-gpu-latency))
+       (when (not= (- Long/MAX_VALUE) gpu-mem-used)
+         ($ stats-text
+            (format "GPU mem: %d" gpu-mem-used)))
+       ($ stats-text
+          (format "Draw calls: %d" num-draw-calls))
+       ($ stats-text
+          (format "UI Layout: %.2fms" (double (/ @minimax.renderer.ui/layout-time 1e6)))))))
 
 (defn tree-view-item [{:keys [on-select selected? object]}]
   (mui/button-text
@@ -148,12 +149,12 @@
            :on-select on-select
            :selected @selected}))))))
 
-(defn root [width height scene selected]
-  (ui/view
-   {:style {:flex 1
-            :width width
-            :height height
-            :flex-direction :column
-            :padding 16}}
-   (perf-stats)
-   (scene-graph scene selected)))
+(defn root [{:keys [width height scene selected]}]
+  ($ :view
+     {:style {:flex 1
+              :width width
+              :height height
+              :flex-direction :column
+              :padding 16}}
+     ($ perf-stats)
+     #_(scene-graph scene selected)))

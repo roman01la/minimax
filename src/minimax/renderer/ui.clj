@@ -13,7 +13,9 @@
    [minimax.resources :as res]
    [minimax.ui.components :as mui]
    [minimax.ui.context :as ui.ctx]
+   [minimax.ui.diff :as diff]
    [minimax.ui.elements :as ui]
+   [minimax.ui.elements2 :as ui2]
    [minimax.ui.primitives :as ui.pmt]
    [minimax.util.fs :as util.fs])
   (:import (org.lwjgl.bgfx BGFX)
@@ -88,12 +90,12 @@
      (vreset! ~ref t#)
      ret#))
 
-(def !root (atom nil))
+(def root (diff/create-root))
 
 (defn render* [opts f]
   (reset! mui/!id 0)
-  (let [el (f)]
-    (reset! !root el)
+  (let [el (-> (diff/render root (f))
+               ui2/get-layout)]
     (measure-time layout-time
                   (ui.pmt/layout (:vnode el)))
     (ui.pmt/store-layout (:vnode el))

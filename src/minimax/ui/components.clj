@@ -3,6 +3,7 @@
    [fg.clock :as clock]
    [minimax.glfw.core :as glfw]
    [minimax.state :as ms]
+   [minimax.ui.diff :as diff :refer [$]]
    [minimax.ui.elements :as ui]
    [minimax.ui.primitives :as ui.pmt])
   (:import (org.lwjgl.glfw GLFW)
@@ -100,8 +101,8 @@
      (when scroll-bar?
        (scroll-bar (:py @state) (:h @state) height)))))
 
-(defui view [{:keys [on-mouse-enter on-mouse-leave] :as props} & children]
-  (let [mouse-over? (use-state :mouse-over? false)
+(defn view [{:keys [on-mouse-enter on-mouse-leave] :as props}]
+  (let [mouse-over? (diff/use-state :mouse-over? false)
         {:keys [cursor]} (:style props)
         props (assoc props
                      :on-mouse-over (fn [hover?]
@@ -112,7 +113,7 @@
                                         (when cursor (glfw/set-cursor :default))
                                         (when on-mouse-leave (on-mouse-leave)))
                                       (reset! mouse-over? hover?)))]
-    (apply ui/view props children)))
+    ($ :view props)))
 
 (defui button [props & children]
   (let [state (use-state :state {:hover? false :pressed? false})
@@ -158,33 +159,35 @@
       {:style (assoc (:text/style props) :text-color text-color)}
       text))))
 
-(defn widget-header [{:keys [on-mouse-down expanded? title]} & children]
-  (apply ui/view {}
-         (ui/view
-          {:on-mouse-down on-mouse-down
-           :style {:align-items :center
-                   :flex-direction :row
-                   :padding [8 0]
-                   :background-color #ui/rgba [50 50 50 1]
-                   :border-radius (if expanded? [5 5 0 0] 5)}}
-          (ui/text
+(defn widget-header [{:keys [on-mouse-down expanded? title children]}]
+  ($ :view {}
+     ($ :view
+        {:on-mouse-down on-mouse-down
+         :style {:align-items :center
+                 :flex-direction :row
+                 :padding [8 0]
+                 :background-color #ui/rgba [50 50 50 1]
+                 :border-radius (if expanded? [5 5 0 0] 5)}}
+        ($ :text
            {:style {:font-size 12
                     :font-face "IBMPlexMono-Regular"
                     :text-color #ui/rgba [230 230 230 1]
                     :text-align (bit-or NanoVG/NVG_ALIGN_LEFT NanoVG/NVG_ALIGN_TOP)}}
            title))
-         (when expanded?
-           children)))
+     (when expanded?
+       children)))
 
-(defn widget* [{:keys [style on-header-click expanded? title header]} & children]
-  (apply view
-         {:style style}
-         (apply widget-header
-                {:on-mouse-down on-header-click
-                 :expanded? expanded?
-                 :title title}
-                header)
-         children))
+(defn widget*
+  [{:keys [style on-header-click expanded? title
+           header children]}]
+  ($ view
+     {:style style}
+     ($ widget-header
+        {:on-mouse-down on-header-click
+         :expanded? expanded?
+         :title title}
+        header)
+     children))
 
 (defn scroll-widget [{:keys [title width height on-header-click expanded? header]} & children]
   (widget*
@@ -201,19 +204,18 @@
           children)))
 
 (defn widget
-  [{:keys [title style on-header-click expanded?]
-    :or {expanded? true}}
-   & children]
-  (widget*
-   {:style style
-    :on-header-click on-header-click
-    :expanded? expanded?
-    :title title}
-   (apply ui/view
-          {:style {:background-color #ui/rgba [35 35 35 1]
-                   :border-radius [0 0 5 5]
-                   :padding [0 8]}}
-          children)))
+  [{:keys [title style on-header-click expanded? children]
+    :or {expanded? true}}]
+  ($ widget*
+     {:style style
+      :on-header-click on-header-click
+      :expanded? expanded?
+      :title title}
+     ($ :view
+        {:style {:background-color #ui/rgba [35 35 35 1]
+                 :border-radius [0 0 5 5]
+                 :padding [0 8]}}
+        children)))
 
 (def ^:private ks
   [:text-color :text-align :font-size :font-face])
