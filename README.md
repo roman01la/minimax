@@ -15,3 +15,18 @@ _Tested only on Apple Silicon system_
 - Make sure to replace [native packages in deps](https://github.com/roman01la/minimax/blob/main/deps.edn#L15-L23) with the ones matching your platform
 - Compile shaders `./scripts/shaders` (shaders code might need changes depending on rendering backend choosen on your platform)
 - Run the sample project `./scripts/start`
+
+## Features
+
+- Windowing and input handling
+- GLTF loader
+- Renderer
+  - Blinn–Phong shading
+  - Shadow maps
+- Scene graph
+- Audio playback
+- Small and incomplete UI system
+  - Scroll views
+  - Buttons
+  - Component system with local state
+  - Flexbox layout
