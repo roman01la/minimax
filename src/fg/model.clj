@@ -7,7 +7,8 @@
             [minimax.util.scene :as util.scene])
   (:import (org.joml Matrix4f)
            (org.lwjgl PointerBuffer)
-           (org.lwjgl.assimp AIMatrix4x4 AIMesh AINode AIScene Assimp)))
+           (org.lwjgl.assimp AIMatrix4x4 AIMesh AINode AIScene Assimp)
+           (java.nio.file Paths)))
 
 (set! *warn-on-reflection* true)
 
@@ -52,20 +53,46 @@
 (defn create-scene-graph [^AIScene scene materials]
   (create-scene-graph* (.mMeshes scene) materials (.mRootNode scene)))
 
+;; (defn load-model [^String path]
+;;   (let [flags (bit-or Assimp/aiProcess_Triangulate
+;;                       Assimp/aiProcess_JoinIdenticalVertices
+;;                       #_Assimp/aiProcess_FlipWindingOrder
+;;                       Assimp/aiProcess_FlipUVs
+;;                       Assimp/aiProcess_MakeLeftHanded
+;;                       Assimp/aiProcess_GenBoundingBoxes
+;;                       #_Assimp/aiProcess_OptimizeGraph
+;;                       Assimp/aiProcess_OptimizeMeshes)
+;;         scene (-> (.getPath (io/resource path))
+;;                   (Assimp/aiImportFile flags))
+;;         textures (t/scene->textures scene)
+;;         materials (mat/create-materials scene textures)
+;;         graph (create-scene-graph scene materials)]
+;;     {:path path
+;;      :materials materials
+;;      :scene graph}))
+
+(defn- normalize-resource-path [path]
+  (-> (io/resource path)
+      (.toURI)
+      (Paths/get)
+      (.toAbsolutePath)
+      (.toString)))
+
 (defn load-model [^String path]
   (let [flags (bit-or Assimp/aiProcess_Triangulate
                       Assimp/aiProcess_JoinIdenticalVertices
-                      #_Assimp/aiProcess_FlipWindingOrder
                       Assimp/aiProcess_FlipUVs
                       Assimp/aiProcess_MakeLeftHanded
                       Assimp/aiProcess_GenBoundingBoxes
-                      #_Assimp/aiProcess_OptimizeGraph
                       Assimp/aiProcess_OptimizeMeshes)
-        scene (-> (.getPath (io/resource path))
-                  (Assimp/aiImportFile flags))
-        textures (t/scene->textures scene)
-        materials (mat/create-materials scene textures)
-        graph (create-scene-graph scene materials)]
-    {:path path
-     :materials materials
-     :scene graph}))
+        normalized-path (normalize-resource-path path)
+        scene (Assimp/aiImportFile normalized-path flags)]
+    (when (nil? scene)
+      (throw (Exception. (str "Failed to load model: " path 
+                             ", Error: " (Assimp/aiGetErrorString)))))
+    (let [textures (t/scene->textures scene)
+          materials (mat/create-materials scene textures)
+          graph (create-scene-graph scene materials)]
+      {:path path
+       :materials materials
+       :scene graph})))
