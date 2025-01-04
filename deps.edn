@@ -21,7 +21,7 @@
         org.lwjgl/lwjgl-nanovg$natives-macos-arm64 {:mvn/version "3.3.3"}
         org.lwjgl/lwjgl-yoga$natives-macos-arm64 {:mvn/version "3.3.3"}
         org.lwjgl/lwjgl-openal$natives-macos-arm64 {:mvn/version "3.3.3"}
-        org.lwjgl/lwjgl-jemalloc$natives-macos-arm64 {:mvn/version "3.3.3"}}
+        org.lwjgl/lwjgl-jemalloc$natives-macos-arm64 {:mvn/version "3.3.3"}
 
         ; for windows
         org.lwjgl/lwjgl$natives-windows {:mvn/version "3.3.3"}
@@ -43,7 +43,7 @@
         org.lwjgl/lwjgl-nanovg$natives-linux {:mvn/version "3.3.3"}
         org.lwjgl/lwjgl-yoga$natives-linux {:mvn/version "3.3.3"}
         org.lwjgl/lwjgl-openal$natives-linux {:mvn/version "3.3.3"}
-        org.lwjgl/lwjgl-jemalloc$natives-linux {:mvn/version "3.3.3"}
+        org.lwjgl/lwjgl-jemalloc$natives-linux {:mvn/version "3.3.3"}}
         
  :paths ["src" "resources"]
  :aliases {:dev {:extra-deps {cljfmt/cljfmt {:mvn/version "0.9.2"}}}
