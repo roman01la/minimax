@@ -1,7 +1,7 @@
 #!/usr/bin/env nu
 
 mkdir resources/shaders_out
-rm resources/shaders_out/*
+rm -f resources/shaders_out/*
 
 ls resources/shaders/vs_* | each { |file|
     let basename = ($file.name | path basename | str replace '.sc' '')
