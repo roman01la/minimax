@@ -115,7 +115,8 @@
         (on-resize fbw fbh)))))
 
 (defn -main [& args]
-  (fg.dev/start)
+  ;; start file watcher
+  ;; (fg.dev/start)
 
   ;; TODO: Add sound control UI
   ;; #_(audio/play :bg)
@@ -135,6 +136,6 @@
   (bgfx/shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
-  (.free (GLFW/glfwSetErrorCallback nil))
+  (.free (GLFW/glfwSetErrorCallback nil)))
   ;; Stop file watcher
-  (fg.dev/stop))
+  ;; (fg.dev/stop))
