@@ -45,7 +45,9 @@
 (def error-callback
   (GLFWErrorCallback/createPrint System/err))
 
-(GLFW/glfwSetErrorCallback error-callback)
+;; (GLFW/glfwSetErrorCallback error-callback)
+;; GLFWErrorCallback.createThrow () .set ();
+(.set (GLFWErrorCallback/createThrow))
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
 
