@@ -17,7 +17,7 @@
                               BGFX/BGFX_UNIFORM_TYPE_VEC4 4
                               BGFX/BGFX_UNIFORM_TYPE_MAT4 16
                               BGFX/BGFX_UNIFORM_TYPE_MAT3 9)]]
-      (.get ^org.joml.Matrix4f value ^FloatBuffer buff)
+      (.get value ^FloatBuffer buff)
       (bgfx/set-uniform uniform buff)))
   (set-value [this value num-elements]
     (bgfx/set-uniform uniform value num-elements))
