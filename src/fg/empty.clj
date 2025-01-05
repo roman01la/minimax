@@ -1,6 +1,6 @@
 (ns fg.empty
   (:require
-   [bgfx.core :as bgfx]
+  ;;  [bgfx.core :as bgfx]
    [fg.clock :as clock]
    [fg.dev]
    [fg.listeners :as listeners]
@@ -97,10 +97,10 @@
       (-> (.platformData init)
           (.nwh (GLFWNativeWin32/glfwGetWin32Window window))))
 
-    (when-not (bgfx/init init)
+    (when-not (BGFX/bgfx_init init)
       (throw (RuntimeException. "Error initializing bgfx renderer")))))
 
-(log/debug (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
+(log/debug (str "bgfx renderer: " (BGFX/bgfx_get_renderer_name (BGFX/bgfx_get_renderer_type))))
 
 ;; (ui/init)
 ;; (audio/init)
@@ -140,7 +140,7 @@
 (defn on-resize [width height]
   (swap! state/state assoc :vwidth width :vheight height)
   ;; (swap! camera assoc :aspect (/ width height))
-  (bgfx/reset width height reset-flags))
+  (BGFX/bgfx_reset width height reset-flags BGFX/BGFX_TEXTURE_FORMAT_COUNT))
 
 (listeners/set-listeners window
                          (fn [_ width height]
@@ -171,13 +171,13 @@
     (run)
     ;(vreset! curr-frame (bgfx/frame)))
     (vswap! curr-frame inc)
-    (bgfx/frame false))
+    (BGFX/bgfx_frame false))
 
   ;; Disposing the program
   (pool/destroy-all)
   ;; (ui/shutdown)
   ;; (audio/shutdown)
-  (bgfx/shutdown)
+  (BGFX/bgfx_shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
   (.free (GLFW/glfwSetErrorCallback nil)))
