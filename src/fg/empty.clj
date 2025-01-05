@@ -9,9 +9,9 @@
    [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
-   [minimax.passes :as passes]
-   [minimax.pool.core :as pool]
-   [minimax.renderer.view :as view])
+  ;;  [minimax.passes :as passes]
+   [minimax.pool.core :as pool])
+  ;;  [minimax.renderer.view :as view])
   (:import
    (java.util.function Consumer)
    (org.lwjgl.bgfx
