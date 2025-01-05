@@ -186,6 +186,9 @@
 (def release
   (delay (create-release-callback)))
 
+(defn touch [view-id]
+  (BGFX/bgfx_touch view-id))
+
 (defn make-ref [mem]
   (BGFX/bgfx_make_ref mem))
 
