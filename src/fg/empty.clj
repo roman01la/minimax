@@ -142,9 +142,9 @@
   ;; (swap! camera assoc :aspect (/ width height))
   (BGFX/bgfx_reset width height reset-flags BGFX/BGFX_TEXTURE_FORMAT_COUNT))
 
-(listeners/set-listeners window
-                         (fn [_ width height]
-                           (vreset! fb-size [width height])))
+;; (listeners/set-listeners window
+;;                          (fn [_ width height]
+;;                            (vreset! fb-size [width height])))
 
 ;; resize to the latest size value in a rendering loop
 (defn maybe-set-size []
@@ -166,7 +166,7 @@
     ;; (println "main frame" @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    (maybe-set-size)
+    ;; (maybe-set-size)
     (clock/step)
     (run)
     ;(vreset! curr-frame (bgfx/frame)))
