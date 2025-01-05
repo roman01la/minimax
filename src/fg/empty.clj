@@ -96,15 +96,15 @@
 
     ;bgfx_set_view_rect(0, 0, 0, width, height);
     ;bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
-    ;; (println "frame" @curr-frame)
+    ;; (println "run frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
+      (view/rect passes/geometry 0 0 v-width v-height)
       (view/clear passes/geometry
                   (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
-                  (:background-color @state/state))
-      (view/rect passes/geometry 0 0 v-width v-height))
+                  (:background-color @state/state)))
 
-    (view/touch passes/geometry)))
+      (view/touch passes/geometry)))
 
 (def fb-size (volatile! nil))
 
@@ -134,6 +134,7 @@
   ;; #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
+    ;; (println "main frame" @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
     (maybe-set-size)
