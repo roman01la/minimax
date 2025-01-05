@@ -9,7 +9,9 @@
    [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
-   [minimax.pool.core :as pool])
+   [minimax.pool.core :as pool]
+   [minimax.passes :as passes]
+   [minimax.renderer.view :as view])
   (:import (java.util.function Consumer)
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFX BGFXInit BGFXResolution)
@@ -92,7 +94,16 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    (bgfx/touch 0)))
+    ;bgfx_set_view_rect(0, 0, 0, width, height);
+    ;bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
+    (let [v-width (:vwidth @state/state)
+          v-height (:vheight @state/state)]
+      (view/clear passes/geometry
+                  (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
+                  (:background-color @state/state))
+      (view/rect passes/geometry 0 0 v-width v-height))
+
+    (view/touch passes/geometry)))
 
 (def fb-size (volatile! nil))
 
