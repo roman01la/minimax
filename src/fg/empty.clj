@@ -96,6 +96,7 @@
 
     ;bgfx_set_view_rect(0, 0, 0, width, height);
     ;bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
+    ;; (println "frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
       (view/clear passes/geometry
@@ -138,7 +139,9 @@
     (maybe-set-size)
     (clock/step)
     (run)
-    (vreset! curr-frame (bgfx/frame)))
+    ;(vreset! curr-frame (bgfx/frame)))
+    (vswap! curr-frame inc)
+    (bgfx/frame false))
 
   ;; Disposing the program
   (pool/destroy-all)
