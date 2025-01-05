@@ -127,8 +127,6 @@
         (on-resize fbw fbh)))))
 
 (defn -main [& args]
-  (System/setProperty "org.lwjgl.util.Debug" "true")
-
   ;; start file watcher
   ;; (fg.dev/start)
 
