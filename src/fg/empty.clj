@@ -6,7 +6,7 @@
    [fg.listeners :as listeners]
    [fg.state :as state]
    [fg.ui.core]
-   [minimax.debug :as debug]
+  ;;  [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
   ;;  [minimax.passes :as passes]
@@ -61,7 +61,7 @@
     :height (:height @state/state)
     :title "minimax"}))
 
-(state/set-size (glfw/detect-dpr))
+;; (state/set-size (glfw/detect-dpr))
 
 (def reset-flags
   BGFX/BGFX_RESET_VSYNC)
@@ -106,8 +106,8 @@
 ;; (audio/init)
 
 ;; debug
-(def selected-object (atom nil))
-(def debug-box @debug/debug-box)
+;; (def selected-object (atom nil))
+;; (def debug-box @debug/debug-box)
 
 ;; Rendering loop
 (def curr-frame (volatile! 0))
