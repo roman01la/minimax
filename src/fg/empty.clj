@@ -9,14 +9,23 @@
    [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
-   [minimax.pool.core :as pool]
    [minimax.passes :as passes]
+   [minimax.pool.core :as pool]
    [minimax.renderer.view :as view])
-  (:import (java.util.function Consumer)
-           (org.joml Matrix4f Vector3f)
-           (org.lwjgl.bgfx BGFX BGFXInit BGFXResolution)
-           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWNativeCocoa GLFWNativeWin32 GLFWNativeX11)
-           (org.lwjgl.system Configuration Platform))
+  (:import
+   (java.util.function Consumer)
+   (org.lwjgl.bgfx
+    BGFX
+    BGFXInit
+    BGFXPlatform
+    BGFXResolution)
+   (org.lwjgl.glfw
+    GLFW
+    GLFWErrorCallback
+    GLFWNativeCocoa
+    GLFWNativeWin32
+    GLFWNativeX11)
+   (org.lwjgl.system Configuration Platform))
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -54,6 +63,10 @@
 
 (def reset-flags
   BGFX/BGFX_RESET_VSYNC)
+
+;; Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
+;; Most graphics APIs must be used on the same thread that created the window.
+(BGFXPlatform/bgfx_render_frame -1)
 
 (let [^BGFXInit init (bgfx/create-init)]
   (.resolution init
