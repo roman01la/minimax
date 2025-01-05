@@ -31,6 +31,9 @@
   ([capture?]
    (BGFX/bgfx_frame capture?)))
 
+(defn set_debug [flags]
+  (BGFX/bgfx_set_debug (int flags)))
+
 (defn get-caps ^BGFXCaps []
   (BGFX/bgfx_get_caps))
 
