@@ -25,7 +25,7 @@
     GLFWNativeCocoa
     GLFWNativeWin32
     GLFWNativeX11)
-   (org.lwjgl.system Configuration Platform))
+   (org.lwjgl.system Configuration MemoryStack Platform))
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -68,31 +68,35 @@
 ;; Most graphics APIs must be used on the same thread that created the window.
 (BGFXPlatform/bgfx_render_frame -1)
 
-(let [^BGFXInit init (bgfx/create-init)]
-  (.resolution init
-               (reify Consumer
-                 (accept [this it]
-                   (-> ^BGFXResolution it
-                       (.width (:vwidth @state/state))
-                       (.height (:vheight @state/state))
-                       (.reset reset-flags)))))
+(with-open [stack (MemoryStack/stackPush)]
+  ;; (let [^BGFXInit init (bgfx/create-init)]
+  (let [init (BGFXInit/malloc stack)]
+    (BGFX/bgfx_init_ctor init)
 
-  (condp = (Platform/get)
-    Platform/MACOSX
-    (-> (.platformData init)
-        (.nwh (GLFWNativeCocoa/glfwGetCocoaWindow window)))
+    (.resolution init
+                 (reify Consumer
+                   (accept [this it]
+                     (-> ^BGFXResolution it
+                         (.width (:vwidth @state/state))
+                         (.height (:vheight @state/state))
+                         (.reset reset-flags)))))
 
-    Platform/LINUX
-    (-> (.platformData init)
-        (.ndt (GLFWNativeX11/glfwGetX11Display))
-        (.nwh (GLFWNativeX11/glfwGetX11Window window)))
+    (condp = (Platform/get)
+      Platform/MACOSX
+      (-> (.platformData init)
+          (.nwh (GLFWNativeCocoa/glfwGetCocoaWindow window)))
 
-    Platform/WINDOWS
-    (-> (.platformData init)
-        (.nwh (GLFWNativeWin32/glfwGetWin32Window window))))
+      Platform/LINUX
+      (-> (.platformData init)
+          (.ndt (GLFWNativeX11/glfwGetX11Display))
+          (.nwh (GLFWNativeX11/glfwGetX11Window window)))
 
-  (when-not (bgfx/init init)
-    (throw (RuntimeException. "Error initializing bgfx renderer"))))
+      Platform/WINDOWS
+      (-> (.platformData init)
+          (.nwh (GLFWNativeWin32/glfwGetWin32Window window))))
+
+    (when-not (bgfx/init init)
+      (throw (RuntimeException. "Error initializing bgfx renderer")))))
 
 (log/debug (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
