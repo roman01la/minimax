@@ -4,23 +4,12 @@
    [fg.clock :as clock]
    [fg.dev]
    [fg.listeners :as listeners]
-   [fg.model :as md]
-   [fg.passes.combine :as pass.comb]
-   [fg.passes.geometry :as pass.geom]
-   [fg.passes.shadow :as pass.shadow]
    [fg.state :as state]
    [fg.ui.core]
-   [minimax.audio.core :as audio]
    [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
-   [minimax.object :as obj]
-   [minimax.objects.camera :as camera]
-   [minimax.objects.light :as light]
-   [minimax.objects.scene :as scene]
-   [minimax.passes :as passes]
-   [minimax.pool.core :as pool]
-   [minimax.renderer.ui :as ui])
+   [minimax.pool.core :as pool])
   (:import (java.util.function Consumer)
            (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFX BGFXInit BGFXResolution)
