@@ -39,7 +39,10 @@
 (GLFW/glfwSetErrorCallback error-callback)
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
-(GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
+
+;; (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
+(when (= (GLFW/glfwGetPlatform) GLFW/GLFW_PLATFORM_COCOA)
+  (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_FALSE))
 
 (def window
   (glfw/create-window
