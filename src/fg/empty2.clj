@@ -186,13 +186,21 @@
     ;;     (debug/set-object-transform obj debug-box mtx)))))
     ;;  (BGFX/bgfx_touch)
 
-     (view/rect passes/geometry 0 0 v-width v-height)
-     (view/clear passes/geometry
+    ;;  (view/rect passes/geometry 0 0 v-width v-height)
+    ;;  (view/clear passes/geometry
+    ;;              (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
+    ;;              0x37eb34ff 1.0)
+    ;;             ;;  (:background-color @state/state))
+     
+    ;;  (view/touch passes/geometry)
+
+     (view/rect passes/shadow 0 0 v-width v-height)
+     (view/clear passes/shadow
                  (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
                  0x37eb34ff 1.0)
                 ;;  (:background-color @state/state))
      
-     (view/touch passes/geometry)
+     (view/touch passes/shadow)
     ))
 
 ;; (defn render-ui []
