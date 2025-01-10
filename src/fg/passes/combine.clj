@@ -49,3 +49,23 @@
 
     (d/screen-space-quad)
     (bgfx/submit (:id passes/combine) @combine-shader)))
+
+(defn render-test []
+  (let [v-width (:vwidth @state/state)
+        v-height (:vheight @state/state)]
+    (view/rect passes/combine 0 0 v-width v-height)
+    (bgfx/set-state
+     (bit-or 0
+             BGFX/BGFX_STATE_WRITE_RGB
+             BGFX/BGFX_STATE_WRITE_A))
+    (obj/render screen-camera (:id passes/combine))
+
+    ;(u/set-texture @u-tex-ui ui/texture 0)
+    ;(u/set-texture @u-tex-screen pass.geom/screen-texture 1)
+
+    ;(u/set-texture @u-tex-position pass.geom/position-texture 2)
+    ;(u/set-texture @u-tex-normal pass.geom/normal-texture 3)
+
+    (d/screen-space-quad)
+    ;(bgfx/submit (:id passes/combine) @combine-shader)))
+    ))
