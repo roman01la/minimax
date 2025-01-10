@@ -57,6 +57,7 @@
   (GLFWErrorCallback/createPrint System/err))
 
 (GLFW/glfwSetErrorCallback error-callback)
+;(.set (GLFWErrorCallback/createThrow))
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
 ;; (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
@@ -188,7 +189,8 @@
      (view/rect passes/geometry 0 0 v-width v-height)
      (view/clear passes/geometry
                  (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
-                 (:background-color @state/state))
+                 0x37eb34ff 1.0)
+                ;;  (:background-color @state/state))
      
      (view/touch passes/geometry)
     ))
@@ -213,7 +215,8 @@
 
     ;; (ui/render @state/state render-ui) ;; ui pass
 
-    (pass.comb/render))) ;; render combine pass
+    ;(pass.comb/render) ;; render combine pass
+    )) 
 
 ;; (def fb-size (volatile! nil))
 
@@ -242,7 +245,7 @@
   ;; #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
-    (println "Frame begin: " @curr-frame)
+    ;(println "Frame begin: " @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
     ;; (maybe-set-size)
@@ -251,7 +254,7 @@
     ;(vreset! curr-frame (bgfx/frame)))
     (vswap! curr-frame inc)
     (BGFX/bgfx_frame false) 
-    (println "Frame end: " @curr-frame)
+    ;(println "Frame end: " @curr-frame)
     )
 
   ;; Disposing the program
