@@ -10,7 +10,6 @@
   (frame-buffer [this fb-handle])
   (transform [this view-mtx proj-mtx])
   (touch [this])
-  (id [this])
   (mode [this mode]))
 
 (defrecord View [id]
@@ -27,8 +26,6 @@
     (lib/set-view-transform id view-mtx proj-mtx))
   (touch [this]
     (bgfx/touch id)) 
-  (id [this]
-    id)
   (mode [this mode]
     (bgfx/set-view-mode id mode)))
 
