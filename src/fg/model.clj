@@ -1,14 +1,21 @@
 (ns fg.model
-  (:require [clojure.java.io :as io]
-            [fg.material :as mat]
-            [minimax.assimp.texture :as t]
-            [minimax.objects.group :as obj.group]
-            [minimax.objects.mesh :as obj.mesh]
-            [minimax.util.scene :as util.scene])
-  (:import (org.joml Matrix4f)
-           (org.lwjgl PointerBuffer)
-           (org.lwjgl.assimp AIMatrix4x4 AIMesh AINode AIScene Assimp)
-           (java.nio.file Paths)))
+  (:require
+   [clojure.java.io :as io]
+   [fg.material :as mat]
+   [minimax.assimp.texture :as t]
+   [minimax.objects.group :as obj.group]
+   [minimax.objects.mesh :as obj.mesh]
+   [minimax.util.scene :as util.scene])
+  (:import
+   (java.nio.file Paths)
+   (org.joml Matrix4f Vector4f)
+   (org.lwjgl PointerBuffer)
+   (org.lwjgl.assimp
+    AIMatrix4x4
+    AIMesh
+    AINode
+    AIScene
+    Assimp)))
 
 (set! *warn-on-reflection* true)
 
@@ -93,6 +100,19 @@
     (let [textures (t/scene->textures scene)
           materials (mat/create-materials scene textures)
           graph (create-scene-graph scene materials)]
+      (println "Loaded model: " path)
+      (println "  Materials: " (count materials))
+      ; for each materials, print uniforms color
+      ;; (doseq [m materials]
+      ;;   (println "    Color: " (:diffuse m)))
+      ; :diffuse is Vector4f, as test, make all red
+      (doseq [m materials]
+        ;(update m :diffuse (fn [v] (Vector4f. 1.0 0.0 0.0 1.0))))
+        (set! (.x (:diffuse m)) 1.0)
+        (set! (.y (:diffuse m)) 0.0)
+        (set! (.z (:diffuse m)) 0.0)
+        (set! (.w (:diffuse m)) 1.0))
+
       {:path path
        :materials materials
        :scene graph})))
