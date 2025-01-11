@@ -3,8 +3,8 @@
 ## How to run checks
 
 ```bash
-# compile shader first
-nu ./scripts/shaders.nu
+# compile shader first if you need, but most of them are already compiled (included)
+# nu ./scripts/shaders.nu
 
 nu ./scripts/start.nu check.empty
 nu ./scripts/start.nu check.empty2
