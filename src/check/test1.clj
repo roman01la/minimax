@@ -1,28 +1,27 @@
-(ns fg.empty2
+(ns check.test1
   (:require
    [bgfx.core :as bgfx]
    [fg.clock :as clock]
    [fg.dev]
-   ;[fg.listeners :as listeners]
-   ;[fg.model :as md]
-   ;[fg.passes.combine :as pass.comb]
+   [fg.listeners :as listeners]
+   [fg.model :as md]
+   [fg.passes.combine :as pass.comb]
    [fg.passes.geometry :as pass.geom]
-   ;[fg.passes.shadow :as pass.shadow]
+   [fg.passes.shadow :as pass.shadow]
    [fg.state :as state]
   ;;  [fg.ui.core]
   ;;  [minimax.audio.core :as audio]
-   ;[minimax.debug :as debug]
+   [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
    [minimax.logger :as log]
-   ;[minimax.object :as obj]
+   [minimax.object :as obj]
    [minimax.objects.camera :as camera]
-   ;[minimax.objects.light :as light]
-   ;[minimax.objects.scene :as scene]
+   [minimax.objects.light :as light]
+   [minimax.objects.scene :as scene]
    [minimax.passes :as passes]
    [minimax.pool.core :as pool]
    [minimax.renderer.view :as view]
-   ;[minimax.renderer.ui :as ui]
-   )
+   [minimax.renderer.ui :as ui])
   (:import
    (java.util.function Consumer)
    (org.joml Matrix4f Vector3f)
@@ -225,6 +224,7 @@
     ;; (ui/render @state/state render-ui) ;; ui pass
 
     ;(pass.comb/render) ;; render combine pass
+    (pass.comb/render-test) ;; render combine pass test
     )) 
 
 ;; (def fb-size (volatile! nil))

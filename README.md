@@ -1,3 +1,17 @@
+# minimax - Win/Linux check branch
+
+## How to run checks
+
+```bash
+nu ./scripts/start.nu check.empty
+nu ./scripts/start.nu check.empty2
+nu ./scripts/start.nu check.test1
+```
+
+-----
+
+(Original README)
+
 <img src="logo.png" width="88" />
 
 Minimalist 3D game engine in Clojure
