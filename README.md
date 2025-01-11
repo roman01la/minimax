@@ -25,13 +25,12 @@ nu ./scripts/start.nu
 
 - [x] empty
 - [x] triangle (2d)
-- [ ] sound
 
 ### fg.core
 
 - [x] Build passing
 - [x] Run through
-- [ ] Sound
+- [x] Sound
 - [x] Model loading (-> probably working)
 - [ ] Rendering compatibility
   - [x] Shadow
