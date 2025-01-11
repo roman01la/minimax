@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 mkdir -p resources/shaders_out
-rm -f resources/shaders_out/*
+rm -rf resources/shaders_out/*
 
 for file in resources/shaders/vs_*
 do
@@ -18,4 +18,38 @@ do
   shaderc -f $file \
           -o "resources/shaders_out/$(basename $file .sc).bin" \
           --type fragment --platform osx --profile metal -O 3
+done
+
+# check_2d
+mkdir -p resources/shaders_out/check_2d
+for file in resources/shaders/check_2d/fs_*
+do
+  shaderc -f $file \
+          -i resources/shaders \
+          -o "resources/shaders_out/check_2d/$(basename $file .sc).bin" \
+          --type fragment --platform osx --profile metal -O 3
+done
+for file in resources/shaders/check_2d/vs_*
+do
+  shaderc -f $file \
+          -i resources/shaders \
+          -o "resources/shaders_out/check_2d/$(basename $file .sc).bin" \
+          --type vertex --platform osx --profile metal -O 3
+done
+
+# check_3d
+mkdir -p resources/shaders_out/check_3d
+for file in resources/shaders/check_3d/fs_*
+do
+  shaderc -f $file \
+          -i resources/shaders \
+          -o "resources/shaders_out/check_3d/$(basename $file .sc).bin" \
+          --type fragment --platform osx --profile metal -O 3
+done
+for file in resources/shaders/check_3d/vs_*
+do
+  shaderc -f $file \
+          -i resources/shaders \
+          -o "resources/shaders_out/check_3d/$(basename $file .sc).bin" \
+          --type vertex --platform osx --profile metal -O 3
 done
