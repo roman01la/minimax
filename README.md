@@ -10,6 +10,7 @@ nu ./scripts/start.nu check.empty
 nu ./scripts/start.nu check.empty2
 nu ./scripts/start.nu check.test1
 nu ./scripts/start.nu check.triangle_2d
+nu ./scripts/start.nu
 ```
 
 -----
