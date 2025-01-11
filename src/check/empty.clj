@@ -1,4 +1,4 @@
-(ns fg.empty
+(ns check.empty
   (:require
   ;;  [bgfx.core :as bgfx]
    [fg.clock :as clock]

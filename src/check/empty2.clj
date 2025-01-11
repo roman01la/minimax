@@ -1,4 +1,4 @@
-(ns fg.test1
+(ns check.empty2
   (:require
    [bgfx.core :as bgfx]
    [fg.clock :as clock]
@@ -224,7 +224,6 @@
     ;; (ui/render @state/state render-ui) ;; ui pass
 
     ;(pass.comb/render) ;; render combine pass
-    (pass.comb/render-test) ;; render combine pass
     )) 
 
 ;; (def fb-size (volatile! nil))
