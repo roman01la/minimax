@@ -38,7 +38,14 @@ nu ./scripts/start.nu
   - [x] Background
   - [ ] Cloud
   - [ ] Castle
-  - [x] Stones  
+  - [x] Stones
+
+### Platforms
+
+- [x] Windows / DX11
+- [x] macOS / Metal 
+- [x] Linux / Vulkan (Ubuntu)
+- [ ] Linux / OpenGL (Currently disabling for shader compatibility, such as phong shading)
 
 ### Current working screenshot for Windows (DX11)
 
