@@ -126,9 +126,9 @@
 (def basic-2d-shader
   (sd/load-program-once "check_2d/fs_basic2d" "check_2d/vs_basic2d"))
 
-(println "basic-2d-shader : " basic-2d-shader)
-(println "basic-2d-shader fsh: " (.f-shader basic-2d-shader))
-(println "basic-2d-shader vsh: " (.v-shader basic-2d-shader))
+;(println "basic-2d-shader : " basic-2d-shader)
+;(println "basic-2d-shader fsh: " (.f-shader basic-2d-shader))
+;(println "basic-2d-shader vsh: " (.v-shader basic-2d-shader))
 (println "basic-2d-shader program: " (.handle basic-2d-shader))
 
 ;; (ui/init)
@@ -176,7 +176,8 @@
                                 1.0
                                 0)
       (BGFX/bgfx_touch 0) 
-      (render-encoder))))
+      (render-encoder)
+      )))
 
 (def fb-size (volatile! nil))
 
