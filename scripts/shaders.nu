@@ -1,5 +1,12 @@
 #!/usr/bin/env nu
 
+# check if shaderc exists
+if (command -v shaderc | complete).exit_code != 0  {
+    print -e -n "[Error] shaderc is not installed."
+    print -e -n "        Please install shaderc from bgfx-tools."
+    exit 1
+}
+
 mkdir resources/shaders_out
 rm -rf resources/shaders_out/*
 
