@@ -70,7 +70,7 @@
     :height (:height @state/state)
     :title "minimax"}))
 
-;(state/set-size (glfw/detect-dpr))
+(state/set-size (glfw/detect-dpr))
 
 (def reset-flags
   BGFX/BGFX_RESET_VSYNC)
