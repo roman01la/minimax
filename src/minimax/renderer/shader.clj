@@ -19,7 +19,7 @@
    (cond
      (= r BGFX/BGFX_RENDERER_TYPE_DIRECT3D11) "dx11/"
      (= r BGFX/BGFX_RENDERER_TYPE_DIRECT3D12) "dx11/"
-     (= r BGFX/BGFX_RENDERER_TYPE_OPENGL) "glsl/"
+    ;;  (= r BGFX/BGFX_RENDERER_TYPE_OPENGL) "glsl/" ; WORKAROUND: OpenGL shaders are not working now
      (= r BGFX/BGFX_RENDERER_TYPE_METAL) "metal/"
      (= r BGFX/BGFX_RENDERER_TYPE_VULKAN) "spirv/"
      :else (throw (Exception. (str "No shaders supported for " (bgfx/get-renderer-name r) " renderer"))))))
