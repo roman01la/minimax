@@ -1,5 +1,7 @@
 # minimax - Win/Linux check branch
 
+Minimalist 3D game engine in Clojure (This fork is for Win/Linux compatibility check)
+
 ## How to run checks
 
 ```bash
@@ -11,6 +13,32 @@ nu ./scripts/start.nu check.empty2
 nu ./scripts/start.nu check.triangle_2d
 nu ./scripts/start.nu
 ```
+
+## Status
+
+### LWJGL Version
+
+- [x] Upgrade to LWJGL 3.3.3 (NOTE: 3.3.4 - 3.3.5 has known compatibility issues)
+- [ ] Check compatibility with LWJGL 3.3.6
+
+### basic checks (prerequisites)
+
+- [x] empty
+- [x] triangle (2d)
+- [ ] sound
+
+### fg.core
+
+- [x] Build passing
+- [x] Run through
+- [ ] Sound
+- [x] Model loading (-> probably working)
+- [ ] Rendering compatibility
+  - [x] Shadow
+  - [x] Background
+  - [ ] Cloud
+  - [ ] Castle
+  - [x] Stones  
 
 -----
 
