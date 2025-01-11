@@ -52,7 +52,9 @@ elif [ "$PLATFORM" == "linux" ]; then
   NEED_METAL=0
   NEED_DX11=0
   NEED_SPIRV=1
-  NEED_GLSL=1
+  #NEED_GLSL=1
+  NEED_GLSL=0 # WORKAROUND
+  echo "GLSL is currently disabled for shader compatibility issues"
 else
   echo "Unknown platform: $PLATFORM"
   exit 1

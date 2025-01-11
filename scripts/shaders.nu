@@ -142,10 +142,12 @@ let NEED_SPIRV = match ($PLATFORM) {
     _ => false
 }
 
-let NEED_GLSL = match ($PLATFORM) {
-    "linux" => true
-    _ => false
-}
+# let NEED_GLSL = match ($PLATFORM) {
+#     "linux" => true
+#     _ => false
+# }
+let NEED_GLSL = false # WORKAROUND
+print $"GLSL is currently disabled for shader compatibility issues"
 
 def print_cmd [...args] {
     let joined = $args | str join " "
