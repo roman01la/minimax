@@ -40,6 +40,15 @@ nu ./scripts/start.nu
   - [ ] Castle
   - [x] Stones  
 
+### Current working screenshot for Windows (DX11)
+
+![SnapCrab_minimax_2025-1-11_16-50-42_No-00](https://github.com/user-attachments/assets/643ae46f-d71c-4a61-8858-760e9774f5bc)
+
+### Current working screenshot for Linux/Ubuntu (Vulkan)
+
+![SnapCrab_minimax (Ubuntu)_2025-1-11_16-51-24_No-00](https://github.com/user-attachments/assets/edf5f2dc-69bb-404c-a7e5-468b5701b901)
+
+
 -----
 
 (Original README)
