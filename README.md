@@ -1,5 +1,7 @@
 # [minimax](https://github.com/roman01la/minimax) - Win/Linux check branch
 
+***NOTE: currently stopping further investigation***
+
 Minimalist 3D game engine in Clojure (This fork is for Win/Linux compatibility check)
 
 ## How to run checks
