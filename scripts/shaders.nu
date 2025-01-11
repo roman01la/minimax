@@ -208,7 +208,7 @@ def compile_all_in_dir [pattern type] {
 }
 
 mkdir resources/shaders_out
-rm -rf resources/shaders_out/*
+# rm -rf resources/shaders_out/*
 
 compile_all_in_dir "resources/shaders/vs_*" "vertex"
 compile_all_in_dir "resources/shaders/fs_*" "fragment"

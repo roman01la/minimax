@@ -11,7 +11,7 @@ set -e
 set -o pipefail
 
 mkdir -p resources/shaders_out
-rm -rf resources/shaders_out/*
+# rm -rf resources/shaders_out/*
 
 METAL_DIR_NAME="metal"
 DX11_DIR_NAME="dx11"
