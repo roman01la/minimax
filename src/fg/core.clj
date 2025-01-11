@@ -235,6 +235,8 @@
     (clock/step)
     (run)
     (vreset! curr-frame (bgfx/frame)))
+    ;(vswap! curr-frame inc)
+    ;(BGFX/bgfx_frame false))
 
   ;; Disposing the program
   (pool/destroy-all)

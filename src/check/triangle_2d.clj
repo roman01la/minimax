@@ -1,15 +1,13 @@
-(ns fg.empty
+(ns check.triangle_2d
   (:require
-  ;;  [bgfx.core :as bgfx]
+   [check.check-util :as util]
    [fg.clock :as clock]
    [fg.dev]
-   [fg.listeners :as listeners]
+   [fg.shader :as sd]
    [fg.state :as state]
-   [fg.ui.core]
-  ;;  [minimax.debug :as debug]
+   [fg.ui.core] ;;  [minimax.debug :as debug]
    [minimax.glfw.core :as glfw]
-   [minimax.logger :as log]
-  ;;  [minimax.passes :as passes]
+   [minimax.logger :as log] ;;  [minimax.passes :as passes]
    [minimax.pool.core :as pool])
   ;;  [minimax.renderer.view :as view])
   (:import
@@ -18,7 +16,8 @@
     BGFX
     BGFXInit
     BGFXPlatform
-    BGFXResolution)
+    BGFXResolution
+    BGFXVertexLayout)
    (org.lwjgl.glfw
     GLFW
     GLFWErrorCallback
@@ -102,6 +101,39 @@
 
 (log/debug (str "bgfx renderer: " (BGFX/bgfx_get_renderer_name (BGFX/bgfx_get_renderer_type))))
 
+(def triangle-vertices
+  [[-0.5 -0.5 0x339933FF]
+   [0.5 -0.5 0x993333FF]
+   [0.0 0.5 0x333399FF]])
+
+(def triangle-indices
+  [0 1 2])
+
+(def vertex-layout (util/create-vertex-layout-2d false true 0))
+
+(def vertex-buffer-mem
+  (util/memAlloc (util/byte-size-of :xyc 3)))
+
+(def vertex-buffer
+  (util/create-vertex-buffer vertex-buffer-mem vertex-layout triangle-vertices))
+
+(def index-buffer-mem
+  (util/memAlloc (* (count triangle-indices) 2)))
+
+(def index-buffer
+  (util/create-index-buffer index-buffer-mem triangle-indices))
+
+(def basic-2d-shader
+  (sd/load-program-once "fs_basic2d" "vs_basic2d"))
+
+(println "vertex-buffer : " vertex-buffer)
+(println "index-buffer : " index-buffer)
+
+;(println "basic-2d-shader : " basic-2d-shader)
+;(println "basic-2d-shader fsh: " (.f-shader basic-2d-shader))
+;(println "basic-2d-shader vsh: " (.v-shader basic-2d-shader))
+(println "basic-2d-shader program: " (.handle basic-2d-shader))
+
 ;; (ui/init)
 ;; (audio/init)
 
@@ -111,6 +143,17 @@
 
 ;; Rendering loop
 (def curr-frame (volatile! 0))
+
+(defn render-encoder []
+  (let [encoder (BGFX/bgfx_encoder_begin false)]
+    (BGFX/bgfx_encoder_set_vertex_buffer encoder 0 vertex-buffer 0 3)
+    (BGFX/bgfx_encoder_set_index_buffer encoder index-buffer 0 3)
+    (BGFX/bgfx_encoder_set_state encoder
+                                 (bit-or BGFX/BGFX_STATE_WRITE_RGB
+                                         BGFX/BGFX_STATE_WRITE_A)
+                                 0)
+    (BGFX/bgfx_encoder_submit encoder 0 (.handle basic-2d-shader) 0 0)
+    (BGFX/bgfx_encoder_end encoder)))
 
 (defn run []
   (let [dt (clock/dt)
@@ -130,10 +173,14 @@
       (BGFX/bgfx_set_view_rect 0 0 0 v-width v-height)
       (BGFX/bgfx_set_view_clear 0 (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 
                                 ;; 0x303030ff
-                                0x37eb34ff
+                                ; semi green
+                                ;; 0x37eb34ff
+                                (util/uint32 0xffa8deff)
                                 1.0
                                 0)
-      (BGFX/bgfx_touch 0))))
+      (BGFX/bgfx_touch 0) 
+      (render-encoder)
+      )))
 
 (def fb-size (volatile! nil))
 
@@ -155,6 +202,14 @@
                 (not= fbh vheight))
         (on-resize fbw fbh)))))
 
+(defn cleanup []
+  (BGFX/bgfx_destroy_program (.handle basic-2d-shader))
+  (BGFX/bgfx_destroy_vertex_buffer vertex-buffer)
+  (BGFX/bgfx_destroy_index_buffer index-buffer)
+  (util/memFree vertex-buffer-mem)
+  (util/memFree index-buffer-mem)
+  (.free vertex-layout))
+
 (defn -main [& args]
   ;; start file watcher
   ;; (fg.dev/start)
@@ -173,6 +228,7 @@
     (vswap! curr-frame inc)
     (BGFX/bgfx_frame false))
 
+  (cleanup)
   ;; Disposing the program
   (pool/destroy-all)
   ;; (ui/shutdown)

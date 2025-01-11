@@ -1,3 +1,21 @@
+# minimax - Win/Linux check branch
+
+## How to run checks
+
+```bash
+# compile shader first if you need, but most of them are already compiled (included)
+# nu ./scripts/shaders.nu
+
+nu ./scripts/start.nu check.empty
+nu ./scripts/start.nu check.empty2
+nu ./scripts/start.nu check.test1
+nu ./scripts/start.nu check.triangle_2d
+```
+
+-----
+
+(Original README)
+
 <img src="logo.png" width="88" />
 
 Minimalist 3D game engine in Clojure

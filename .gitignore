@@ -4,5 +4,5 @@
 .nrepl-port
 *.iml
 *.log
-resources/shaders_out/
+#resources/shaders_out/
 target
