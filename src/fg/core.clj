@@ -101,7 +101,9 @@
         (.nwh (GLFWNativeWin32/glfwGetWin32Window window))))
 
   (when-not (bgfx/init init)
-    (throw (RuntimeException. "Error initializing bgfx renderer"))))
+    (throw (RuntimeException. "Error initializing bgfx renderer")))
+
+   (BGFX/bgfx_set_debug (bit-or BGFX/BGFX_DEBUG_TEXT BGFX/BGFX_DEBUG_WIREFRAME)) )
 
 (log/debug (str "bgfx renderer: " (bgfx/get-renderer-name (bgfx/get-renderer-type))))
 
