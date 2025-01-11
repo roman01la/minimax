@@ -124,7 +124,7 @@
   (util/create-index-buffer index-buffer-mem triangle-indices))
 
 (def basic-2d-shader
-  (sd/load-program-once "check_2d/fs_basic2d" "check_2d/vs_basic2d"))
+  (sd/load-program-once "fs_basic2d" "vs_basic2d"))
 
 (println "vertex-buffer : " vertex-buffer)
 (println "index-buffer : " index-buffer)
