@@ -126,6 +126,9 @@
 (def basic-2d-shader
   (sd/load-program-once "check_2d/fs_basic2d" "check_2d/vs_basic2d"))
 
+(println "vertex-buffer : " vertex-buffer)
+(println "index-buffer : " index-buffer)
+
 ;(println "basic-2d-shader : " basic-2d-shader)
 ;(println "basic-2d-shader fsh: " (.f-shader basic-2d-shader))
 ;(println "basic-2d-shader vsh: " (.v-shader basic-2d-shader))
@@ -200,7 +203,7 @@
         (on-resize fbw fbh)))))
 
 (defn cleanup []
-  (BGFX/bgfx_destroy_program basic-2d-shader)
+  (BGFX/bgfx_destroy_program (.handle basic-2d-shader))
   (BGFX/bgfx_destroy_vertex_buffer vertex-buffer)
   (BGFX/bgfx_destroy_index_buffer index-buffer)
   (util/memFree vertex-buffer-mem)
