@@ -121,8 +121,9 @@ let _host = sys host | get name | str downcase
 let PLATFORM = match ($_host) {
     "darwin" => "osx"
     "linux" => "linux"
+    "ubuntu" => "linux"
     "windows" => "windows"
-    _ => "windows"
+    _ => "linux" # WORKAROUND
 }
 
 print $"Platform: ($PLATFORM) \(auto detected\)"
