@@ -46,12 +46,10 @@
   (GLFWErrorCallback/createPrint System/err))
 
 ;; (GLFW/glfwSetErrorCallback error-callback)
-;; GLFWErrorCallback.createThrow () .set ();
 (.set (GLFWErrorCallback/createThrow))
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
 
-;; (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
 (when (= (GLFW/glfwGetPlatform) GLFW/GLFW_PLATFORM_COCOA)
   (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_FALSE))
 
@@ -116,18 +114,11 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    ;; (println "run frame" @curr-frame)
+    #_(println "run frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
-      ;; (view/rect passes/geometry 0 0 v-width v-height)
-      ;; (view/clear passes/geometry
-      ;;             (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
-      ;;             (:background-color @state/state)))
-
-      ;; (view/touch passes/geometry)))
       (BGFX/bgfx_set_view_rect 0 0 0 v-width v-height)
       (BGFX/bgfx_set_view_clear 0 (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 
-                                ;; 0x303030ff
                                 0x37eb34ff
                                 1.0
                                 0)
@@ -137,7 +128,7 @@
 
 (defn on-resize [width height]
   (swap! state/state assoc :vwidth width :vheight height)
-  ;; (swap! camera assoc :aspect (/ width height))
+  #_(swap! camera assoc :aspect (/ width height))
   (BGFX/bgfx_reset width height reset-flags BGFX/BGFX_TEXTURE_FORMAT_COUNT))
 
 ;; (listeners/set-listeners window
@@ -155,29 +146,29 @@
 
 (defn -main [& args]
   ;; start file watcher
-  ;; (fg.dev/start)
+  #_(fg.dev/start)
 
   ;; TODO: Add sound control UI
-  ;; #_(audio/play :bg)
+  #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
-    ;; (println "main frame" @curr-frame)
+    #_(println "main frame" @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    ;; (maybe-set-size)
+    #_(maybe-set-size)
     (clock/step)
     (run)
-    ;(vreset! curr-frame (bgfx/frame)))
+    #_(vreset! curr-frame (bgfx/frame))
     (vswap! curr-frame inc)
     (BGFX/bgfx_frame false))
 
   ;; Disposing the program
   (pool/destroy-all)
-  ;; (ui/shutdown)
-  ;; (audio/shutdown)
+  #_(ui/shutdown)
+  #_(audio/shutdown)
   (BGFX/bgfx_shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
-  (.free (GLFW/glfwSetErrorCallback nil)))
+  (.free (GLFW/glfwSetErrorCallback nil))
   ;; Stop file watcher
-  ;; (fg.dev/stop))
+  #_(fg.dev/stop))
