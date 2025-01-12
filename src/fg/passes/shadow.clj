@@ -6,24 +6,71 @@
    [minimax.objects.camera :as camera]
    [minimax.passes :as passes]
    [minimax.renderer.frame-buffer :as fb]
+   [minimax.renderer.texture :as t]
    [minimax.renderer.view :as view])
   (:import (org.joml Matrix4f Vector3f)
            (org.lwjgl.bgfx BGFX)))
 
-(def render-state
-  (bit-or
-   0
-   BGFX/BGFX_STATE_WRITE_Z
-   BGFX/BGFX_STATE_DEPTH_TEST_LESS
-   BGFX/BGFX_STATE_CULL_CW))
+; cache value if once calculated
+(defn- use-shadow-sampler-impl []
+  (let [caps (bgfx/get-caps)
+        sup (not= (bit-and BGFX/BGFX_CAPS_TEXTURE_COMPARE_LEQUAL
+                           (.supported caps))
+            0)]
+    (when sup
+      (println "using shadow sampler"))
+    (when (not sup)
+      (println "not using shadow sampler, use shadow_pd instead"))
+      sup))
 
-(defn create-shadow-map-fb [shadow-size]
+(def -use-shadow-sampler-val (atom nil))
+(defn use-shadow-sampler? []
+  (or @-use-shadow-sampler-val
+  (reset! -use-shadow-sampler-val (use-shadow-sampler-impl))))
+
+(def render-state
+  (delay
+    (if (use-shadow-sampler?)
+      (bit-or
+      0
+      BGFX/BGFX_STATE_WRITE_Z
+      BGFX/BGFX_STATE_DEPTH_TEST_LESS
+      BGFX/BGFX_STATE_CULL_CW)
+      (bit-or
+      0
+      BGFX/BGFX_STATE_WRITE_RGB
+      BGFX/BGFX_STATE_WRITE_A
+      BGFX/BGFX_STATE_WRITE_Z
+      BGFX/BGFX_STATE_DEPTH_TEST_LESS
+      BGFX/BGFX_STATE_CULL_CW))))
+
+(defn create-shadow-map-fb-for-sampler [shadow-size]
   (fb/create
    {:width shadow-size
     :height shadow-size
     :format BGFX/BGFX_TEXTURE_FORMAT_D24
     :flags (bit-or BGFX/BGFX_TEXTURE_RT
                    BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
+
+(defn create-shadow-map-fb-for-non-sampler [shadow-size]
+  (let [width shadow-size
+        height shadow-size
+        texture-color (t/create-2d
+                       {:width width
+                        :height height
+                        :format BGFX/BGFX_TEXTURE_FORMAT_RGBA8
+                        :flags BGFX/BGFX_TEXTURE_RT})
+        texture-depth (t/create-2d
+                       {:width width
+                        :height height
+                        :format BGFX/BGFX_TEXTURE_FORMAT_D24
+                        :flags BGFX/BGFX_TEXTURE_RT_WRITE_ONLY})]
+    (fb/create-from-textures [texture-color texture-depth] true)))
+
+(defn create-shadow-map-fb [shadow-size]
+  (if (use-shadow-sampler?)
+    (create-shadow-map-fb-for-sampler shadow-size)
+    (create-shadow-map-fb-for-non-sampler shadow-size)))
 
 (def shadow-map-fb
   ;; TODO: Maybe make it dependant on `:shadow-map-size` if the value is dynamic

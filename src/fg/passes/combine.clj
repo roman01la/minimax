@@ -38,7 +38,8 @@
     (bgfx/set-state
      (bit-or 0
              BGFX/BGFX_STATE_WRITE_RGB
-             BGFX/BGFX_STATE_WRITE_A))
+             BGFX/BGFX_STATE_WRITE_A
+             #_BGFX/BGFX_STATE_DEPTH_TEST_LESS))
     (obj/render screen-camera (:id passes/combine))
 
     (u/set-texture @u-tex-ui ui/texture 0)

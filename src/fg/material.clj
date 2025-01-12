@@ -57,7 +57,10 @@
   (sd/load-program "fs_geometry" "vs_geometry"))
 
 (def shadow-shader
-  (sd/load-program "fs_shadow" "vs_shadow"))
+  (delay 
+    (if (pass.shadow/use-shadow-sampler?)
+      (sd/load-program "fs_shadow" "vs_shadow")
+      (sd/load-program "fs_shadow_pd" "vs_shadow_pd"))))
 
 (def line-shader
   (sd/load-program "fs_line" "vs_line"))
@@ -106,7 +109,7 @@
       :shadow pass.shadow/shadow-map-texture
       :texture texture
       :shader @diffuse-shader
-      :shadow-shader @shadow-shader
+      :shadow-shader @@shadow-shader
       :uniforms {:color @u-color
                  :texture @u-tex-diffuse
                  :shadow @u-shadow

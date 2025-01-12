@@ -13,13 +13,14 @@
   (:import (org.lwjgl.bgfx BGFX)))
 
 (def render-state
-  (bit-or
-   0
-   BGFX/BGFX_STATE_WRITE_RGB
-   BGFX/BGFX_STATE_WRITE_A
-   BGFX/BGFX_STATE_WRITE_Z
-   BGFX/BGFX_STATE_DEPTH_TEST_LESS
-   BGFX/BGFX_STATE_CULL_CW))
+  (delay 
+    (bit-or
+    0
+    BGFX/BGFX_STATE_WRITE_RGB
+    BGFX/BGFX_STATE_WRITE_A
+    BGFX/BGFX_STATE_WRITE_Z
+    BGFX/BGFX_STATE_DEPTH_TEST_LESS
+    BGFX/BGFX_STATE_CULL_CW)))
 
 (defn create-geometry-fb [v-width v-height]
   (let [flags (bit-or
