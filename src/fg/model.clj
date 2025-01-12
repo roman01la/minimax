@@ -60,24 +60,6 @@
 (defn create-scene-graph [^AIScene scene materials]
   (create-scene-graph* (.mMeshes scene) materials (.mRootNode scene)))
 
-;; (defn load-model [^String path]
-;;   (let [flags (bit-or Assimp/aiProcess_Triangulate
-;;                       Assimp/aiProcess_JoinIdenticalVertices
-;;                       #_Assimp/aiProcess_FlipWindingOrder
-;;                       Assimp/aiProcess_FlipUVs
-;;                       Assimp/aiProcess_MakeLeftHanded
-;;                       Assimp/aiProcess_GenBoundingBoxes
-;;                       #_Assimp/aiProcess_OptimizeGraph
-;;                       Assimp/aiProcess_OptimizeMeshes)
-;;         scene (-> (.getPath (io/resource path))
-;;                   (Assimp/aiImportFile flags))
-;;         textures (t/scene->textures scene)
-;;         materials (mat/create-materials scene textures)
-;;         graph (create-scene-graph scene materials)]
-;;     {:path path
-;;      :materials materials
-;;      :scene graph}))
-
 (defn- normalize-resource-path [path]
   (-> (io/resource path)
       (.toURI)
@@ -88,7 +70,7 @@
 (defn load-model [^String path]
   (let [flags (bit-or Assimp/aiProcess_Triangulate
                       Assimp/aiProcess_JoinIdenticalVertices
-;;                    #_Assimp/aiProcess_FlipWindingOrder
+                      #_Assimp/aiProcess_FlipWindingOrder
                       Assimp/aiProcess_FlipUVs
                       Assimp/aiProcess_MakeLeftHanded
                       Assimp/aiProcess_GenBoundingBoxes
@@ -102,18 +84,6 @@
     (let [textures (t/scene->textures scene)
           materials (mat/create-materials scene textures)
           graph (create-scene-graph scene materials)]
-      ;; (println "Loaded model: " path)
-      ;; (println "  Materials: " (count materials))
-      ; for each materials, print uniforms color
-      ;; (doseq [m materials]
-      ;;   (println "    Color: " (:diffuse m)))
-      ; :diffuse is Vector4f, as test, make all red
-      ;; (doseq [m materials]
-      ;;   ;(update m :diffuse (fn [v] (Vector4f. 1.0 0.0 0.0 1.0))))
-      ;;   (set! (.x (:diffuse m)) 1.0)
-      ;;   (set! (.y (:diffuse m)) 0.0)
-      ;;   (set! (.z (:diffuse m)) 0.0)
-      ;;   (set! (.w (:diffuse m)) 1.0))
       {:path path
        :materials materials
        :scene graph})))
