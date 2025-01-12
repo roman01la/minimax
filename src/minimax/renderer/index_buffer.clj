@@ -22,10 +22,21 @@
         (.add ret (.get dst)))
       ret)))
 
+(defn- unsigned-short [x]
+  (cond
+    (> x 65535)
+      (throw (IllegalArgumentException. "Too large for unsigned short"))
+    (> x 32767)
+     ; make negative
+      (short (- x 65536))
+    :else
+      (short x)))
+
 (defn- create* [^ArrayList indices]
   (let [mem ^ByteBuffer (mem/alloc :byte (* 2 (.size indices)))]
     (doseq [idx indices]
-      (.putShort mem (short idx)))
+      ;(.putShort mem (short idx)))
+      (.putShort mem (unsigned-short idx)))
     (assert (zero? (.remaining mem)) "ByteBuffer size and number of arguments do not match")
     (.flip mem)
     (bgfx/create-index-buffer (bgfx/make-ref-release mem))))
