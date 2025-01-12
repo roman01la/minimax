@@ -159,22 +159,11 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    ;bgfx_set_view_rect(0, 0, 0, width, height);
-    ;bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
     ;; (println "run frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
-      ;; (view/rect passes/geometry 0 0 v-width v-height)
-      ;; (view/clear passes/geometry
-      ;;             (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
-      ;;             (:background-color @state/state)))
-
-      ;; (view/touch passes/geometry)))
       (BGFX/bgfx_set_view_rect 0 0 0 v-width v-height)
       (BGFX/bgfx_set_view_clear 0 (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH) 
-                                ;; 0x303030ff
-                                ; semi green
-                                ;; 0x37eb34ff
                                 (util/uint32 0xffa8deff)
                                 1.0
                                 0)

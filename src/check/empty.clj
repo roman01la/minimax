@@ -116,8 +116,6 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    ;bgfx_set_view_rect(0, 0, 0, width, height);
-    ;bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
     ;; (println "run frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
