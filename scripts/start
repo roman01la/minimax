@@ -1,6 +1,11 @@
 #!/bin/bash
 
+CLASS_NAME=$1
+if [ -z "$CLASS_NAME" ]; then
+    CLASS_NAME=fg.core
+fi
+
 set -e
 set -o pipefail
 
-MINIMAX_DEBUG=1 clojure -J-Djava.awt.headless=true -J-Dorg.lwjgl.util.Debug=true -M -m fg.core
+MINIMAX_DEBUG=1 clojure -J-Djava.awt.headless=true -J-Dorg.lwjgl.util.Debug=true -M -m $CLASS_NAME

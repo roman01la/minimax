@@ -10,11 +10,11 @@ Minimalist 3D game engine in Clojure
 
 ## How to run
 
-_Tested only on Apple Silicon system_
+_Tested on Mac (Metal) / Windows (DX11) / Linux (Vulkan). Note that **not supporting OpenGL** currently for shader function compatibility._
 
 - Make sure to replace [native packages in deps](https://github.com/roman01la/minimax/blob/main/deps.edn#L15-L23) with the ones matching your platform
-- Compile shaders `./scripts/shaders` (shaders code might need changes depending on rendering backend choosen on your platform)
-- Run the sample project `./scripts/start`
+- Compile shaders `./scripts/shaders` (or `nu ./scripts/shaders.nu`) (shaders code might need changes depending on rendering backend choosen on your platform)
+- Run the sample project `./scripts/start` (or `nu ./scripts/start.nu`)
 
 ## Features
 

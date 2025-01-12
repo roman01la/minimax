@@ -1,21 +1,117 @@
 #!/bin/bash
 
+# check if shaderc exists
+if ! [ -x "$(command -v shaderc)" ]; then
+    echo "[Error] shaderc is not installed." >&2
+    echo "        Please install shaderc from bgfx-tools." >&2
+    exit 1
+fi
+
 set -e
 set -o pipefail
 
 mkdir -p resources/shaders_out
-rm -f resources/shaders_out/*
+# rm -rf resources/shaders_out/*
 
-for file in resources/shaders/vs_*
-do
-  shaderc -f $file \
-          -o "resources/shaders_out/$(basename $file .sc).bin" \
-          --type vertex --platform osx --profile metal -O 3
-done
+METAL_DIR_NAME="metal"
+DX11_DIR_NAME="dx11"
+SPIRV_DIR_NAME="spirv"
+GLSL_DIR_NAME="glsl"
 
-for file in resources/shaders/fs_*
-do
-  shaderc -f $file \
-          -o "resources/shaders_out/$(basename $file .sc).bin" \
-          --type fragment --platform osx --profile metal -O 3
-done
+METAL_FLAGS="--platform osx --profile metal -O 3"
+DX11_FLAGS="--platform windows -p s_5_0 -O 3 --disasm"
+SPIRV_FLAGS="--platform linux -p spirv --disasm"
+GLSL_FLAGS="--platform linux -p 120 --disasm"
+
+if [ -z "$PLATFORM" ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        PLATFORM=osx
+    elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+        PLATFORM=linux
+    elif [[ "$OSTYPE" == "msys" ]]; then
+        PLATFORM=windows
+    else
+        PLATFORM=windows # WORKAROUND
+    fi
+    echo "Platform: $PLATFORM (auto detected)"
+else
+    echo "Platform: $PLATFORM (specified by env)"
+fi
+
+if [ "$PLATFORM" == "osx" ]; then
+  NEED_METAL=1
+  NEED_DX11=0
+  NEED_SPIRV=0
+  NEED_GLSL=0
+elif [ "$PLATFORM" == "windows" ]; then
+  NEED_METAL=0
+  NEED_DX11=1
+  NEED_SPIRV=0
+  NEED_GLSL=0
+elif [ "$PLATFORM" == "linux" ]; then
+  NEED_METAL=0
+  NEED_DX11=0
+  NEED_SPIRV=1
+  #NEED_GLSL=1
+  NEED_GLSL=0 # WORKAROUND
+  echo "GLSL is currently disabled for shader compatibility issues"
+else
+  echo "Unknown platform: $PLATFORM"
+  exit 1
+fi
+
+function run_cmd {
+  echo "shaderc $@"
+  shaderc $@
+}
+
+function compile_shader {
+  file=$1
+  dir=$2
+  type=$3
+  run_cmd -f $file \
+          -i resources/shaders \
+          -o "resources/shaders_out/$2$(basename $file .sc).bin" \
+          --type $type $FLAGS 
+}
+
+function compile_all {
+  if [ $NEED_METAL -eq 1 ]; then
+    echo "## Compiling $1 for Metal"
+    mkdir -p resources/shaders_out/$METAL_DIR_NAME
+    FLAGS=$METAL_FLAGS
+    compile_shader $1 $METAL_DIR_NAME/ $2
+  fi
+  if [ $NEED_DX11 -eq 1 ]; then
+    echo "## Compiling $1 for DX11"
+    mkdir -p resources/shaders_out/$DX11_DIR_NAME
+    FLAGS=$DX11_FLAGS
+    compile_shader $1 $DX11_DIR_NAME/ $2
+  fi
+  if [ $NEED_SPIRV -eq 1 ]; then
+    echo "## Compiling $1 for SPIRV"
+    mkdir -p resources/shaders_out/$SPIRV_DIR_NAME
+    FLAGS=$SPIRV_FLAGS
+    compile_shader $1 $SPIRV_DIR_NAME/ $2
+  fi
+  if [ $NEED_GLSL -eq 1 ]; then
+    echo "## Compiling $1 for GLSL"
+    mkdir -p resources/shaders_out/$GLSL_DIR_NAME
+    FLAGS=$GLSL_FLAGS
+    compile_shader $1 $GLSL_DIR_NAME/ $2
+  fi
+}
+
+function compile_all_in_dir {
+  for file in $1
+  do
+    compile_all $file $2
+  done
+}
+
+compile_all_in_dir "resources/shaders/vs_*" vertex
+compile_all_in_dir "resources/shaders/fs_*" fragment
+compile_all_in_dir "resources/shaders/check_2d/vs_*" vertex
+compile_all_in_dir "resources/shaders/check_2d/fs_*" fragment
+compile_all_in_dir "resources/shaders/shadow_pd/fs_*" fragment
+compile_all_in_dir "resources/shaders/shadow_pd/vs_*" vertex

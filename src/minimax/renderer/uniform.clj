@@ -12,7 +12,7 @@
 
 (deftype Uniform [name uniform type]
   IUniform
-  (set-value [this value]
+  (set-value [^Uniform this value]
     (mem/slet [buff [:float (condp = type
                               BGFX/BGFX_UNIFORM_TYPE_VEC4 4
                               BGFX/BGFX_UNIFORM_TYPE_MAT4 16

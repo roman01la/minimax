@@ -19,11 +19,17 @@ vec2(0.19984126, 0.78641367),
 vec2(0.14383161, -0.14100790)
 };
 
+// int imod(int x, int y)
+// {
+//     return x - y * (x / y);
+// }
+
 float pcfShadow(vec3 view, Sampler shadow_map, vec3 texCoord, float spread, float bias)
 {
     float visibility = 1.0;
     for (int idx = 0; idx < 16; idx++) {
         int index = int(16 * random(floor(view * 1000.0), idx)) % 16;
+        //int index = imod(int(16 * random(floor(view * 1000.0), idx)), 16);
         float depth = shadow2D(shadow_map, vec3(texCoord.xy + (poissonDisk[index] / spread), texCoord.z - bias));
         visibility -= 0.05 * (1.0 - depth);
     }

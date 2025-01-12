@@ -34,8 +34,8 @@
     (let [state (or
                  state
                  (condp contains? id
-                   #{(:id passes/shadow)} pass.shadow/render-state
-                   #{(:id passes/geometry)} pass.geom/render-state))]
+                   #{(:id passes/shadow)} @pass.shadow/render-state
+                   #{(:id passes/geometry)} @pass.geom/render-state))]
       (assert state "state should be set")
       (bgfx/set-vertex-buffer 0 vb 0 vc)
       (bgfx/set-index-buffer ib 0 ic)

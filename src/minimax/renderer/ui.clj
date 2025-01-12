@@ -27,7 +27,7 @@
 
 (defn load-font! [vg font-name file]
   (let [data (util.fs/load-resource file)]
-    (when (= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data 1))
+    (when (= -1 (NanoVG/nvgCreateFontMem ^long vg ^CharSequence font-name data true))
       (throw (RuntimeException. (str "Failed to load " font-name " font"))))))
 
 (defn create-frame-buffer [width height]

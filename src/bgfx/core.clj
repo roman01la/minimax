@@ -31,6 +31,9 @@
   ([capture?]
    (BGFX/bgfx_frame capture?)))
 
+(defn set_debug [flags]
+  (BGFX/bgfx_set_debug (int flags)))
+
 (defn get-caps ^BGFXCaps []
   (BGFX/bgfx_get_caps))
 
@@ -69,10 +72,10 @@
   (BGFX/bgfx_destroy_texture handle))
 
 (defn read-texture
-  ([texture-handle dest-buff]
+  ([texture-handle ^java.nio.ByteBuffer dest-buff]
    (read-texture texture-handle dest-buff 0))
-  ([texture-handle dest-buff mip]
-   (BGFX/bgfx_read_texture texture-handle dest-buff mip)))
+  ([texture-handle ^java.nio.ByteBuffer dest-buff mip]
+   (BGFX/bgfx_read_texture (short texture-handle) dest-buff (byte mip))))
 
 (def FRAME_BUFFER_TEXTURE_DEFAULT_FLAGS
   (bit-or BGFX/BGFX_SAMPLER_U_CLAMP BGFX/BGFX_SAMPLER_V_CLAMP))
@@ -186,13 +189,16 @@
 (def release
   (delay (create-release-callback)))
 
-(defn make-ref [mem]
+(defn touch [view-id]
+  (BGFX/bgfx_touch view-id))
+
+(defn make-ref [^java.nio.ByteBuffer mem]
   (BGFX/bgfx_make_ref mem))
 
 (defn make-ref-release
-  ([mem]
+  ([^java.nio.ByteBuffer mem]
    (make-ref-release mem @release))
-  ([mem f]
+  ([^java.nio.ByteBuffer mem f]
    (BGFX/bgfx_make_ref_release mem ^BGFXReleaseFunctionCallbackI f (long 0))))
 
 (defn blit
