@@ -61,7 +61,7 @@
 ;(.set (GLFWErrorCallback/createThrow))
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
-;; (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
+
 (when (= (GLFW/glfwGetPlatform) GLFW/GLFW_PLATFORM_COCOA)
   (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_FALSE))
 
@@ -160,8 +160,7 @@
         z (-> (Math/cos (/ t 10))
               (/ 100))
         v-width (:vwidth @state/state)
-        v-height (:vheight @state/state)
-        ]
+        v-height (:vheight @state/state)]
 
     ;; (obj/rotate-y cloud-1-obj (* dt 0.3))
     ;; (obj/set-position-y cloud-1-obj (+ (.y pos1) y))
@@ -199,10 +198,9 @@
      (view/clear passes/shadow
                  (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH)
                  0x37eb34ff 1.0)
-                ;;  (:background-color @state/state))
+                ; (:background-color @state/state))
      
-     (view/touch passes/shadow)
-    ))
+     (view/touch passes/shadow)))
 
 ;; (defn render-ui []
 ;;   (fg.ui.core/test-root @state/state @scene selected-object))
@@ -214,18 +212,17 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    ;; (pass.shadow/setup d-light) ;; setup pass shadow
+    #_(pass.shadow/setup d-light) ;; setup pass shadow
     (pass.geom/setup camera) ;; render pass geometry
 
     (render dt t)
 
-    ;; (obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
-    ;; (obj/render @scene (:id passes/geometry)) ;; fill screen space texture
+    #_(obj/render @scene (:id passes/shadow)) ;; fill shadow map texture
+    #_(obj/render @scene (:id passes/geometry)) ;; fill screen space texture
 
-    ;; (ui/render @state/state render-ui) ;; ui pass
+    #_(ui/render @state/state render-ui) ;; ui pass
 
-    ;(pass.comb/render) ;; render combine pass
-    )) 
+    #_(pass.comb/render))) ;; render combine pass
 
 ;; (def fb-size (volatile! nil))
 
@@ -248,32 +245,30 @@
 ;;         (on-resize fbw fbh)))))
 
 (defn -main [& args]
-  ;; (fg.dev/start)
+  #_(fg.dev/start)
 
   ;; TODO: Add sound control UI
-  ;; #_(audio/play :bg)
+  #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
-    ;(println "Frame begin: " @curr-frame)
+    #_(println "Frame begin: " @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    ;; (maybe-set-size)
+    #_(maybe-set-size)
     (clock/step)
     (run)
-    ;(vreset! curr-frame (bgfx/frame)))
+    #_(vreset! curr-frame (bgfx/frame))
     (vswap! curr-frame inc)
     (BGFX/bgfx_frame false) 
-    ;(println "Frame end: " @curr-frame)
-    )
+    #_(println "Frame end: " @curr-frame))
 
   ;; Disposing the program
   (pool/destroy-all)
-  ;; (ui/shutdown)
-  ;; (audio/shutdown)
+  #_(ui/shutdown)
+  #_(audio/shutdown)
   (bgfx/shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
-  (.free (GLFW/glfwSetErrorCallback nil))
+  (.free (GLFW/glfwSetErrorCallback nil)
   ;; Stop file watcher
-  ;; (fg.dev/stop)
-  )
+  #_(fg.dev/stop)))
