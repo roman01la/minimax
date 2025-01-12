@@ -45,12 +45,10 @@
   (GLFWErrorCallback/createPrint System/err))
 
 ;; (GLFW/glfwSetErrorCallback error-callback)
-;; GLFWErrorCallback.createThrow () .set ();
 (.set (GLFWErrorCallback/createThrow))
 
 (GLFW/glfwWindowHint GLFW/GLFW_CLIENT_API GLFW/GLFW_NO_API)
 
-;; (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_TRUE)
 (when (= (GLFW/glfwGetPlatform) GLFW/GLFW_PLATFORM_COCOA)
   (GLFW/glfwWindowHint GLFW/GLFW_COCOA_RETINA_FRAMEBUFFER GLFW/GLFW_FALSE))
 
@@ -159,7 +157,7 @@
   (let [dt (clock/dt)
         t (clock/time)]
 
-    ;; (println "run frame" @curr-frame)
+    #_(println "run frame" @curr-frame)
     (let [v-width (:vwidth @state/state)
           v-height (:vheight @state/state)]
       (BGFX/bgfx_set_view_rect 0 0 0 v-width v-height)
@@ -168,8 +166,7 @@
                                 1.0
                                 0)
       (BGFX/bgfx_touch 0) 
-      (render-encoder)
-      )))
+      (render-encoder))))
 
 (def fb-size (volatile! nil))
 
@@ -201,30 +198,30 @@
 
 (defn -main [& args]
   ;; start file watcher
-  ;; (fg.dev/start)
+  #_(fg.dev/start)
 
   ;; TODO: Add sound control UI
-  ;; #_(audio/play :bg)
+  #_(audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
-    ;; (println "main frame" @curr-frame)
+    #_(println "main frame" @curr-frame)
     (state/reset-state)
     (GLFW/glfwPollEvents)
-    ;; (maybe-set-size)
+    #_(maybe-set-size)
     (clock/step)
     (run)
-    ;(vreset! curr-frame (bgfx/frame)))
+    #_(vreset! curr-frame (bgfx/frame))
     (vswap! curr-frame inc)
     (BGFX/bgfx_frame false))
 
   (cleanup)
   ;; Disposing the program
   (pool/destroy-all)
-  ;; (ui/shutdown)
-  ;; (audio/shutdown)
+  #_(ui/shutdown)
+  #_(audio/shutdown)
   (BGFX/bgfx_shutdown)
   (glfw/destroy-window)
   (GLFW/glfwTerminate)
-  (.free (GLFW/glfwSetErrorCallback nil)))
+  #_(.free (GLFW/glfwSetErrorCallback nil))
   ;; Stop file watcher
-  ;; (fg.dev/stop))
+  #_(fg.dev/stop))
