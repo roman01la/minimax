@@ -20,7 +20,8 @@
     (when sup
       (println "using shadow sampler"))
     (when (not sup)
-      (println "not using shadow sampler, use shadow_pd instead"))
+      (println "not using shadow sampler, use shadow_pd instead")
+      (println "[WARN] shadow_pd is not tested well"))
       sup))
 
 (def -use-shadow-sampler-val (atom nil))
