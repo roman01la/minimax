@@ -8,14 +8,14 @@ rm -f resources/shaders_out/*
 
 for file in resources/shaders/vs_*
 do
-  shaderc -f $file \
+  ./shaderc -f $file \
           -o "resources/shaders_out/$(basename $file .sc).bin" \
           --type vertex --platform osx --profile metal -O 3
 done
 
 for file in resources/shaders/fs_*
 do
-  shaderc -f $file \
+  ./shaderc -f $file \
           -o "resources/shaders_out/$(basename $file .sc).bin" \
           --type fragment --platform osx --profile metal -O 3
 done

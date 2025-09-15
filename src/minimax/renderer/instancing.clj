@@ -11,7 +11,7 @@
 (def ^:private instance-stride 80)
 
 (defn render [num-instances]
-  (mem/slet [idb BGFXInstanceDataBuffer]
+  (mem/slet [^BGFXInstanceDataBuffer idb BGFXInstanceDataBuffer]
     (let [instances-available (BGFX/bgfx_get_avail_instance_data_buffer num-instances instance-stride)
           _ (BGFX/bgfx_alloc_instance_data_buffer idb num-instances instance-stride)
           data (.data idb)]

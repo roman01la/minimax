@@ -209,8 +209,7 @@
 (defn -main [& args]
   (fg.dev/start)
 
-  ;; TODO: Add sound control UI
-  #_(audio/play :bg)
+  (audio/play :bg)
 
   (while (not (GLFW/glfwWindowShouldClose window))
     (state/reset-state)

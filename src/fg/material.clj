@@ -16,20 +16,19 @@
   (Vector4f. 0.4 0.4 0.4 1.0))
 
 (defn get-material-color [^AIMaterial material ^CharSequence key]
-  (mem/slet [color AIColor4D]
+  (mem/slet [^AIColor4D color AIColor4D]
     (if (zero? (Assimp/aiGetMaterialColor material key Assimp/aiTextureType_NONE 0 ^AIColor4D color))
       (Vector4f. (.r color) (.g color) (.b color) (.a color))
       default-color)))
 
 (defn get-material-texture [^AIMaterial material type textures]
-  (mem/slet [path AIString
-             mapping [:int 1]]
+  (mem/slet [^AIString path AIString
+             ^IntBuffer mapping [:int 1]]
     (let [_ (Assimp/aiGetMaterialTexture
              material
              ^int type
              0
-             ^AIString path
-             ^IntBuffer mapping
+             path mapping
              nil nil nil nil nil)
           filename (.dataString path)]
       (if (= filename "")
