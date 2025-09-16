@@ -3,4 +3,4 @@
 set -e
 set -o pipefail
 
-MINIMAX_DEBUG=1 clojure -J-Djava.awt.headless=true -J-Dorg.lwjgl.util.Debug=true -M -m fg.core
+MINIMAX_DEBUG=1 clojure -J-Djava.awt.headless=true -J-Dorg.lwjgl.util.Debug=true -J--enable-native-access=ALL-UNNAMED -J-XX:+UseZGC -M -m fg.core

@@ -1,4 +1,6 @@
 {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.suskalo/coffi {:mvn/version "1.0.615"}
+        nrepl/nrepl {:mvn/version "1.3.1"}
 
         org.joml/joml {:mvn/version "1.10.5"}
 

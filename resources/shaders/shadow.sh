@@ -34,8 +34,10 @@ float shadow(vec4 shadowcoord, vec3 view, vec3 normal, vec3 light_pos, Sampler s
 {
     // variable bias
     float cosTheta = clamp(dot(normal, normalize(light_pos)),0, 1);
-    float bias = clamp(_bias * tan(acos(cosTheta)), 0, 0.002);
+    float bias = clamp(_bias * tan(acos(cosTheta)), 0, 0.01);
     vec3 texCoord = shadowcoord.xyz / shadowcoord.w;
+
+    texCoord.z = clamp(texCoord.z, 0.0, 1.0);
 
     // clear depth outside of shadow map boundaries
     bool outside = any(greaterThan(texCoord.xy, vec2_splat(0.99))) || any(lessThan(texCoord.xy, vec2_splat(0.01)));

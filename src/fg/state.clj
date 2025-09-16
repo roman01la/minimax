@@ -36,7 +36,7 @@
          :background-color 0xe9fcff
 
          :shadow-map-size 1024
-         :light-pos (Vector3f. -0.4 -1.0 0.6)}))
+         :light-pos (Vector3f. -0.4 -1.5 -1.1)}))
 
 (defn reset-state []
   ;; reset mouse button state to make it singular

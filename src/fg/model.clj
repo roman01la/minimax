@@ -55,11 +55,9 @@
 (defn load-model [^String path]
   (let [flags (bit-or Assimp/aiProcess_Triangulate
                       Assimp/aiProcess_JoinIdenticalVertices
-                      #_Assimp/aiProcess_FlipWindingOrder
                       Assimp/aiProcess_FlipUVs
                       Assimp/aiProcess_MakeLeftHanded
                       Assimp/aiProcess_GenBoundingBoxes
-                      #_Assimp/aiProcess_OptimizeGraph
                       Assimp/aiProcess_OptimizeMeshes)
         scene (-> (.getPath (io/resource path))
                   (Assimp/aiImportFile flags))

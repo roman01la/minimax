@@ -1,6 +1,7 @@
 (ns fg.dev
   (:require [clojure.java.io :as io]
-            [minimax.logger :as log])
+            [minimax.logger :as log]
+            [nrepl.server])
   (:import (java.nio.file FileSystems Path StandardWatchEventKinds WatchEvent WatchService)))
 
 (def ^WatchService watch-service
@@ -18,6 +19,8 @@
 (def change-listeners (atom {}))
 
 (defn start []
+  (nrepl.server/start-server :port 7888)
+  (println "nrepl server started on port 7888")
   (reset! watcher
           (doto (Thread.
                  (fn []

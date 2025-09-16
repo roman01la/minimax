@@ -124,6 +124,9 @@
 (def castle-obj
   (obj/find-by-name @scene "castle_root"))
 
+(def ground-obj
+  (obj/find-by-name @scene "ground"))
+
 (def cloud-1-obj
   (obj/find-by-name @scene "cloud_1"))
 

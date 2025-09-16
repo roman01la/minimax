@@ -12,7 +12,6 @@
 
 (def render-state
   (bit-or
-   0
    BGFX/BGFX_STATE_WRITE_Z
    BGFX/BGFX_STATE_DEPTH_TEST_LESS
    BGFX/BGFX_STATE_CULL_CW))
@@ -21,8 +20,12 @@
   (fb/create
    {:width shadow-size
     :height shadow-size
-    :format BGFX/BGFX_TEXTURE_FORMAT_D24
-    :flags (bit-or BGFX/BGFX_TEXTURE_RT
+    :format BGFX/BGFX_TEXTURE_FORMAT_D16
+    :flags (bit-or 0
+                   BGFX/BGFX_TEXTURE_RT
+                   BGFX/BGFX_TEXTURE_RT_WRITE_ONLY
+                   BGFX/BGFX_SAMPLER_POINT
+                   BGFX/BGFX_SAMPLER_UVW_CLAMP
                    BGFX/BGFX_SAMPLER_COMPARE_LEQUAL)}))
 
 (def shadow-map-fb
@@ -35,8 +38,8 @@
 
 (def ortho-camera
   (camera/create-orthographic-camera
-   {:area 6
-    :near -100
+   {:area 4
+    :near 0.1
     :far 10}))
 
 (defn update-ortho-view-projection [id camera eye-vec3 at-vec3]
@@ -44,15 +47,22 @@
   (obj/render camera id))
 
 (def ^Matrix4f shadow-mtx (Matrix4f.))
+(def ^Vector3f dir (Vector3f.))
+(def ^Vector3f eye (Vector3f.))
 
 (defn setup [d-light]
-  (let [shadow-map-size (:shadow-map-size @state/state)]
+  (let [shadow-map-size (:shadow-map-size @state/state)
+        pos ^Vector3f (:position d-light)
+        at ^Vector3f (:at @state/state)
+        dir (.normalize pos dir)
+        dist (float (- (:far ortho-camera)))
+        eye (doto eye
+              (.set at)
+              (.fma dist dir))]
     (view/rect passes/shadow 0 0 shadow-map-size shadow-map-size)
     (view/frame-buffer passes/shadow @@shadow-map-fb)
-    (update-ortho-view-projection (:id passes/shadow) ortho-camera
-                                  (.negate ^Vector3f (:position d-light) (Vector3f.))
-                                  (:at @state/state)))
-  (view/clear passes/shadow
-              (bit-or BGFX/BGFX_CLEAR_COLOR BGFX/BGFX_CLEAR_DEPTH BGFX/BGFX_CLEAR_STENCIL)
-              (:background-color @state/state))
-  (.mul ^Matrix4f @(:proj-mtx ortho-camera) ^Matrix4f (:view-mtx ortho-camera) ^Matrix4f shadow-mtx))
+    (update-ortho-view-projection (:id passes/shadow) ortho-camera eye at)
+    (view/clear passes/shadow
+                BGFX/BGFX_CLEAR_DEPTH
+                1.0)
+    (.mul ^Matrix4f @(:proj-mtx ortho-camera) ^Matrix4f (:view-mtx ortho-camera) shadow-mtx)))
